@@ -1,4 +1,4 @@
-import {AbstractComponent} from '../../components/abstract/AbstractComponent';
+import {AbstractComponent} from '../../component/AbstractComponent';
 import Application from '../../ctrl/Application';
 
 export default {

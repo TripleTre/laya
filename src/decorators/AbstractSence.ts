@@ -1,4 +1,4 @@
-import {World} from '../laya/index';
+import {World} from '../abstract/index';
 
 interface AbstractSenceConstructor {
     new (): AbstractSence;

@@ -2,7 +2,13 @@ import {Bind,
         Ref} from './decorators/directive/index';
 import Application from './ctrl/Application';
 import {data,
-        sence} from './decorators/index';
+        sence,
+        component} from './decorators/index';
+import {AbstractSence,
+        AbstractSenceConstructor} from './decorators/AbstractSence';
+import {AbstractComponent,
+        AbstractComponentConstructor} from './component/AbstractComponent';
+import * as LayaObjects from './abstract/index';
 
 let app = new Application();
 
@@ -13,5 +19,11 @@ export default app;
 
 export {
     data,
-    sence
+    sence,
+    component,
+    AbstractSence,
+    AbstractSenceConstructor,
+    AbstractComponent,
+    AbstractComponentConstructor,
+    LayaObjects
 };

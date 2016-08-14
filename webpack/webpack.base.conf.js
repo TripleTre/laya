@@ -1,5 +1,4 @@
 /* eslint-disable */
-var layaLoader = require('../src/layaPreLoad');
 var path = require('path')
 var config = require('../config')
 var utils = require('./utils')
@@ -31,10 +30,6 @@ module.exports = {
   },
   module: {
     preLoaders: [
-      {
-        test: /\LayaComponent.ts$/,
-        loader: "laya-loader"
-      },
       {
         test: /\.js$/,
         loader: 'eslint',

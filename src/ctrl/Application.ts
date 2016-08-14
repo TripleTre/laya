@@ -1,8 +1,8 @@
-import {AbstractComponent, AbstractComponentConstructor} from '../components/abstract/AbstractComponent';
+import {AbstractComponent, AbstractComponentConstructor} from '../component/AbstractComponent';
 import {AbstractSence, AbstractSenceConstructor} from '../decorators/AbstractSence';
 import {Container,
         DisplayObject,
-        Game} from '../laya/index';
+        Game} from '../abstract/index';
 import Directive from '../decorators/directive/type';
 import Dom from '../util/Dom';
 import Is from '../util/Is';
@@ -55,6 +55,7 @@ declare interface ComponentItem {
 class Application {
     private game:              Game;
     private sence:             Map<string, any>;
+    private curSence:          string;
     private components:        Map<string, AbstractComponentConstructor>;
     private directives:        Map<string, Directive>;
     private dependencies:      Map<string, Map<string, Array<Function>>>;
@@ -191,7 +192,7 @@ class Application {
      * @param viewModel 可选， 用于使用现有数据重新构建 component
      * @param ignore 可选， hmr 时更新的 component 不能用 vm 重建
      */
-    buildComponent(own: AbstractComponent, name: string, ele: ComponentItem, container: Container<DisplayObject>, viewModel: any = undefined, ignore: Array<string> = []): AbstractComponent {
+    buildComponent(own: AbstractComponent, name: string, ele: ComponentItem, container: Container<DisplayObject<any>>, viewModel: any = undefined, ignore: Array<string> = []): AbstractComponent {
         let tree  = this.componentTreeMap.get(name);
         let cons  = this.components.get(name);
         let self  = new cons();
@@ -226,7 +227,7 @@ class Application {
         return self;
     }
 
-    buildDisplayObject(name: string, obj: ComponentItem, own: AbstractComponent, container: Container<DisplayObject>, ownName: string): DisplayObject {
+    buildDisplayObject(name: string, obj: ComponentItem, own: AbstractComponent, container: Container<DisplayObject<any>>, ownName: string): DisplayObject<any> {
         let viewModel = this.getDataVm(ownName, own);
         let creator   = this.displayObjectCons.get(name);
         let diso      = new creator(this.game, obj.normals, obj.directives, viewModel, ownName);
@@ -278,6 +279,10 @@ class Application {
         this.componentDataMap.get(name).get(cpt)[prop] = value;
     }
 
+    getCurSence(): string {
+        return this.curSence;
+    }
+
     /**
      * 为组件注册添加属于 data 一类的属性
      * @cptName 组件名
@@ -293,11 +298,13 @@ class Application {
     boot (game: Game, state: string): void {
         let g = this.game = game;
         this.sence.forEach((value, key, map) => {g.registerSence(key, value); });
+        this.curSence = state;
         g.senceJump(state);
     }
 
     senceJump(state: string, clearWorld: boolean, clearCache: boolean): void {
         this.game.senceJump(state, clearWorld, clearCache);
+        this.curSence = state;
     }
 
     init(args: Array<AbstractComponentConstructor | AbstractSenceConstructor>): void {

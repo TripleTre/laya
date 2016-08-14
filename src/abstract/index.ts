@@ -7,7 +7,7 @@ export interface Container<T> {
 }
 
 export interface DisplayObject<T> {
-    getRealObject<T>(): T;
+    getRealObject(): T;
     destroy(): void;
 }
 
@@ -24,6 +24,4 @@ export interface State {
     update?(): void;
 }
 
-export interface World extends Container<DisplayObject<any>> {
-    
-}
+export interface World extends Container<DisplayObject<any>> {}

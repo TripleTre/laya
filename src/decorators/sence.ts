@@ -1,4 +1,4 @@
-import app from '../ctrl/ApplicationOut';
+import app from '../index';
 
 const DEFAULT = {
     template: `
@@ -12,7 +12,6 @@ declare interface SenceLike {
 }
 
 export default function (component: SenceLike = DEFAULT) {
-    console.log('sence', component);
     let template: string = component.template;
     let paser = new DOMParser();
     let tree = paser.parseFromString(template, 'text/xml');

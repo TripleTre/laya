@@ -1,12 +1,11 @@
-import {AbstractComponentConstructor} from '../components/abstract/AbstractComponent';
-import app from '../ctrl/ApplicationOut';
+import {AbstractComponentConstructor} from '../component/AbstractComponent';
+import app from '../index';
 
 declare interface ComponentLike {
     template: string;
 }
 
 export default function (component: ComponentLike) {
-    console.log('component');
     let template: string = component.template;
     let paser = new DOMParser();
     let tree = paser.parseFromString(template, 'text/xml');

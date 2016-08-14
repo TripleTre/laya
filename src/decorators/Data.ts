@@ -1,4 +1,4 @@
-import app from '../ctrl/ApplicationOut';
+import app from '../index';
 
 export default function(arg1: any, propertyName: string) {
     if (typeof arg1 === 'function') {

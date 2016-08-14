@@ -1,6 +1,6 @@
-import {AbstractComponent} from '../../components/abstract/AbstractComponent';
+import {AbstractComponent} from '../../component/AbstractComponent';
 import Application from '../../ctrl/Application';
-import {DisplayObject} from '../../laya/index';
+import {DisplayObject} from '../../abstract/index';
 
 declare interface Directive {
     name: string;
