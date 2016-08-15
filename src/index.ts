@@ -2,6 +2,7 @@ import {Bind,
         Ref} from './decorators/directive/index';
 import Application from './ctrl/Application';
 import {data,
+        prop,
         sence,
         component} from './decorators/index';
 import {AbstractSence,
@@ -18,6 +19,7 @@ app.setupDirective(Ref);
 export default app;
 
 export {
+    prop,
     data,
     sence,
     component,

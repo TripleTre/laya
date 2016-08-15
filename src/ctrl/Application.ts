@@ -7,6 +7,8 @@ import Directive from '../decorators/directive/type';
 import Dom from '../util/Dom';
 import Is from '../util/Is';
 import {parseDirective} from '../util/LayaParse';
+import {createStore, combineReducers} from 'redux';
+import * as Redux from 'redux/index.d.ts';
 
 declare var module;
 
@@ -53,6 +55,7 @@ declare interface ComponentItem {
  * @prop objectFactory 
  */
 class Application {
+    store:             Redux.Store<any>;
     private game:              Game;
     private sence:             Map<string, any>;
     private curSence:          string;
@@ -128,14 +131,14 @@ class Application {
             let name    = Object.keys(value)[0];
             let creator = this.components.get(name);
             if (Is.isAbsent(creator)) {
-                this.buildDisplayObject(name, value[name], <any>sence, this.game.getWorld(), senceName);
+                this.buildDisplayObject(<any>sence, senceName, name, value[name], this.game.getWorld());
             } else {
-                this.buildComponent(<any>sence, name, value[name], this.game.getWorld(), remainingVm, ignore);
+                this.buildComponent(<any>sence, senceName, name, value[name], this.game.getWorld(), remainingVm, ignore);
             }
         });
     }
 
-    initDependencies(cpt: string, item: ComponentItem) {
+    initDependencies(cpt: string, ...item: Array<ComponentItem>) {
         let map = new Map<string, Array<Function>>();
         let itemHandler = function handler(item, map) {
             item.directives.forEach(({value}) => {map.set(value, []); });
@@ -146,7 +149,7 @@ class Application {
                 });
             }
         };
-        itemHandler(item, map);
+        item.forEach(v => {itemHandler(v, map); });
         this.dependencies.set(cpt, map);
     }
 
@@ -186,54 +189,70 @@ class Application {
 
     /**
      * @param own 组件的上级， 可能是另一个组件或者是一个场景对象
+     * @param owenName 上层组件的名称
      * @param name 组件的名称，大小写敏感，其实就是组件类的类名
-     * @param ele DOM标签处理后的结果
+     * @param ele 以组件名为名的标签上的解析结果，比如： <spin attr="attr" />， attr 属性就在 ele.normals 里面
+     *            而组件的实现中标签的解析结果， 需从 componentTreeMap 中取出。
      * @param container 父级容器
      * @param viewModel 可选， 用于使用现有数据重新构建 component
      * @param ignore 可选， hmr 时更新的 component 不能用 vm 重建
      */
-    buildComponent(own: AbstractComponent, name: string, ele: ComponentItem, container: Container<DisplayObject<any>>, viewModel: any = undefined, ignore: Array<string> = []): AbstractComponent {
+    buildComponent(own: AbstractComponent, ownName: string, name: string, ele: ComponentItem, container: Container<DisplayObject<any>>, viewModel: any = undefined, ignore: Array<string> = []): AbstractComponent {
+        if (ele.normals.length + ele.directives.length !== this.cptDataPropGetter.get(name).prop.size) {
+            console.warn('组件 prop 属性，与父组件传入不符。 检查 @prop 标记， ' + name);
+        }
         let tree  = this.componentTreeMap.get(name);
         let cons  = this.components.get(name);
         let self  = new cons();
         let group = Object.keys(tree)[0];
         if (group !== 'Container') {
-            throw new Error('组件模板必须以Group为根元素');
+            console.error('组件模板必须以Group为根元素');
         }
 
-        this.initDependencies(name, tree[group]);
-
+        this.initDependencies(name, tree[group], ele);
         // 设置 component 的 viewModel，在此之后才能 buildDiplayObject
         let remainingVm = this.setComponentViewModel(name, self, viewModel, ignore);
-
-        let subContainer: any = this.buildDisplayObject(group, tree[group], self, container, name);
+        // 设置 component prop 属性的默认值
+        this.cptDataPropGetter.get(name).prop.forEach(v => {self[v] = own[v]; });
+        let subContainer: any = this.buildDisplayObject(self, name, group, tree[group], container);
         self.setRootContainer(subContainer);
         ele.normals.forEach(({name: attrName}) => { // 组件上的普通属性，直接赋值
             self[attrName] = this.getDataVm(name, self)[attrName];
         });
-        ele.directives.forEach(({name: attrName, value}) => { // 绑定指令
+        ele.directives.forEach(({name: attrName, value}) => { // 绑定组件标签上的指令
             let {name: directiveName, argument: directiveArg} = parseDirective(attrName);
-            this.getDirective(directiveName).bind(name, own, self, directiveArg, value, this);
+            /**
+             * <container bind-visible="visible">
+             *     <scroller l-bind-test="test"/>
+             *     <image key="loading" l-bind-x="x" l-bind-y="y"/>
+             * </container>
+             *  像这样组件包含另一个组件， ele.directives 是 <scroller> 上的指令， 这一部分指令是bind传入的应该是 ownName
+             */
+            this.getDirective(directiveName).bind(ownName, own, self, directiveArg, value, this);
         });
         ele.children.forEach((value, index, array) => {
-            let name = Object.keys(value)[0];
+            let childName = Object.keys(value)[0];
             let cons = this.components.get(name);
             if (Is.isAbsent(cons)) {
-                this.buildDisplayObject(name, value[name], self, subContainer, name);
+                this.buildDisplayObject(self, name, childName, value[childName], subContainer);
             } else {
-                this.buildComponent(self, name, value[name], subContainer, remainingVm, ignore);
+                this.buildComponent(self, name, childName, value[childName], subContainer, remainingVm, ignore);
             }
         });
         return self;
     }
 
-    buildDisplayObject(name: string, obj: ComponentItem, own: AbstractComponent, container: Container<DisplayObject<any>>, ownName: string): DisplayObject<any> {
+    /**
+     * @param own 拥有 DisplayObject 的上层组件
+     * @param ownName 上层组件名称
+     * @param name DisplayObject 名称
+     * @param obj 当前 displayObject 标签解析结果
+     * @param container 在引擎层面包含 displayObject 的容器
+     */
+    buildDisplayObject(own: AbstractComponent, ownName: string, name: string, obj: ComponentItem, container: Container<DisplayObject<any>>): DisplayObject<any> {
         let viewModel = this.getDataVm(ownName, own);
         let creator   = this.displayObjectCons.get(name);
         let diso      = new creator(this.game, obj.normals, obj.directives, viewModel, ownName);
-        // obj.normals.forEach(({name, value}) => {
-        //     diso[name] = value;
-        // });
         obj.directives.forEach(({name: attrName, value}) => {
             let {name: directiveName, argument: directiveArg} = parseDirective(attrName);
             this.getDirective(directiveName).bind(ownName, own, diso, directiveArg, value, this);
@@ -241,7 +260,12 @@ class Application {
         if (name === 'Container') {
             obj.children.forEach(v => {
                 let name = Object.keys(v)[0];
-                this.buildDisplayObject(name, v[name], own, diso, ownName);
+                let cons = this.components.get(name);
+                if (Is.isAbsent(cons)) {
+                    this.buildDisplayObject(own, ownName, name, v[name], diso);
+                } else {
+                    this.buildComponent(own, ownName, name, v[name], diso);
+                }
             });
         }
         container.add(diso);
@@ -287,12 +311,13 @@ class Application {
      * 为组件注册添加属于 data 一类的属性
      * @cptName 组件名
      * @proName 属性名
+     * @type 类型  data prop 或 getter
      */
-    addDataPropertyForComponent(cptName: string, proName: string): void {
+    addDataPropertyForComponent(cptName: string, proName: string, type: string): void {
         if (Is.isAbsent(this.cptDataPropGetter.get(cptName))) {
             this.cptDataPropGetter.set(cptName, {data: new Set<string>(), prop: new Set<string>(), getter: new Set<string>()});
         }
-        this.cptDataPropGetter.get(cptName).data.add(proName);
+        this.cptDataPropGetter.get(cptName)[type].add(proName);
     }
 
     boot (game: Game, state: string): void {
@@ -317,11 +342,16 @@ class Application {
         }
     }
 
+    initRedux(reducers: Redux.ReducersMapObject) {
+        let all = combineReducers(reducers);
+        this.store = createStore(all, undefined,
+          window['devToolsExtension'] && window['devToolsExtension']());
+    }
+
     /**
      * 将 name 所指定的组件注册的信息全部清除
      */
     clearCptAllData(name: string) {
-        console.log('clear ', name);
         this.components.delete(name);
         this.dependencies.delete(name);
         this.componentTreeMap.delete(name);

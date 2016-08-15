@@ -5,5 +5,5 @@ export default function(arg1: any, propertyName: string) {
         console.error('@data 不应该修饰静态变量。 ---> ' + arg1);
     }
     let cptName = arg1.constructor.name;
-    app.addDataPropertyForComponent(cptName, propertyName, 'data');
+    app.addDataPropertyForComponent(cptName, propertyName, 'prop');
 }

@@ -2,9 +2,9 @@ import Is from './Is';
 
 function mergeNormalsAndDirectives(normals: Array<Attr>, directives: Array<Attr>, vm: any) {
     let ret = Object.create(null);
-    directives.forEach(({name}) => {
+    directives.forEach(({name, value}) => {
         let {argument: da} = parseDirective(name);
-        ret[da] = vm[da];
+        ret[da] = vm[value];
     });
     normals.forEach(({name, value}) => {
         let pValue;
