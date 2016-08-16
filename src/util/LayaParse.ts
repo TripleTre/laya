@@ -1,38 +1,48 @@
 import Is from './Is';
+declare var process;
 
-function typeOfAttrValue(attrValue, vm) {
-    var s     = '';
-    var rep   = attrValue;
-    var words =  attrValue.match(/.([a-zA-Z]+)./g);
-    words.filter(v => !/^'\w+'$/.test(v))
-         .forEach((v, index) => {
-             var vmJson = JSON.stringify(vm);
-             s += ` var v${index} = JSON.parse('${vmJson}')[${v}]; \n`
-             s += `console.log(v${index}); \n`
-             rep = rep.replace(v, 'v'+index);
-         });
-         s += attrValue;
-    console.log(s);
-    return (0, eval)(s);
+var unSupportReg = /\{|\}/g;
+
+// 'abc'+88* ppp ==={xxx: 'yyy'} ? true : false
+function expressionVars(expression: string): Array<string> {
+    if (unSupportReg.test(expression)) {
+        console.error('暂不支持对象字面量');
+        return [];
+    }
+    let ms: Array<string> = expression.match(/.?([a-zA-Z_$]+).?/g);
+    if (Is.isAbsent(ms)) {
+        return [];
+    } else {
+        return ms.filter(v => !/(^'\w+'$)|false|true/.test(v))
+                 .map(v => v.match(/[a-zA-Z]+/)[0]);
+    }
 }
 
-function mergeNormalsAndDirectives(normals: Array<Attr>, directives: Array<Attr>, vm: any) {
+function expToFunction(exp: string): Function {
+    expressionVars(exp).forEach(v => {
+        exp = exp.replace(v, 'vm.' + v);
+    });
+    try {
+        return new Function('vm', 'return ' + exp);
+    } catch (e) {
+        if (process.env.NODE_ENV === 'development') {
+            throw e;
+        } else {
+            return function(){}; // tslint:disable-line
+        }
+    }
+}
+
+function mergeNormalsAndDirectives(normals: Array<Attr>, directives: Array<Attr>, vm: any): any {
     let ret = Object.create(null);
     directives.forEach(({name, value}) => {
+        let calc = expToFunction(value);
         let {argument: da} = parseDirective(name);
-        ret[da] = vm[value];
+        ret[da] = calc(vm);
     });
     normals.forEach(({name, value}) => {
-        let pValue;
-        let pName = name.replace(/\-([a-z])/g, (a: string, b: string) => b.toUpperCase());
-        if (/\'\w+\'/.test(value)) { // 字符串
-            pValue = value.replace(/\'/g, '');
-        } else if (Is.isNumber(parseFloat(value))) { // 数值
-            pValue = parseFloat(value);
-        } else {
-            pValue = vm[value];
-        }
-        ret[pName] = pValue;
+        let calc = expToFunction(value);
+        ret[name] = calc(vm);
     });
     return ret;
 }
@@ -40,17 +50,15 @@ function mergeNormalsAndDirectives(normals: Array<Attr>, directives: Array<Attr>
 function parseDirective(name: string): {name: string, argument: string} {
     let dn;
     let da;
-    if (/^l-[a-z]+$/.test(name)) {
-        dn = name.match(/l-([a-z]+)/)[1];
-        da = undefined;
-    } else if (/^l-[a-z]+-[a-z]+$/.test(name)) {
-        dn = name.match(/l-([a-z]+)-([a-z\-]+)/)[1];
-        da = name.match(/l-([a-z]+)-([a-z\-]+)/)[2]
-                 .replace(/\-([a-z])/g, (a: string, b: string) => {
-                     return b.toUpperCase();
-                 });
-    } else {
-        return undefined;
+    try {
+        dn = name.match(/^l-([a-z]+)/)[1];
+        da = name.replace(/^l-[a-z]+/, '')
+                    .replace('-', '')
+                    .replace(/\-([a-z])/g, (a: string, b: string) => {
+                        return b.toUpperCase();
+                    });
+    } catch (e) {
+        console.error('指令格式有誤: ', name);
     }
     return {name: dn, argument: da};
 }
@@ -62,4 +70,9 @@ function parseDirective(name: string): {name: string, argument: string} {
 //
 // }
 
-export {mergeNormalsAndDirectives, parseDirective};
+export {
+    mergeNormalsAndDirectives,
+    parseDirective,
+    expressionVars,
+    expToFunction
+};

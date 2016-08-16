@@ -6,7 +6,7 @@ import {Container,
 import {Directive} from '../decorators/directive';
 import Dom from '../util/Dom';
 import Is from '../util/Is';
-import {parseDirective} from '../util/LayaParse';
+import {parseDirective, expressionVars, expToFunction} from '../util/LayaParse'; // tslint:disable-line
 import {createStore, combineReducers} from 'redux';
 import * as Redux from 'redux/index.d.ts';
 
@@ -225,6 +225,7 @@ class Application {
         // 设置 component 的 viewModel，在此之后才能 buildDiplayObject
         let remainingVm = this.setComponentViewModel(name, self, viewModel, ignore);
         // 设置 component prop 属性的默认值
+        debugger;
         ele.normals.concat(ele.directives).forEach(({name: attrName, value: attrVal}) => {
             let argument = parseDirective(attrName);
             if (Is.isAbsent(argument)) {

@@ -11,6 +11,7 @@ import {AbstractSence,
 import {AbstractComponent,
         AbstractComponentConstructor} from './component/AbstractComponent';
 import * as LayaObjects from './abstract/index';
+import {mergeNormalsAndDirectives} from './util/LayaParse';
 
 app.setupDirective(Bind);
 app.setupDirective(Ref);
@@ -27,5 +28,6 @@ export {
     AbstractSenceConstructor,
     AbstractComponent,
     AbstractComponentConstructor,
-    LayaObjects
+    LayaObjects,
+    mergeNormalsAndDirectives
 };

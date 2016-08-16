@@ -1,5 +1,7 @@
 import * as Redux from 'redux/index.d.ts';
 
+export function mergeNormalsAndDirectives(normals: Array<Attr>, directives: Array<Attr>, vm: any): any; 
+
 interface ComponentLike {
     template: string;
 }
