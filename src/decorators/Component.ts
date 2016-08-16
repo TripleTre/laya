@@ -1,7 +1,7 @@
 import {AbstractComponentConstructor} from '../component/AbstractComponent';
 import app from '../index';
 
-declare interface ComponentLike {
+export interface ComponentLike {
     template: string;
 }
 

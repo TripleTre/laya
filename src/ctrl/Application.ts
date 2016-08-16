@@ -3,7 +3,7 @@ import {AbstractSence, AbstractSenceConstructor} from '../decorators/AbstractSen
 import {Container,
         DisplayObject,
         Game} from '../abstract/index';
-import Directive from '../decorators/directive/type';
+import {Directive} from '../decorators/directive';
 import Dom from '../util/Dom';
 import Is from '../util/Is';
 import {parseDirective} from '../util/LayaParse';
@@ -45,7 +45,7 @@ declare interface DataGetter {
     getter: Array<string>;
 }
 
-declare interface ComponentItem {
+export interface ComponentItem {
     normals:          Array<Attr>;
     children:         Array<ComponentItem>;
     directives:       Array<Attr>;

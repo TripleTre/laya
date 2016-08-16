@@ -7,7 +7,7 @@ const DEFAULT = {
     `
 };
 
-declare interface SenceLike {
+export interface SenceLike {
     template: string;
 }
 

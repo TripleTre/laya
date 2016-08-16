@@ -6,11 +6,11 @@ import {Container,
  * AbstractComponent 指定了Component 实例的规范
  * 所有 Component 必须继承自 AbstractComponent 接口
  */
-interface AbstractComponentConstructor {
+export interface AbstractComponentConstructor {
     new (): AbstractComponent;
 }
 
-abstract class AbstractComponent {
+export abstract class AbstractComponent {
     private rootContainer: Container<DisplayObject<any>>;
     refs: Map<string, any> = new Map<string, any>(); // tslint:disable-line
 
@@ -22,5 +22,3 @@ abstract class AbstractComponent {
         this.rootContainer = value;
     }
 }
-
-export {AbstractComponentConstructor, AbstractComponent};
