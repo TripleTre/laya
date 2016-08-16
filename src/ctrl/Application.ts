@@ -64,7 +64,7 @@ class Application {
     private dependencies:      Map<string, Map<string, Array<Function>>>;
     private senceTreeMap:      Map<string, ComponentItem>;
     private componentTreeMap:  Map<string, ComponentItem>;
-    private componentDataMap:  Map<string, Map<AbstractComponent, any>>;
+    private componentDataMap:  Map<string, Map<number, any>>;
     private displayObjectCons: Map<string, any>;
     private cptDataPropGetter: Map<string, DataPropGetter>;
 
@@ -75,7 +75,7 @@ class Application {
         this.dependencies      = new Map<string, Map<string, Array<Function>>>();
         this.senceTreeMap      = new Map<string, ComponentItem>();
         this.componentTreeMap  = new Map<string, ComponentItem>();
-        this.componentDataMap  = new Map<string, Map<AbstractComponent, any>>();
+        this.componentDataMap  = new Map<string, Map<number, any>>();
         this.displayObjectCons = new Map<string, any>();
         this.cptDataPropGetter = new Map<string, DataPropGetter>();
     }
@@ -89,7 +89,7 @@ class Application {
         let phaserTree: ComponentItem = createPhaserTree(<Element>tree.firstChild);
         this.componentTreeMap.set(name, phaserTree);
         this.components.set(name, creator);
-        this.componentDataMap.set(name, new Map<AbstractComponent, any>());
+        this.componentDataMap.set(name, new Map<number, any>());
     }
 
     registerSence(creator: AbstractSenceConstructor, tree: Document) {
@@ -109,7 +109,7 @@ class Application {
             preload.apply(ret);
         };
         this.sence.set(name, ret);
-        let map = new Map<AbstractComponent, any>();
+        let map = new Map<number, any>();
         map.set(<any>ret, Object.create(null));
         this.componentDataMap.set(name, map);
         this.initDependencies(name, phaserTree['Sence']);
@@ -161,25 +161,37 @@ class Application {
             if (Is.isAbsent(oneOf)) {
                 console.error('viewModel 数据缺失!', name);
             }
-            this.componentDataMap.get(name).set(cpt, namedMap.get(next.value));
+            this.componentDataMap.get(name).set(cpt.getId(), namedMap.get(next.value));
             namedMap.delete(next.value);
         } else {
             let all  = this.cptDataPropGetter.get(name);
             let that = this;
-            this.componentDataMap.get(name).set(cpt, Object.create(null));
+            this.componentDataMap.get(name).set(cpt.getId(), Object.create(null));
             if (Is.isPresent(all)) {
                 for (let key in all) {
                     all[key].forEach((property, index, array) => {
                         that.setDataVm(name, cpt, property, cpt[property]); // 设置 viewModel 的默认值
-                        Object.defineProperty(cpt, property, {
-                            get () {
-                                return that.getDataVm(name, cpt)[property];
-                            },
-                            set (value) {
-                                that.setDataVm(name, cpt, property, value);
-                                that.getDependencies(name, property).forEach(v => v.apply(null, [cpt, value]));
-                            }
-                        });
+                        if (key === 'data') {
+                            Object.defineProperty(cpt, property, {
+                                get () {
+                                    return that.getDataVm(name, cpt)[property];
+                                },
+                                set (value) {
+                                    that.setDataVm(name, cpt, property, value);
+                                    that.getDependencies(name, property).forEach(v => v.apply(null, [cpt, value]));
+                                }
+                            });
+                        } else {
+                            Object.defineProperty(cpt, property, {
+                                get () {
+                                    return that.getDataVm(name, cpt)[property];
+                                },
+                                set (value) {
+                                    debugger;
+                                    console.warn('getter 和 prop 属性不能赋值。');
+                                }
+                            });
+                        }
                     });
                 }
             }
@@ -213,12 +225,20 @@ class Application {
         // 设置 component 的 viewModel，在此之后才能 buildDiplayObject
         let remainingVm = this.setComponentViewModel(name, self, viewModel, ignore);
         // 设置 component prop 属性的默认值
-        this.cptDataPropGetter.get(name).prop.forEach(v => {self[v] = own[v]; });
+        ele.normals.concat(ele.directives).forEach(({name: attrName, value: attrVal}) => {
+            let argument = parseDirective(attrName);
+            if (Is.isAbsent(argument)) {
+                this.componentDataMap.get(name).get(self.getId())[attrName] = own[attrVal];
+            } else {
+                this.componentDataMap.get(name).get(self.getId())[argument.argument] = own[attrVal];
+            }
+        });
         let subContainer: any = this.buildDisplayObject(self, name, group, tree[group], container);
         self.setRootContainer(subContainer);
-        ele.normals.forEach(({name: attrName}) => { // 组件上的普通属性，直接赋值
-            self[attrName] = this.getDataVm(name, self)[attrName];
-        });
+        // todo delete
+        // ele.normals.forEach(({name: attrName}) => { // 组件上的普通属性，直接赋值
+        //     self[attrName] = this.getDataVm(name, self)[attrName];
+        // });
         ele.directives.forEach(({name: attrName, value}) => { // 绑定组件标签上的指令
             let {name: directiveName, argument: directiveArg} = parseDirective(attrName);
             /**
@@ -296,11 +316,11 @@ class Application {
      *  返回相应 component 的所有响应属性，包括 data prop getter
      */
     getDataVm(name: string, cpt: AbstractComponent): any {
-        return this.componentDataMap.get(name).get(cpt);
+        return this.componentDataMap.get(name).get(cpt.getId());
     }
 
     setDataVm(name: string, cpt: AbstractComponent, prop: string, value: any): void {
-        this.componentDataMap.get(name).get(cpt)[prop] = value;
+        this.componentDataMap.get(name).get(cpt.getId())[prop] = value;
     }
 
     getCurSence(): string {
@@ -343,6 +363,7 @@ class Application {
     }
 
     initRedux(reducers: Redux.ReducersMapObject) {
+        debugger;
         let all = combineReducers(reducers);
         this.store = createStore(all, undefined,
           window['devToolsExtension'] && window['devToolsExtension']());
@@ -366,3 +387,4 @@ class Application {
 }
 
 export default Application;
+export var app = new Application();

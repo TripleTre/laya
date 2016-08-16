@@ -8,7 +8,7 @@
     "webpack"
   ],
   "author": "huaguzheng",
-  "main": "src/index.js",
+  "main": "src/index.ts",
   "scripts": {
     "dev": "node webpack/dev-server.js",
     "build": "node webpack/build.js",

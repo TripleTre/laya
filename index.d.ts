@@ -8,6 +8,8 @@ export function component(component: ComponentLike): (targetConstructor: Abstrac
 
 export function prop(arg1: any, propertyName: string): void;
 
+export function getter(arg1: any, propertyName: string): void;
+
 export function data(arg1: any, propertyName: string): void;
 
 interface SenceLike {
@@ -35,6 +37,7 @@ export interface AbstractSenceConstructor {
 }
 
 export interface AbstractSence {
+    getId(): number;
     getWorld(): World;
     preload(): void;
     destroy?(): void; // todo 暂时问号
