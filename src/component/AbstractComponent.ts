@@ -11,14 +11,9 @@ export interface AbstractComponentConstructor {
 }
 
 export abstract class AbstractComponent {
-    static count: number = 0;
     private id: number;
     private rootContainer: Container<DisplayObject<any>>;
     refs: Map<string, any> = new Map<string, any>(); // tslint:disable-line
-
-    constructor() {
-        this.id = AbstractComponent.count++;
-    }
 
     destroy() {
         this.rootContainer.destroy();
@@ -30,5 +25,9 @@ export abstract class AbstractComponent {
 
     getId() {
         return this.id;
+    }
+
+    setId(id: number) {
+        this.id = id;
     }
 }

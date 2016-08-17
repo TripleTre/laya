@@ -51,13 +51,15 @@ export interface ComponentItem {
     directives:       Array<Attr>;
 }
 
+let count = 0;
+
 /**
  * @prop objectFactory 
  */
 class Application {
-    store:             Redux.Store<any>;
+    store:                     Redux.Store<any>;
     private game:              Game;
-    private sence:             Map<string, any>;
+    private sence:             Map<string, AbstractSence>;
     private curSence:          string;
     private components:        Map<string, AbstractComponentConstructor>;
     private directives:        Map<string, Directive>;
@@ -67,9 +69,11 @@ class Application {
     private componentDataMap:  Map<string, Map<number, any>>;
     private displayObjectCons: Map<string, any>;
     private cptDataPropGetter: Map<string, DataPropGetter>;
+    private componentMap:      Map<number, AbstractComponent>;
+    private senceCptMap:       Map<string, Array<number>>;
 
     constructor() {
-        this.sence             = new Map<string, any>();
+        this.sence             = new Map<string, AbstractSence>();
         this.components        = new Map<string, AbstractComponentConstructor>();
         this.directives        = new Map<string, Directive>();
         this.dependencies      = new Map<string, Map<string, Array<Function>>>();
@@ -78,6 +82,8 @@ class Application {
         this.componentDataMap  = new Map<string, Map<number, any>>();
         this.displayObjectCons = new Map<string, any>();
         this.cptDataPropGetter = new Map<string, DataPropGetter>();
+        this.componentMap      = new Map<number, AbstractComponent>();
+        this.senceCptMap       = new Map<string, Array<number>>();
     }
 
     registerComponent(creator: AbstractComponentConstructor, tree: Document): void {
@@ -108,11 +114,13 @@ class Application {
             hook.apply(null, [name, ret]);
             preload.apply(ret);
         };
+        ret.setId(count++);
         this.sence.set(name, ret);
         let map = new Map<number, any>();
         map.set(<any>ret, Object.create(null));
         this.componentDataMap.set(name, map);
         this.initDependencies(name, phaserTree['Sence']);
+        this.senceCptMap.set(name, []);
     }
 
     /**
@@ -122,6 +130,7 @@ class Application {
         let senceTree = this.senceTreeMap.get(senceName);
         let keys      = Object.keys(senceTree);
         let obj       = senceTree[keys[0]];
+
         this.game.setWorld(sence.getWorld());
         if (keys.length > 1 || keys[0] !== 'Sence') {
             console.error('sence的模板必须包含在单个 <sence></sence> 标签中。 --->', name);
@@ -131,27 +140,38 @@ class Application {
             let name    = Object.keys(value)[0];
             let creator = this.components.get(name);
             if (Is.isAbsent(creator)) {
-                this.buildDisplayObject(<any>sence, senceName, name, value[name], this.game.getWorld());
+                this.buildDisplayObject(senceName, <any>sence, senceName, name, value[name], this.game.getWorld());
             } else {
-                this.buildComponent(<any>sence, senceName, name, value[name], this.game.getWorld(), remainingVm, ignore);
+                this.buildComponent(senceName, <any>sence, senceName, name, value[name], this.game.getWorld(), remainingVm, ignore);
             }
         });
     }
 
     initDependencies(cpt: string, ...item: Array<ComponentItem>) {
         let map = new Map<string, Array<Function>>();
-        let itemHandler = function handler(item, map) {
-            item.directives.forEach(({value}) => {map.set(value, []); });
-            if (item.children.length > 0) {
-                item.children.forEach((v) => {
-                    let key = Object.keys(v)[0];
-                    handler(v[key], map);
-                });
-            }
-        };
-        item.forEach(v => {itemHandler(v, map); });
+        let dpg = this.cptDataPropGetter.get(cpt);
+        for (let attr in dpg) {
+            dpg[attr].forEach(v => {
+                map.set(v, []);
+            });
+        }
         this.dependencies.set(cpt, map);
     }
+
+    // initDependencies(cpt: string, ...item: Array<ComponentItem>) {
+    //     let map = new Map<string, Array<Function>>();
+    //     let itemHandler = function handler(item, map) {
+    //         item.directives.forEach(({value}) => {map.set(value, []); });
+    //         if (item.children.length > 0) {
+    //             item.children.forEach((v) => {
+    //                 let key = Object.keys(v)[0];
+    //                 handler(v[key], map);
+    //             });
+    //         }
+    //     };
+    //     item.forEach(v => {itemHandler(v, map); });
+    //     this.dependencies.set(cpt, map);
+    // }
 
     setComponentViewModel(name: string, cpt: AbstractComponent, vm: any = undefined, ignore: Array<string> = []) {
         if (Is.isPresent(vm) && ignore.indexOf(name) < 0) {
@@ -187,7 +207,6 @@ class Application {
                                     return that.getDataVm(name, cpt)[property];
                                 },
                                 set (value) {
-                                    debugger;
                                     console.warn('getter 和 prop 属性不能赋值。');
                                 }
                             });
@@ -200,6 +219,7 @@ class Application {
     }
 
     /**
+     * @param sence 场景
      * @param own 组件的上级， 可能是另一个组件或者是一个场景对象
      * @param owenName 上层组件的名称
      * @param name 组件的名称，大小写敏感，其实就是组件类的类名
@@ -209,7 +229,7 @@ class Application {
      * @param viewModel 可选， 用于使用现有数据重新构建 component
      * @param ignore 可选， hmr 时更新的 component 不能用 vm 重建
      */
-    buildComponent(own: AbstractComponent, ownName: string, name: string, ele: ComponentItem, container: Container<DisplayObject<any>>, viewModel: any = undefined, ignore: Array<string> = []): AbstractComponent {
+    buildComponent(senceName: string, own: AbstractComponent, ownName: string, name: string, ele: ComponentItem, container: Container<DisplayObject<any>>, viewModel: any = undefined, ignore: Array<string> = []): AbstractComponent {
         if (ele.normals.length + ele.directives.length !== this.cptDataPropGetter.get(name).prop.size) {
             console.warn('组件 prop 属性，与父组件传入不符。 检查 @prop 标记， ' + name);
         }
@@ -220,12 +240,13 @@ class Application {
         if (group !== 'Container') {
             console.error('组件模板必须以Group为根元素');
         }
-
+        self.setId(count++);
+        this.senceCptMap.get(senceName).push(self.getId());
+        this.componentMap.set(self.getId(), self);
         this.initDependencies(name, tree[group], ele);
         // 设置 component 的 viewModel，在此之后才能 buildDiplayObject
         let remainingVm = this.setComponentViewModel(name, self, viewModel, ignore);
         // 设置 component prop 属性的默认值
-        debugger;
         ele.normals.concat(ele.directives).forEach(({name: attrName, value: attrVal}) => {
             let argument = parseDirective(attrName);
             if (Is.isAbsent(argument)) {
@@ -234,7 +255,7 @@ class Application {
                 this.componentDataMap.get(name).get(self.getId())[argument.argument] = own[attrVal];
             }
         });
-        let subContainer: any = this.buildDisplayObject(self, name, group, tree[group], container);
+        let subContainer: any = this.buildDisplayObject(senceName, self, name, group, tree[group], container);
         self.setRootContainer(subContainer);
         // todo delete
         // ele.normals.forEach(({name: attrName}) => { // 组件上的普通属性，直接赋值
@@ -255,22 +276,23 @@ class Application {
             let childName = Object.keys(value)[0];
             let cons = this.components.get(name);
             if (Is.isAbsent(cons)) {
-                this.buildDisplayObject(self, name, childName, value[childName], subContainer);
+                this.buildDisplayObject(senceName, self, name, childName, value[childName], subContainer);
             } else {
-                this.buildComponent(self, name, childName, value[childName], subContainer, remainingVm, ignore);
+                this.buildComponent(senceName, self, name, childName, value[childName], subContainer, remainingVm, ignore);
             }
         });
         return self;
     }
 
     /**
+     * @param senceName 场景
      * @param own 拥有 DisplayObject 的上层组件
      * @param ownName 上层组件名称
      * @param name DisplayObject 名称
      * @param obj 当前 displayObject 标签解析结果
      * @param container 在引擎层面包含 displayObject 的容器
      */
-    buildDisplayObject(own: AbstractComponent, ownName: string, name: string, obj: ComponentItem, container: Container<DisplayObject<any>>): DisplayObject<any> {
+    buildDisplayObject(senceName: string, own: AbstractComponent, ownName: string, name: string, obj: ComponentItem, container: Container<DisplayObject<any>>): DisplayObject<any> {
         let viewModel = this.getDataVm(ownName, own);
         let creator   = this.displayObjectCons.get(name);
         let diso      = new creator(this.game, obj.normals, obj.directives, viewModel, ownName);
@@ -283,9 +305,9 @@ class Application {
                 let name = Object.keys(v)[0];
                 let cons = this.components.get(name);
                 if (Is.isAbsent(cons)) {
-                    this.buildDisplayObject(own, ownName, name, v[name], diso);
+                    this.buildDisplayObject(senceName, own, ownName, name, v[name], diso);
                 } else {
-                    this.buildComponent(own, ownName, name, v[name], diso);
+                    this.buildComponent(senceName, own, ownName, name, v[name], diso);
                 }
             });
         }
@@ -364,7 +386,6 @@ class Application {
     }
 
     initRedux(reducers: Redux.ReducersMapObject) {
-        debugger;
         let all = combineReducers(reducers);
         this.store = createStore(all, undefined,
           window['devToolsExtension'] && window['devToolsExtension']());
@@ -378,12 +399,22 @@ class Application {
         this.dependencies.delete(name);
         this.componentTreeMap.delete(name);
         this.cptDataPropGetter.delete(name);
-        let keys = this.componentDataMap.get(name).keys();
-        let next;
-        while (next = keys.next(), !next.done) {
-            next.value.destroy();
-        }
+        // let keys = this.componentDataMap.get(name).keys();
+        // let next;
+        // while (next = keys.next(), !next.done) {
+        //     this.componentMap.get(next.value).destroy();
+        //     this.componentMap.delete(next.value);
+        // }
         this.componentDataMap.delete(name);
+    }
+
+    destoryCptForSence(name: string): void {
+        console.log('destoryCptForSence');
+        this.senceCptMap.get(name).forEach(v => {
+            this.componentMap.get(v).destroy();
+            this.componentMap.delete(v);
+        });
+        this.senceCptMap.set(name, []);
     }
 }
 
