@@ -10,7 +10,7 @@ export function component(component: ComponentLike): (targetConstructor: Abstrac
 
 export function prop(arg1: any, propertyName: string): void;
 
-export function getter(arg1: any, propertyName: string): void;
+export function getter(exp: Function, force?: boolean): (arg1: any, propertyName: string) => void;
 
 export function data(arg1: any, propertyName: string): void;
 
@@ -39,8 +39,6 @@ export interface AbstractSenceConstructor {
 }
 
 export interface AbstractSence {
-    getId(): number;
-    setId(id: number): void;
     getWorld(): World;
     preload(): void;
     destroy?(): void; // todo 暂时问号
@@ -108,24 +106,27 @@ export interface AbstractComponentConstructor {
     new (): AbstractComponent;
 }
 export declare abstract class AbstractComponent {
-    private id;
-    private rootContainer;
+    private getterMap: Map<Function, string>;
+    private id: number;
+    private rootContainer: Container<DisplayObject<any>>;
     refs: Map<string, any>;
     destroy(): void;
     getId(): number;
     setId(id: number): void;
     setRootContainer(value: Container<DisplayObject<any>>): void;
+    addGetterMap(getter: Function, attribute: string): void;
 }
 
 declare interface DataPropGetter {
     data:   Set<string>;
     prop:   Set<string>;
-    getter: Set<string>;
+    getter: Set<Getter>;
 }
 
-declare interface DataGetter {
-    data:   Array<string>;
-    getter: Array<string>;
+declare interface Getter {
+    getter: Function,
+    name:   string,
+    force:  boolean
 }
 
 export interface ComponentItem {
@@ -148,6 +149,7 @@ declare class Application {
     private displayObjectCons;
     private cptDataPropGetter;
     private componentMap: Map<number, AbstractComponent>;
+    private cptNameToIdMap: Map<string, Array<number>>;
     constructor();
     registerComponent(creator: AbstractComponentConstructor, tree: Document): void;
     registerSence(creator: AbstractSenceConstructor, tree: Document): void;
@@ -196,16 +198,19 @@ declare class Application {
      * @type 类型  data prop 或 getter
      */
     addDataPropertyForComponent(cptName: string, proName: string, type: string): void;
+    addGetterPropertyForComponent(cptName: string, proName: string, type: string): void;
     boot(game: Game, state: string): void;
     senceJump(state: string, clearWorld: boolean, clearCache: boolean): void;
     init(args: Array<AbstractComponentConstructor | AbstractSenceConstructor>): void;
     setupDisplayObject(creates: any): void;
-    initRedux(reducers: Redux.ReducersMapObject): void;
+    initRedux(reducers: Redux.ReducersMapObject, defaultValue: any): void;
     /**
      * 将 name 所指定的组件注册的信息全部清除
      */
     clearCptAllData(name: string): void;
     destoryCptForSence(name: string): void;
+    activePropOrGetter(cptName: string, cpt: AbstractComponent, property: string, value: any): void;
+    getComponent(id: number): AbstractComponent;
 }
 
 declare var app: Application;

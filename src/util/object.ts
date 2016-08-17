@@ -18,5 +18,9 @@ export default {
             Object.defineProperty(ret, v, {});
         });
         return ret;
+    },
+
+    getValueByPath(obj: any, path: string): any {
+        let nodes = path.split('.');
     }
 };

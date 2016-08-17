@@ -11,6 +11,7 @@ export interface AbstractComponentConstructor {
 }
 
 export abstract class AbstractComponent {
+    private getterMap: Map<Function, string> = new Map<Function, string>();
     private id: number;
     private rootContainer: Container<DisplayObject<any>>;
     refs: Map<string, any> = new Map<string, any>(); // tslint:disable-line
@@ -29,5 +30,13 @@ export abstract class AbstractComponent {
 
     setId(id: number) {
         this.id = id;
+    }
+
+    addGetterMap(getter: Function, attribute: string): void {
+        this.getterMap.set(getter, attribute);
+    }
+
+    getterAttribute(getter: Function): string {
+        return this.getterMap.get(getter);
     }
 }

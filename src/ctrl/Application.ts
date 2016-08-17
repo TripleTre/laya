@@ -9,6 +9,7 @@ import Is from '../util/Is';
 import {parseDirective, expressionVars, expToFunction} from '../util/LayaParse'; // tslint:disable-line
 import {createStore, combineReducers} from 'redux';
 import * as Redux from 'redux/index.d.ts';
+import StateManager from './StateManager';
 
 declare var module;
 
@@ -37,12 +38,13 @@ function createPhaserTree(domTree: Element): ComponentItem {
 declare interface DataPropGetter {
     data:   Set<string>;
     prop:   Set<string>;
-    getter: Set<string>;
+    getter: Set<Getter>;
 }
 
-declare interface DataGetter {
-    data:   Array<string>;
-    getter: Array<string>;
+declare interface Getter {
+    getter: Function,
+    name:   string,
+    force:  boolean
 }
 
 export interface ComponentItem {
@@ -63,7 +65,8 @@ class Application {
     private curSence:          string;
     private components:        Map<string, AbstractComponentConstructor>;
     private directives:        Map<string, Directive>;
-    private dependencies:      Map<string, Map<string, Array<Function>>>;
+    private defaultValue:      any;
+    private dependencies:      Map<number, Map<string, Array<Function>>>;
     private senceTreeMap:      Map<string, ComponentItem>;
     private componentTreeMap:  Map<string, ComponentItem>;
     private componentDataMap:  Map<string, Map<number, any>>;
@@ -71,12 +74,13 @@ class Application {
     private cptDataPropGetter: Map<string, DataPropGetter>;
     private componentMap:      Map<number, AbstractComponent>;
     private senceCptMap:       Map<string, Array<number>>;
+    private cptNameToIdMap:    Map<string, Array<number>>;
 
     constructor() {
         this.sence             = new Map<string, AbstractSence>();
         this.components        = new Map<string, AbstractComponentConstructor>();
         this.directives        = new Map<string, Directive>();
-        this.dependencies      = new Map<string, Map<string, Array<Function>>>();
+        this.dependencies      = new Map<number, Map<string, Array<Function>>>();
         this.senceTreeMap      = new Map<string, ComponentItem>();
         this.componentTreeMap  = new Map<string, ComponentItem>();
         this.componentDataMap  = new Map<string, Map<number, any>>();
@@ -84,9 +88,11 @@ class Application {
         this.cptDataPropGetter = new Map<string, DataPropGetter>();
         this.componentMap      = new Map<number, AbstractComponent>();
         this.senceCptMap       = new Map<string, Array<number>>();
+        this.cptNameToIdMap    = new Map<string, Array<number>>();
     }
 
     registerComponent(creator: AbstractComponentConstructor, tree: Document): void {
+        console.log('register component, ', creator['name']);
         let name: string = creator.toString().match(/function\s*(\w+)/)[1];
         // if (Is.isPresent(this.components.get(name))) {
         //     console.error('components ' + name + '已经注册过');
@@ -96,6 +102,7 @@ class Application {
         this.componentTreeMap.set(name, phaserTree);
         this.components.set(name, creator);
         this.componentDataMap.set(name, new Map<number, any>());
+        this.cptNameToIdMap.set(name, []);
     }
 
     registerSence(creator: AbstractSenceConstructor, tree: Document) {
@@ -107,14 +114,17 @@ class Application {
         let phaserTree = createPhaserTree(<Element>tree.firstChild);
 
         this.senceTreeMap.set(name, phaserTree);
-        let ret     = new creator();
-        let preload = ret.preload;
-        let hook    = this.buildSence.bind(this);
-        ret.preload = function () {
+        let ret      = new creator();
+        let preload  = ret.preload;
+        let hook     = this.buildSence.bind(this);
+        ret['_id']   = count++;
+        ret['getId'] = function () {
+            return this.id;
+        };
+        ret.preload  = function () {
             hook.apply(null, [name, ret]);
             preload.apply(ret);
         };
-        ret.setId(count++);
         this.sence.set(name, ret);
         let map = new Map<number, any>();
         map.set(<any>ret, Object.create(null));
@@ -147,15 +157,23 @@ class Application {
         });
     }
 
-    initDependencies(cpt: string, ...item: Array<ComponentItem>) {
+    initDependencies(cptName: string, id: number, ...item: Array<ComponentItem>) {
         let map = new Map<string, Array<Function>>();
-        let dpg = this.cptDataPropGetter.get(cpt);
+        let dpg = this.cptDataPropGetter.get(cptName);
         for (let attr in dpg) {
-            dpg[attr].forEach(v => {
-                map.set(v, []);
-            });
+            if (dpg.hasOwnProperty(attr)) {
+                if (attr === 'getter') {
+                    dpg[attr].forEach(v => {
+                        map.set(v.name, []);
+                    });
+                } else {
+                    dpg[attr].forEach(v => {
+                        map.set(v, []);
+                    });
+                }
+            }
         }
-        this.dependencies.set(cpt, map);
+        this.dependencies.set(id, map);
     }
 
     // initDependencies(cpt: string, ...item: Array<ComponentItem>) {
@@ -190,19 +208,33 @@ class Application {
             if (Is.isPresent(all)) {
                 for (let key in all) {
                     all[key].forEach((property, index, array) => {
-                        that.setDataVm(name, cpt, property, cpt[property]); // 设置 viewModel 的默认值
                         if (key === 'data') {
+                            that.setDataVm(name, cpt, property, cpt[property]); // 设置 viewModel 的默认值
                             Object.defineProperty(cpt, property, {
                                 get () {
                                     return that.getDataVm(name, cpt)[property];
                                 },
                                 set (value) {
                                     that.setDataVm(name, cpt, property, value);
-                                    that.getDependencies(name, property).forEach(v => v.apply(null, [cpt, value]));
+                                    that.getDependencies(cpt.getId(), property).forEach(v => v.apply(null));
                                 }
                             });
                         } else {
-                            Object.defineProperty(cpt, property, {
+                            let p;
+                            if (key === 'getter') {
+                                p = property.name;
+                                if (property.force === true) {
+                                    StateManager.addToForce(property.getter, cpt.getId());
+                                } else {
+                                    StateManager.addToGetters(property.getter, cpt.getId());
+                                }
+                                cpt.addGetterMap(property.getter, property.name);
+                                that.setDataVm(name, cpt, property.name, property.getter(that.defaultValue, cpt)); // 设置 viewModel 的默认值
+                            } else {
+                                that.setDataVm(name, cpt, property, cpt[property]); // 设置 viewModel 的默认值
+                                p = property;
+                            }
+                            Object.defineProperty(cpt, p, {
                                 get () {
                                     return that.getDataVm(name, cpt)[property];
                                 },
@@ -241,9 +273,10 @@ class Application {
             console.error('组件模板必须以Group为根元素');
         }
         self.setId(count++);
+        this.cptNameToIdMap.get(name).push(self.getId());
         this.senceCptMap.get(senceName).push(self.getId());
         this.componentMap.set(self.getId(), self);
-        this.initDependencies(name, tree[group], ele);
+        this.initDependencies(name, self.getId(), tree[group], ele);
         // 设置 component 的 viewModel，在此之后才能 buildDiplayObject
         let remainingVm = this.setComponentViewModel(name, self, viewModel, ignore);
         // 设置 component prop 属性的默认值
@@ -319,12 +352,12 @@ class Application {
         return 'un do';
     }
 
-    addDependencies(cpt: string, property: string, fn: Function): void {
-        this.dependencies.get(cpt).get(property).push(fn);
+    addDependencies(id: number, property: string, fn: Function): void {
+        this.dependencies.get(id).get(property).push(fn);
     }
 
-    getDependencies(cpt: string, prop: string): Array<Function> {
-        return this.dependencies.get(cpt).get(prop);
+    getDependencies(id: number, prop: string): Array<Function> {
+        return this.dependencies.get(id).get(prop);
     }
 
     setupDirective(directive: Directive): void {
@@ -351,16 +384,23 @@ class Application {
     }
 
     /**
-     * 为组件注册添加属于 data 一类的属性
+     * 为组件注册添加属于 data, prop 一类的属性
      * @cptName 组件名
      * @proName 属性名
      * @type 类型  data prop 或 getter
      */
     addDataPropertyForComponent(cptName: string, proName: string, type: string): void {
         if (Is.isAbsent(this.cptDataPropGetter.get(cptName))) {
-            this.cptDataPropGetter.set(cptName, {data: new Set<string>(), prop: new Set<string>(), getter: new Set<string>()});
+            this.cptDataPropGetter.set(cptName, {data: new Set<string>(), prop: new Set<string>(), getter: new Set<Getter>()});
         }
         this.cptDataPropGetter.get(cptName)[type].add(proName);
+    }
+
+    addGetterPropertyForComponent(cptName: string, getter: Getter): void {
+        if (Is.isAbsent(this.cptDataPropGetter.get(cptName))) {
+            this.cptDataPropGetter.set(cptName, {data: new Set<string>(), prop: new Set<string>(), getter: new Set<Getter>()});
+        }
+        this.cptDataPropGetter.get(cptName).getter.add(getter);
     }
 
     boot (game: Game, state: string): void {
@@ -385,10 +425,15 @@ class Application {
         }
     }
 
-    initRedux(reducers: Redux.ReducersMapObject) {
+    initRedux(reducers: Redux.ReducersMapObject, defaultValue: any): void {
+        StateManager.setLast(defaultValue);
+        this.defaultValue = defaultValue;
         let all = combineReducers(reducers);
-        this.store = createStore(all, undefined,
+        this.store = createStore(all, defaultValue,
           window['devToolsExtension'] && window['devToolsExtension']());
+        this.store.subscribe(() => {
+            StateManager.updateState(this.store.getState(), this);
+        });
     }
 
     /**
@@ -396,25 +441,34 @@ class Application {
      */
     clearCptAllData(name: string) {
         this.components.delete(name);
-        this.dependencies.delete(name);
         this.componentTreeMap.delete(name);
         this.cptDataPropGetter.delete(name);
-        // let keys = this.componentDataMap.get(name).keys();
-        // let next;
-        // while (next = keys.next(), !next.done) {
-        //     this.componentMap.get(next.value).destroy();
-        //     this.componentMap.delete(next.value);
-        // }
         this.componentDataMap.delete(name);
+        this.cptNameToIdMap.get(name).forEach(v => {this.dependencies.delete(v); });
+        this.cptNameToIdMap.set(name, []);
     }
 
     destoryCptForSence(name: string): void {
-        console.log('destoryCptForSence');
         this.senceCptMap.get(name).forEach(v => {
             this.componentMap.get(v).destroy();
             this.componentMap.delete(v);
+            StateManager.delete(v);
         });
         this.senceCptMap.set(name, []);
+        let keys = this.cptNameToIdMap.keys();
+        let next;
+        while (next = keys.next(), !next.done) {
+            this.cptNameToIdMap.set(next.value, []);
+        }
+    }
+
+    activePropOrGetter(cptName: string, cpt: AbstractComponent, property: string, value: any) {
+        this.setDataVm(cptName, cpt, property, value);
+        this.getDependencies(cpt.getId(), property).forEach(v => v.apply(null));
+    }
+
+    getComponent(id: number): AbstractComponent {
+        return this.componentMap.get(id);
     }
 }
 

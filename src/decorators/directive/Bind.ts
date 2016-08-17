@@ -8,9 +8,15 @@ export default {
     bind(cptName: string, cpt: AbstractComponent, target: any, argument: string, value: string, app: Application) {
         expressionVars(value).forEach((v) => {
             let fn: Function = expToFunction(value);
-            app.addDependencies(cptName, v, (([target], component) => {
-                target[argument] = fn(app.getDataVm(cptName, cpt));
-            }).bind(null, [target]));
+            if (target instanceof AbstractComponent) {
+                app.addDependencies(cpt.getId(), v, (() => {
+                    app.activePropOrGetter(target.constructor.name, target, argument, fn(app.getDataVm(cptName, cpt)));
+                }));
+            } else {
+                app.addDependencies(cpt.getId(), v, (() => {
+                    target[argument] = fn(app.getDataVm(cptName, cpt));
+                }));
+            }
         });
     },
 
