@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "karma": "^1.2.0"
+  }
+}

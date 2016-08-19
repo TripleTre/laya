@@ -39,6 +39,7 @@ export interface AbstractSenceConstructor {
 }
 
 export interface AbstractSence {
+    refs: Map<string, any>;
     getWorld(): World;
     preload(): void;
     destroy?(): void; // todo 暂时问号
@@ -53,8 +54,8 @@ export namespace LayaObjects {
         destroy(): void;
     }
 
-    interface DisplayObject<T> {
-        getRealObject(): T;
+    interface DisplayObject {
+        getRealObject<T>(): T;
         destroy(): void;
     }
 
@@ -71,7 +72,7 @@ export namespace LayaObjects {
         update?(): void;
     }
 
-    interface World extends Container<DisplayObject<any>> {}
+    interface World extends Container<DisplayObject> {}
 }
 
 interface Container<T> {
@@ -82,8 +83,8 @@ interface Container<T> {
     destroy(): void;
 }
 
-interface DisplayObject<T> {
-    getRealObject(): T;
+interface DisplayObject {
+    getRealObject<T>(): T;
     destroy(): void;
 }
 
@@ -100,7 +101,7 @@ interface State {
     update?(): void;
 }
 
-interface World extends Container<DisplayObject<any>> {}
+interface World extends Container<DisplayObject> {}
 
 export interface AbstractComponentConstructor {
     new (): AbstractComponent;
@@ -108,12 +109,12 @@ export interface AbstractComponentConstructor {
 export declare abstract class AbstractComponent {
     private getterMap: Map<Function, string>;
     private id: number;
-    private rootContainer: Container<DisplayObject<any>>;
+    private rootContainer: Container<DisplayObject>;
     refs: Map<string, any>;
     destroy(): void;
     getId(): number;
     setId(id: number): void;
-    setRootContainer(value: Container<DisplayObject<any>>): void;
+    setRootContainer(value: Container<DisplayObject>): void;
     addGetterMap(getter: Function, attribute: string): void;
 }
 
@@ -170,7 +171,7 @@ declare class Application {
      * @param viewModel 可选， 用于使用现有数据重新构建 component
      * @param ignore 可选， hmr 时更新的 component 不能用 vm 重建
      */
-    buildComponent(sence: string, own: AbstractComponent, ownName: string, name: string, ele: ComponentItem, container: Container<DisplayObject<any>>, viewModel?: any, ignore?: Array<string>): AbstractComponent;
+    buildComponent(sence: string, own: AbstractComponent, ownName: string, name: string, ele: ComponentItem, container: Container<DisplayObject>, viewModel?: any, ignore?: Array<string>): AbstractComponent;
     /**
      * @param senceName 场景
      * @param own 拥有 DisplayObject 的上层组件
@@ -179,7 +180,7 @@ declare class Application {
      * @param obj 当前 displayObject 标签解析结果
      * @param container 在引擎层面包含 displayObject 的容器
      */
-    buildDisplayObject(senceName: string, own: AbstractComponent, ownName: string, name: string, obj: ComponentItem, container: Container<DisplayObject<any>>): DisplayObject<any>;
+    buildDisplayObject(senceName: string, own: AbstractComponent, ownName: string, name: string, obj: ComponentItem, container: Container<DisplayObject>): DisplayObject;
     getValue(cpt: string, path: string): any;
     addDependencies(cpt: string, property: string, fn: Function): void;
     getDependencies(cpt: string, prop: string): Array<Function>;

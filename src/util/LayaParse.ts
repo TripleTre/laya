@@ -1,19 +1,28 @@
 import Is from './Is';
 declare var process;
 
-var unSupportReg = /\{|\}/g;
+const ignoreWords = 'true,false,null,undefined,Infinity,NaN';
+const ignoreWordsRE = new RegExp('\\b' + ignoreWords.replace(/,/g, '\\b|\\b') + '\\b');
+const improperKeywords =
+    '{,},this,Math,Date' +
+    'break,case,class,catch,const,continue,debugger,default,' +
+    'delete,do,else,export,extends,finally,for,function,if,' +
+    'import,in,instanceof,let,return,super,switch,throw,try,' +
+    'var,while,with,yield,enum,await,implements,package,' +
+    'protected,static,interface,private,public';
+const improperKeywordsRE = new RegExp('\\b' + improperKeywords.replace(/,/g, '\\b|\\b') + '\\b');
 
 // 'abc'+88* ppp ==={xxx: 'yyy'} ? true : false
 function expressionVars(expression: string): Array<string> {
-    if (unSupportReg.test(expression)) {
-        console.error('暂不支持对象字面量');
+    if (improperKeywordsRE.test(expression)) {
+        console.error('表达式包含不支持的关键字', improperKeywords, expression);
         return [];
     }
-    let ms: Array<string> = expression.match(/.?([a-zA-Z_$]+).?/g);
+    let ms: Array<string> = expression.match(/.?\b[a-zA-Z._$]+\b.?/g);
     if (Is.isAbsent(ms)) {
         return [];
     } else {
-        return ms.filter(v => !/(^'\w+'$)|false|true/.test(v))
+        return ms.filter(v => !/(^'\w+'$)/.test(v) && !ignoreWordsRE.test(v))
                  .map(v => v.match(/[a-zA-Z]+/)[0]);
     }
 }
@@ -58,7 +67,7 @@ function parseDirective(name: string): {name: string, argument: string} {
                         return b.toUpperCase();
                     });
     } catch (e) {
-        console.error('指令格式有誤: ', name);
+        console.error('指令格式有誤: ', name, e);
     }
     return {name: dn, argument: da};
 }

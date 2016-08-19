@@ -6,9 +6,10 @@ export default {
 
     bind(cptName: string, cpt: AbstractComponent, target: any, argument: string, value: string, app: Application) {
         if (target instanceof AbstractComponent) {
-            throw new Error('ref 指令不能使用在组件上');
+            console.warn('ref 指令不能使用在组件上');
+            return;
         }
-        cpt.refs.set(value, target);
+        cpt.refs.set(value.replace(/'/g, ''), target);
     },
 
     unbind() {

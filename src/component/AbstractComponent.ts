@@ -13,14 +13,14 @@ export interface AbstractComponentConstructor {
 export abstract class AbstractComponent {
     private getterMap: Map<Function, string> = new Map<Function, string>();
     private id: number;
-    private rootContainer: Container<DisplayObject<any>>;
+    private rootContainer: Container<DisplayObject>;
     refs: Map<string, any> = new Map<string, any>(); // tslint:disable-line
 
     destroy() {
         this.rootContainer.destroy();
     }
 
-    setRootContainer(value: Container<DisplayObject<any>>): void {
+    setRootContainer(value: Container<DisplayObject>): void {
         this.rootContainer = value;
     }
 

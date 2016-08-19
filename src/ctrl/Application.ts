@@ -119,7 +119,7 @@ class Application {
         let hook     = this.buildSence.bind(this);
         ret['_id']   = count++;
         ret['getId'] = function () {
-            return this.id;
+            return this._id;
         };
         ret.preload  = function () {
             hook.apply(null, [name, ret]);
@@ -127,7 +127,7 @@ class Application {
         };
         this.sence.set(name, ret);
         let map = new Map<number, any>();
-        map.set(<any>ret, Object.create(null));
+        map.set((<any>ret).getId(), Object.create(null));
         this.componentDataMap.set(name, map);
         this.initDependencies(name, phaserTree['Sence']);
         this.senceCptMap.set(name, []);
@@ -140,7 +140,6 @@ class Application {
         let senceTree = this.senceTreeMap.get(senceName);
         let keys      = Object.keys(senceTree);
         let obj       = senceTree[keys[0]];
-
         this.game.setWorld(sence.getWorld());
         if (keys.length > 1 || keys[0] !== 'Sence') {
             console.error('sence的模板必须包含在单个 <sence></sence> 标签中。 --->', name);
@@ -261,7 +260,7 @@ class Application {
      * @param viewModel 可选， 用于使用现有数据重新构建 component
      * @param ignore 可选， hmr 时更新的 component 不能用 vm 重建
      */
-    buildComponent(senceName: string, own: AbstractComponent, ownName: string, name: string, ele: ComponentItem, container: Container<DisplayObject<any>>, viewModel: any = undefined, ignore: Array<string> = []): AbstractComponent {
+    buildComponent(senceName: string, own: AbstractComponent, ownName: string, name: string, ele: ComponentItem, container: Container<DisplayObject>, viewModel: any = undefined, ignore: Array<string> = []): AbstractComponent {
         if (ele.normals.length + ele.directives.length !== this.cptDataPropGetter.get(name).prop.size) {
             console.warn('组件 prop 属性，与父组件传入不符。 检查 @prop 标记， ' + name);
         }
@@ -277,17 +276,20 @@ class Application {
         this.senceCptMap.get(senceName).push(self.getId());
         this.componentMap.set(self.getId(), self);
         this.initDependencies(name, self.getId(), tree[group], ele);
+        // 设置 component prop 属性的默认值
+        ele.directives.forEach(({name: attrName, value: attrVal}) => {
+            let argument = parseDirective(attrName);
+            this.componentDataMap.get(name).get(self.getId())[argument.argument] = expToFunction(attrVal)(own);
+        });
+        ele.normals.forEach(({name: attrName, value: attrVal}) => {
+            attrName = attrName.replace(/\-([a-z])/g, (a: string, b: string) => {
+                        return b.toUpperCase();
+            });
+            debugger;
+            this.componentDataMap.get(name).get(self.getId())[attrName] = expToFunction(attrVal)(own);
+        });
         // 设置 component 的 viewModel，在此之后才能 buildDiplayObject
         let remainingVm = this.setComponentViewModel(name, self, viewModel, ignore);
-        // 设置 component prop 属性的默认值
-        ele.normals.concat(ele.directives).forEach(({name: attrName, value: attrVal}) => {
-            let argument = parseDirective(attrName);
-            if (Is.isAbsent(argument)) {
-                this.componentDataMap.get(name).get(self.getId())[attrName] = own[attrVal];
-            } else {
-                this.componentDataMap.get(name).get(self.getId())[argument.argument] = own[attrVal];
-            }
-        });
         let subContainer: any = this.buildDisplayObject(senceName, self, name, group, tree[group], container);
         self.setRootContainer(subContainer);
         // todo delete
@@ -325,7 +327,7 @@ class Application {
      * @param obj 当前 displayObject 标签解析结果
      * @param container 在引擎层面包含 displayObject 的容器
      */
-    buildDisplayObject(senceName: string, own: AbstractComponent, ownName: string, name: string, obj: ComponentItem, container: Container<DisplayObject<any>>): DisplayObject<any> {
+    buildDisplayObject(senceName: string, own: AbstractComponent, ownName: string, name: string, obj: ComponentItem, container: Container<DisplayObject>): DisplayObject {
         let viewModel = this.getDataVm(ownName, own);
         let creator   = this.displayObjectCons.get(name);
         let diso      = new creator(this.game, obj.normals, obj.directives, viewModel, ownName);
