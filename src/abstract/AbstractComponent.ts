@@ -1,5 +1,7 @@
 import {Container,
-        DisplayObject} from '../abstract/index';
+        DisplayObject} from './LayaObject';
+import {AbstractSence} from './AbstractSence';
+import {Getter} from '../ctrl/DirectiveManager';
 
 /**
  * AbstractComponentConstructor 指定了Component 的构造函数规范
@@ -11,9 +13,11 @@ export interface AbstractComponentConstructor {
 }
 
 export abstract class AbstractComponent {
-    private getterMap: Map<Function, string> = new Map<Function, string>();
+    private own: AbstractComponent | AbstractSence;
     private id: number;
     private rootContainer: Container<DisplayObject>;
+    private getterProperty: Map<Getter, string> = new Map<Getter, string>();
+
     refs: Map<string, any> = new Map<string, any>(); // tslint:disable-line
 
     destroy() {
@@ -32,11 +36,19 @@ export abstract class AbstractComponent {
         this.id = id;
     }
 
-    addGetterMap(getter: Function, attribute: string): void {
-        this.getterMap.set(getter, attribute);
+    getOwn(): AbstractComponent | AbstractSence {
+        return this.own;
     }
 
-    getterAttribute(getter: Function): string {
-        return this.getterMap.get(getter);
+    setOwn(own: AbstractComponent | AbstractSence): void {
+        this.own = own;
+    }
+
+    addToGetterProperty(getter: Getter, property: string) {
+        this.getterProperty.set(getter, property);
+    }
+
+    getGetterProperty(getter: Getter): string {
+        return this.getterProperty.get(getter);
     }
 }

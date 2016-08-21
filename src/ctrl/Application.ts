@@ -140,7 +140,7 @@ class Application {
         let senceTree = this.senceTreeMap.get(senceName);
         let keys      = Object.keys(senceTree);
         let obj       = senceTree[keys[0]];
-        this.game.setWorld(sence.getWorld());
+        this.game.setWorld(sence.getWorld()); // todo 写到控制中心里
         if (keys.length > 1 || keys[0] !== 'Sence') {
             console.error('sence的模板必须包含在单个 <sence></sence> 标签中。 --->', name);
         }
@@ -273,7 +273,7 @@ class Application {
         }
         self.setId(count++);
         this.cptNameToIdMap.get(name).push(self.getId());
-        this.senceCptMap.get(senceName).push(self.getId());
+        // this.senceCptMap.get(senceName).push(self.getId()); 应该在 buildSence 里加才对
         this.componentMap.set(self.getId(), self);
         this.initDependencies(name, self.getId(), tree[group], ele);
         // 设置 component prop 属性的默认值

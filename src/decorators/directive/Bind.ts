@@ -1,20 +1,21 @@
-import {AbstractComponent} from '../../component/AbstractComponent';
-import Application from '../../ctrl/Application';
-import {expressionVars, expToFunction} from '../../util/LayaParse';
+import {AbstractComponent} from '../../abstract/AbstractComponent';
+import {expressionVars, expToFunction} from '../../parser/Expression';
+import ViewModelManager from '../../ctrl/ViewModelManager';
 
 export default {
     name: 'bind',
 
-    bind(cptName: string, cpt: AbstractComponent, target: any, argument: string, value: string, app: Application) {
-        expressionVars(value).forEach((v) => {
-            let fn: Function = expToFunction(value);
+    bind(cpt: AbstractComponent, target: any, argument: string, value: string) {
+        let vars = expressionVars(value);
+        let fn   = expToFunction(value, vars);
+        vars.forEach((v) => {
             if (target instanceof AbstractComponent) {
-                app.addDependencies(cpt.getId(), v, (() => {
-                    app.activePropOrGetter(target.constructor.name, target, argument, fn(app.getDataVm(cptName, cpt)));
+                ViewModelManager.addDependences(cpt.getId(), v, (() => {
+                    ViewModelManager.activePropertyForComponent(target, argument, fn(cpt));
                 }));
-            } else {
-                app.addDependencies(cpt.getId(), v, (() => {
-                    target[argument] = fn(app.getDataVm(cptName, cpt));
+            } else { // 对于 displayObject 直接给相应属性赋值即可
+                ViewModelManager.addDependences(cpt.getId(), v, (() => {
+                    target[argument] = fn(cpt);
                 }));
             }
         });

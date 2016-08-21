@@ -18,7 +18,7 @@ export interface Game {
     registerSence(key: string, state: any);
 }
 
-export interface State {
+export interface Sence {
     create?(): void;
     preLoad?(): void;
     update?(): void;
