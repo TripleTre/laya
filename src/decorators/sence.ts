@@ -1,4 +1,6 @@
-import app from '../index';
+import SenceManager from '../ctrl/SenceManager';
+import {ComponentNode} from '../ctrl/ComponentManager';
+import {elementToComponentNode} from '../parser/Template';
 
 const DEFAULT = {
     template: `
@@ -12,11 +14,13 @@ export interface SenceLike {
 }
 
 export default function (component: SenceLike = DEFAULT) {
-    let template: string = component.template;
-    let paser = new DOMParser();
-    let tree = paser.parseFromString(template, 'text/xml');
+    console.log('sencesenve');
+    let template: string        = component.template;
+    let paser:    DOMParser     = new DOMParser();
+    let ele:      Element       = <Element>(paser.parseFromString(template, 'text/xml')).firstChild;
+    let cn:       ComponentNode = elementToComponentNode(ele);
     return function (targetConstructor: any) {
         console.log(targetConstructor);
-        app.registerSence(targetConstructor, tree);
+        SenceManager.reigsterSence(targetConstructor, cn);
     };
 }

@@ -27,12 +27,13 @@ export default class DisplayObjectManager {
             });
             attributes[attrName] = attrVal(own);
         });
-        node.directives.forEach(({name: attrName, value: attrVal}) => {
-             let directive = parseDirective(attrName);
-             attributes[directive.argument] = attrVal(own);
-             DirectiveManager.getDirective(directive.name).bind(own, build, directive.argument, attrVal);
+        node.directives.forEach(({name, argument, value, triggers}) => {
+             attributes[argument] = value(own);
         });
-        let build = new registe(game, attributes);
+        let build      = new registe(game, attributes);
+        node.directives.forEach(({name, argument, value, triggers}) => {
+             DirectiveManager.getDirective(name).bind(own, build, argument, value, triggers);
+        });
         if (name === 'Container') {
             node.children.forEach(v => {
                 if (Is.isPresent(ComponentManager.hasComponent(name))) {

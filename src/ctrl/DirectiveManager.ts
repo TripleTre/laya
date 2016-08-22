@@ -10,7 +10,7 @@ export interface ParsedDirective {
 
 export interface Directive {
     name:   string;
-    bind:   (cpt: AbstractComponent | AbstractSence, target: any, argument: string, value: (context) => any) => void;
+    bind:   (cpt: AbstractComponent | AbstractSence, target: any, argument: string, value: (context) => any, triggers: Array<string>) => void;
     unbind: () =>  void;
 }
 
@@ -24,7 +24,7 @@ export interface Getter {
 }
 
 export default class DirectiveManager {
-    private static directives: Map<string, Directive>
+    private static directives: Map<string, Directive> = new Map<string, Directive>();
 
     static addDirective(di: Directive) {
         DirectiveManager.directives.set(di.name, di);

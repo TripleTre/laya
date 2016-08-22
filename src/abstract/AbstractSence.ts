@@ -9,10 +9,10 @@ export interface AbstractSenceConstructor {
 }
 
 export abstract class AbstractSence {
-    private subComponents: Array<AbstractComponent> = [];
-    private game:          Game;
-    private getterProperty: Map<Getter, string> = new Map<Getter, string>();
     refs: Map<string, any>;
+    private subComponents: Array<AbstractComponent> = [];
+    private layaGame:          Game;
+    private getterProperty: Map<Getter, string> = new Map<Getter, string>();
 
     /**
      *  返回场景对象的所有子组件
@@ -25,15 +25,15 @@ export abstract class AbstractSence {
         this.subComponents.push(component);
     }
 
-    getGame(): Game {
-        return this.game;
+    getLayaGame(): Game {
+        return this.layaGame;
     }
 
-    setGame(game: Game): void {
-        this.game = game;
+    setLayaGame(game: Game): void {
+        this.layaGame = game;
     }
 
-    addToGetterProperty(getter: Getter, property: string) {
+    addToGetterProperty(getter: Getter, property: string): void {
         this.getterProperty.set(getter, property);
     }
 
@@ -41,7 +41,7 @@ export abstract class AbstractSence {
         return this.getterProperty.get(getter);
     }
 
-    destorySubComponents() {
+    destorySubComponents(): void {
         this.subComponents.forEach(v => {
             ComponentManager.deleteComponent(v.getId());
             ViewModelManager.deleteViewModel(v.getId());
@@ -51,5 +51,5 @@ export abstract class AbstractSence {
 
     abstract getWorld(): World;
     abstract preload(): void;
-    abstract destroy(): void; // todo 暂时问号
+    abstract destroy(): void;
 }

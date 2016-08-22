@@ -20,7 +20,7 @@ export abstract class AbstractComponent {
 
     refs: Map<string, any> = new Map<string, any>(); // tslint:disable-line
 
-    destroy() {
+    destroy(): void {
         this.rootContainer.destroy();
     }
 
@@ -28,11 +28,11 @@ export abstract class AbstractComponent {
         this.rootContainer = value;
     }
 
-    getId() {
+    getId(): number {
         return this.id;
     }
 
-    setId(id: number) {
+    setId(id: number): void {
         this.id = id;
     }
 
@@ -44,7 +44,7 @@ export abstract class AbstractComponent {
         this.own = own;
     }
 
-    addToGetterProperty(getter: Getter, property: string) {
+    addToGetterProperty(getter: Getter, property: string): void {
         this.getterProperty.set(getter, property);
     }
 

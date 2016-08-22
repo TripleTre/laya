@@ -6,10 +6,10 @@ export default function (getter: (state: any, context: any) => any, compare: boo
             console.error('@data 不应该修饰静态变量。 ---> ' + arg1);
         }
         let cptName = arg1.constructor.name;
-        ActivePropertyManager.addGetterActiveProperty(cptName, {
+        ActivePropertyManager.addWaiteExecute(cptName, {
             getter,
             compare,
             name
-        });
+        }, 'getter');
     };
 }

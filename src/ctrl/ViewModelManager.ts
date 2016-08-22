@@ -3,13 +3,13 @@ import {AbstractSence} from '../abstract/AbstractSence';
 import {ActiveProperties} from './ActivePropertyManager';
 import StateManager from './StateManager';
 
-export interface viewModel {
+export interface ViewModel {
     value: any;
     dependences: Array<Function>;
 }
 
 export default class ViewModelManager {
-    private static viewModel: Map<number, Map<string, viewModel>> = new Map<number, Map<string, viewModel>>();
+    private static viewModel: Map<number, Map<string, ViewModel>> = new Map<number, Map<string, ViewModel>>();
 
     /**
      * @param id 组件id
@@ -30,8 +30,8 @@ export default class ViewModelManager {
         let viewModel = {
             value: Object.create(null),
             dependences: []
-        }
-        let map = new Map<string, viewModel>();
+        };
+        let map = new Map<string, ViewModel>();
         map.set(name, viewModel);
         ViewModelManager.viewModel.set(id, map);
     }
@@ -59,7 +59,7 @@ export default class ViewModelManager {
         });
     }
 
-    private static defineData(obj: AbstractComponent | AbstractSence, propertyName: string, viewModel: viewModel) {
+    static defineData(obj: AbstractComponent | AbstractSence, propertyName: string, viewModel: ViewModel) {
          Object.defineProperty(obj, propertyName, {
             get() {
                 return viewModel.value;
@@ -71,7 +71,7 @@ export default class ViewModelManager {
         });
     }
 
-    private static defineGetter(obj: AbstractComponent | AbstractSence, propertyName: string, viewModel: viewModel) {
+    static defineGetter(obj: AbstractComponent | AbstractSence, propertyName: string, viewModel: ViewModel) {
         Object.defineProperty(obj, propertyName, {
             get() {
                 return viewModel.value;
@@ -88,6 +88,7 @@ export default class ViewModelManager {
      *  @para activeProperties 该类 component 对象的所有响应属性
      */
     static initComponentViewModel(component: AbstractComponent, activeProperties: ActiveProperties): void {
+        debugger;
         let id        = component.getId();
         let viewModel = ViewModelManager.viewModel.get(id);
         activeProperties.data.forEach(v => {

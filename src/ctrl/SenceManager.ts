@@ -19,11 +19,11 @@ export default class SenceManager {
     private static instances: Map<number, AbstractSence>          = new Map<number, AbstractSence>();
 
     static reigsterSence(newFunc: AbstractSenceConstructor, cptNode: ComponentNode) {
-        let name: string  = newFunc.constructor.name;
+        let name: string  = newFunc['name'];
         let activeProperties: ActiveProperties = {
                                          data:   new Set<string>(),
                                          getter: new Set<Getter>()
-                                     }
+                                     };
         SenceManager.registers.set(name, {
             node:             cptNode,
             newFunc:          newFunc
@@ -31,24 +31,38 @@ export default class SenceManager {
         ActivePropertyManager.initActiveProperty(name, activeProperties);
     }
 
-    static buildSence(name: string, game: Game) {
+    static buildSence(name: string, build: AbstractSence, game: Game): AbstractSence {
         let registe = SenceManager.registers.get(name);
         let newFunc = registe.newFunc;
         let node    = registe.node;
-        let build   = new newFunc();
         build['id'] = counter();
-        build.setGame(game);
+        build.setLayaGame(game);
         SenceManager.instances.set(build['id'], build);
         ViewModelManager.initSenceViewModel(build, ActivePropertyManager.getActiveProperties(name));
-        
+
         node.children.forEach(v => {
             let name = v.name;
             if (ComponentManager.hasComponent(name)) {
-                let c = ComponentManager.buildComponent(build, v, build.getWorld(), build.getGame());
+                let c = ComponentManager.buildComponent(build, v, build.getWorld(), build.getLayaGame());
                 build.addSubComponent(c);
             } else {
-                build.getWorld().add(DisplayObjectManager.buildDisplayObject(build, v, build.getGame()));
+                build.getWorld().add(DisplayObjectManager.buildDisplayObject(build, v, build.getLayaGame()));
             }
         });
+        return build;
+    }
+
+    static getAllRegisters(): Array<AbstractSenceConstructor> {
+        let ret = [];
+        SenceManager.registers.forEach(v => {
+            ret.push(v.newFunc);
+        });
+        return ret;
+    }
+
+    static getByName(name: string): AbstractSenceConstructor {
+        return SenceManager.registers.get(name).newFunc;
     }
 }
+
+window['_senceManager'] = SenceManager;

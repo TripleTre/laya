@@ -12,14 +12,14 @@ import Dom from '../util/Dom';
 export function elementToComponentNode(ele: Element): ComponentNode {
     let res:        ComponentNode    = Object.create(null);
     let attrs:      NamedNodeMap     = ele.attributes;
-    let normals:    Array<{name: string, 
+    let normals:    Array<{name: string,
                            value: (context) => any}>
                                      = Array.prototype.filter.call(attrs, (v) => !/^l-/.test(v.name))
                                           .map(({name: attrName, value: attrValue}) => {
                                               return {
                                                   name: attrName,
                                                   value: expToFunction(attrValue)
-                                              }
+                                              };
                                           });
     let children:   Array<Element>   = Dom.getChildren(ele);
     let phaserCons: string           = ele.nodeName.replace(/^\w/, (a)        => a.toUpperCase());
@@ -32,7 +32,7 @@ export function elementToComponentNode(ele: Element): ComponentNode {
                                                   argument: directive.argument,
                                                   value: expToFunction(value, vars),
                                                   triggers: vars
-                                              }
+                                              };
                                           });
     res.normals    = normals;
     res.children   = children.map(v => elementToComponentNode(v));

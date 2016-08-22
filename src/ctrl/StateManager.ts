@@ -1,4 +1,3 @@
-import Application from '../ctrl/Application';
 import * as Iter from '../util/Iter';
 import equal from '../util/DeepEqual';
 import Is from '../util/Is';

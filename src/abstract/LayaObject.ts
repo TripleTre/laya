@@ -1,3 +1,5 @@
+import {AbstractSenceConstructor, AbstractSence} from './AbstractSence';
+
 export interface Container<T> {
     add(obj: T): void;
 
@@ -14,8 +16,8 @@ export interface DisplayObject {
 export interface Game {
     setWorld(world: World): void;
     getWorld(): World;
-    senceJump(state: string, clearWorld?: boolean, clearCache?: boolean): void;
-    registerSence(key: string, state: any);
+    startSence(name: string, clearWorld: boolean, clearCache?: boolean): void;
+    registerSence(key: string, sence: AbstractSence);
 }
 
 export interface Sence {

@@ -34,12 +34,12 @@ export default class ComponentManager {
     private static nameIdMap: Map<string, Array<number>>     = new Map<string, Array<number>>();
 
     static registerComponent(newFunc: AbstractComponentConstructor, cptNode: ComponentNode) {
-        let name:   string         = newFunc.constructor.name;
+        let name:   string         = newFunc['name'];
         let dpg:    ActiveProperties = {
                                          data:   new Set<string>(),
                                          prop:   new Set<string>(),
                                          getter: new Set<Getter>()
-                                     }
+                                     };
         ComponentManager.registers.set(name, {
             node:      cptNode,
             newFunc:   newFunc,
@@ -47,6 +47,8 @@ export default class ComponentManager {
         });
         ComponentManager.nameIdMap.set(name, []);
         ComponentManager.registed.add(name);
+        ActivePropertyManager.initActiveProperty(name, dpg);
+        ActivePropertyManager.doWaiteExecute(name);
     }
 
     /**
@@ -71,11 +73,10 @@ export default class ComponentManager {
             });
             build[attrName] = attrVal(own);
         });
-        node.directives.forEach(({name: attrName, value: attrVal}) => {
-            let directive = parseDirective(attrName);
-            build[directive.argument] = attrVal(own);
-            DirectiveManager.getDirective(directive.name).bind(own, build, directive.argument, attrVal);
-        })
+        node.directives.forEach(({name, argument, value, triggers}) => {
+            build[argument] = value(own);
+            DirectiveManager.getDirective(name).bind(own, build, argument, value, triggers);
+        });
         let id = build.getId();
         this.instances.set(id, build);
         this.nameIdMap.get(name).push(id);
@@ -126,4 +127,14 @@ export default class ComponentManager {
             remove(v, id);
         });
     }
+
+    static getAllRegisters(): Array<AbstractComponentConstructor> {
+        let ret = [];
+        ComponentManager.registers.forEach(v => {
+            ret.push(v.newFunc);
+        });
+        return ret;
+    }
 }
+
+window['_componentManager'] = ComponentManager;

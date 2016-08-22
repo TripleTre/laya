@@ -1,22 +1,20 @@
-import {Bind,
-        Ref} from './decorators/directive/index';
-import {app} from './ctrl/Application';
+import Bind from './decorators/directive/Bind';
+import Ref from './decorators/directive/Ref';
 import {data,
         prop,
         sence,
         getter,
         component} from './decorators/index';
 import {AbstractSence,
-        AbstractSenceConstructor} from './decorators/AbstractSence';
+        AbstractSenceConstructor} from './abstract/AbstractSence';
 import {AbstractComponent,
-        AbstractComponentConstructor} from './component/AbstractComponent';
-import * as LayaObjects from './abstract/index';
-import {mergeNormalsAndDirectives} from './util/LayaParse';
+        AbstractComponentConstructor} from './abstract/AbstractComponent';
+import * as LayaObjects from './abstract/LayaObject';
+import DirectiveManager from './ctrl/DirectiveManager';
+import laya from './ctrl/Laya';
 
-app.setupDirective(Bind);
-app.setupDirective(Ref);
-
-export default app;
+DirectiveManager.addDirective(Bind);
+DirectiveManager.addDirective(Ref);
 
 export {
     prop,
@@ -28,6 +26,7 @@ export {
     AbstractSenceConstructor,
     AbstractComponent,
     AbstractComponentConstructor,
-    LayaObjects,
-    mergeNormalsAndDirectives
+    LayaObjects
 };
+
+export default laya;
