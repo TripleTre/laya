@@ -48,7 +48,6 @@ export abstract class AbstractComponent {
 
     addToRepeatScope(name: string, value: any) {
         this.repeatScope.set(name, value);
-        debugger;
         Object.defineProperty(this, name, {
             get() {
                 return this.repeatScope.get(name)[this.repeatIndex.get(name)];

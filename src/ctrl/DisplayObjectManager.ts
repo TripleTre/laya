@@ -44,7 +44,6 @@ export default class DisplayObjectManager {
                     if (ComponentManager.hasComponent(v.name)) {
                         ComponentManager.buildComponent(own, v, build, game);
                     } else {
-                        debugger;
                         build.add(DisplayObjectManager.buildDisplayObject(own, v, game));
                     }
                 });
