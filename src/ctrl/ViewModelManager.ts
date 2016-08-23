@@ -26,14 +26,12 @@ export default class ViewModelManager {
      * @param name 属性名称
      * @param defaultValue 默认值
      */
-    static initViewModel(id: number, name: string, defaultValue: any) {
+    static addViewModel(id: number, name: string, defaultValue: any) {
         let viewModel = {
-            value: Object.create(null),
+            value: defaultValue,
             dependences: []
         };
-        let map = new Map<string, ViewModel>();
-        map.set(name, viewModel);
-        ViewModelManager.viewModel.set(id, map);
+        ViewModelManager.viewModel.get(id).set(name, viewModel);
     }
 
     /**
@@ -42,20 +40,21 @@ export default class ViewModelManager {
      *  @para activeProperties 该类 sence 对象的所有响应属性
      */
     static initSenceViewModel(sence: AbstractSence, activeProperties: ActiveProperties): void {
+        let id  = sence['id'];
+        let map = new Map<string, ViewModel>();
+        ViewModelManager.viewModel.set(id, map);
         activeProperties.data.forEach(v => {
-             ViewModelManager.initViewModel(sence['id'], v, sence[v]);
-             let viewModel = ViewModelManager.viewModel.get(sence['id']).get(v);
-             ViewModelManager.defineData(sence, v, viewModel);
+             ViewModelManager.addViewModel(id, v, sence[v]);
+             ViewModelManager.defineData(sence, v, map.get(v));
         });
         activeProperties.getter.forEach(v => {
-            ViewModelManager.initViewModel(sence['id'], v.name, v.getter(StateManager.getDefaultValue(), sence));
-            let viewModel = ViewModelManager.viewModel.get(sence['id']).get(v.name);
+            ViewModelManager.addViewModel(id, v.name, v.getter(StateManager.getDefaultValue(), sence));
             if (v.compare === false) {
-                StateManager.addToForce(v, sence['id']);
+                StateManager.addToForce(v, id);
             } else {
-                StateManager.addToGetters(v, sence['id']);
+                StateManager.addToGetters(v, id);
             }
-            ViewModelManager.defineGetter(sence, v.name, viewModel);
+            ViewModelManager.defineGetter(sence, v.name, map.get(v.name));
         });
     }
 
@@ -88,25 +87,25 @@ export default class ViewModelManager {
      *  @para activeProperties 该类 component 对象的所有响应属性
      */
     static initComponentViewModel(component: AbstractComponent, activeProperties: ActiveProperties): void {
-        debugger;
-        let id        = component.getId();
-        let viewModel = ViewModelManager.viewModel.get(id);
+        let id = component.getId();
+        let map = new Map<string, ViewModel>();
+        ViewModelManager.viewModel.set(id, map);
         activeProperties.data.forEach(v => {
-            ViewModelManager.initViewModel(id, v, component[v]);
-            ViewModelManager.defineData(component, v, viewModel.get(v));
+            ViewModelManager.addViewModel(id, v, component[v]);
+            ViewModelManager.defineData(component, v, map.get(v));
         });
         activeProperties.getter.forEach(v => {
-            ViewModelManager.initViewModel(id, v.name, v.getter(StateManager.getDefaultValue(), component));
+            ViewModelManager.addViewModel(id, v.name, v.getter(StateManager.getDefaultValue(), component));
             if (v.compare === false) {
                 StateManager.addToForce(v, id);
             } else {
                 StateManager.addToGetters(v, id);
             }
-            ViewModelManager.defineGetter(component, v.name, viewModel.get(v.name));
+            ViewModelManager.defineGetter(component, v.name, map.get(v.name));
         });
         activeProperties.prop.forEach(v => {
-            ViewModelManager.initViewModel(id, v, component[v]);
-            ViewModelManager.defineData(component, v, viewModel.get(v));
+            ViewModelManager.addViewModel(id, v, component[v]);
+            ViewModelManager.defineData(component, v, map.get(v));
         });
     }
 

@@ -7,11 +7,13 @@ import SenceManager from './SenceManager';
 import DisplayObjectManager from './DisplayObjectManager';
 import {AbstractComponentConstructor} from '../abstract/AbstractComponent';
 import ComponentManager from './ComponentManager';
+import Is from '../util/Is';
+import ActivePropertyManager from './ActivePropertyManager';
 
 export default class Laya {
-    static store:    Redux.Store<any>;
-    static curSence: AbstractSence;
-    static game:     Game;
+    private static store:    Redux.Store<any>;
+    private static curSence: AbstractSence;
+    private static game:     Game;
 
     static initRedux(reducers: Redux.ReducersMapObject, defaultValue: any): void {
         StateManager.setLast(defaultValue);
@@ -54,13 +56,31 @@ export default class Laya {
         let preload   = sence.preload;
         sence.preload = function () {
             SenceManager.buildSence(name, sence, Laya.game);
-            preload.apply(sence);
+            if (Is.isPresent(preload)) {
+                preload.apply(sence);
+            }
         };
         Laya.game.registerSence(name, sence);
         Laya.game.startSence(name, clearWorld, clearCache);
+        Laya.curSence = sence;
     }
 
     static useDisplayObject(impls: any): void {
         DisplayObjectManager.setLayaObjectImpl(impls);
+    }
+
+    /**
+     *  清楚组件注册信息
+     */
+    static cancelComponent(name: string): void {
+        ComponentManager.cancelComponent(name);
+        ActivePropertyManager.cancelRegistData(name);
+    }
+
+    static rebuildSence(): void {
+        let curSence = Laya.curSence;
+        curSence.destorySubComponent();
+        let name = curSence.constructor['name'];
+        SenceManager.buildSence(name, curSence, Laya.game);
     }
 }

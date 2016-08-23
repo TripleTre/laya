@@ -25,8 +25,8 @@ export default class SenceManager {
                                          getter: new Set<Getter>()
                                      };
         SenceManager.registers.set(name, {
-            node:             cptNode,
-            newFunc:          newFunc
+            node:    cptNode,
+            newFunc: newFunc
         });
         ActivePropertyManager.initActiveProperty(name, activeProperties);
     }

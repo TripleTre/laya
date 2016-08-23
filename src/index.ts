@@ -1,5 +1,6 @@
 import Bind from './decorators/directive/Bind';
 import Ref from './decorators/directive/Ref';
+import Repeat from './decorators/directive/Repeat';
 import {data,
         prop,
         sence,
@@ -15,6 +16,7 @@ import laya from './ctrl/Laya';
 
 DirectiveManager.addDirective(Bind);
 DirectiveManager.addDirective(Ref);
+DirectiveManager.addDirective(Repeat);
 
 export {
     prop,

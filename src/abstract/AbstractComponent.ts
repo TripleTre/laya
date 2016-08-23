@@ -13,6 +13,8 @@ export interface AbstractComponentConstructor {
 }
 
 export abstract class AbstractComponent {
+    private repeatScope: Map<string, Array<any>> = new Map<string, Array<any>>();
+    private repeatIndex: Map<string, number> = new Map<string, number>();
     private own: AbstractComponent | AbstractSence;
     private id: number;
     private rootContainer: Container<DisplayObject>;
@@ -44,11 +46,17 @@ export abstract class AbstractComponent {
         this.own = own;
     }
 
-    addToGetterProperty(getter: Getter, property: string): void {
-        this.getterProperty.set(getter, property);
+    addToRepeatScope(name: string, value: any) {
+        this.repeatScope.set(name, value);
+        debugger;
+        Object.defineProperty(this, name, {
+            get() {
+                return this.repeatScope.get(name)[this.repeatIndex.get(name)];
+            }
+        });
     }
 
-    getGetterProperty(getter: Getter): string {
-        return this.getterProperty.get(getter);
+    setRepeatIndex(name: string, index: number) {
+        this.repeatIndex.set(name, index);
     }
 }

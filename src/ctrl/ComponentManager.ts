@@ -68,10 +68,10 @@ export default class ComponentManager {
         build.setId(counter());
         // 设置 component prop 属性的默认值
         node.normals.forEach(({name: attrName, value: attrVal}) => {
-            attrName = attrName.replace(/\-([a-z])/g, (a: string, b: string) => {
+            let parsedName = attrName.replace(/\-([a-z])/g, (a: string, b: string) => {
                         return b.toUpperCase();
             });
-            build[attrName] = attrVal(own);
+            build[parsedName] = attrVal(own);
         });
         node.directives.forEach(({name, argument, value, triggers}) => {
             build[argument] = value(own);
@@ -83,14 +83,12 @@ export default class ComponentManager {
         let activeProperties = ActivePropertyManager.getActiveProperties(name);
         ViewModelManager.initComponentViewModel(build, activeProperties);
         // 构建组件的具体实现
-        let implement = DisplayObjectManager.buildDisplayObject(own, registe.node, game);
+        let implement = DisplayObjectManager.buildDisplayObject(build, registe.node, game);
+        build.setRootContainer(<any>implement);
         container.add(implement);
         node.children.forEach(v => {
+            // todo
             new Error('这个node暂时不可能有children的, 明天再来处理, children在subContainer就处理了');
-            // let name = v.name;
-            // if (Is.isPresent(ComponentManager.hasComponent(name))) {
-            //     ComponentManager.buildComponent(build, name, v, )
-            // }
         });
         return build;
     }
@@ -106,6 +104,9 @@ export default class ComponentManager {
         return ComponentManager.instances.get(id);
     }
 
+    /**
+     *  注销 component, 清楚注册信息
+     */
     static cancelComponent(name: string) {
         let cancels = ComponentManager.nameIdMap.get(name);
         let keys    = ComponentManager.instances.keys();
@@ -137,4 +138,4 @@ export default class ComponentManager {
     }
 }
 
-window['_componentManager'] = ComponentManager;
+window['_ComponentManager'] = ComponentManager;

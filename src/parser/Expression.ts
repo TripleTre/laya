@@ -26,12 +26,12 @@ export function expressionVars(expression: string): Array<string> {
         console.error('表达式包含不支持的关键字', improperKeywords, expression);
         return [];
     }
-    let ms: Array<string> = expression.match(/.?\b[a-zA-Z._$]+\b.?/g);
+    let ms: Array<string> = expression.replace(/'[^']*'/g, '')
+                                      .match(/\b[a-zA-Z._$]+\b/g);
     if (Is.isAbsent(ms)) {
         return [];
     } else {
-        return ms.filter(v => !/(^'\w+'$)/.test(v) && !ignoreWordsRE.test(v))
-                 .map(v => v.match(/[a-zA-Z]+/)[0]);
+        return ms.filter(v => !ignoreWordsRE.test(v));
     }
 }
 
@@ -53,7 +53,7 @@ export function expToFunction(exp: string, vars?: Array<string>): (context: any)
         exp = exp.replace(v, 'vm.' + v);
     });
     try {
-        let fn = <(context: any) => any>new Function('context', 'return ' + exp);
+        let fn = <(context: any) => any>new Function('vm', 'return ' + exp);
         cache[exp] = fn;
         return fn;
     } catch (e) {

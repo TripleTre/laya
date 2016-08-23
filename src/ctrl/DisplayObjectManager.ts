@@ -22,26 +22,33 @@ export default class DisplayObjectManager {
         let registe    = DisplayObjectManager.registers.get(name);
         let attributes = Object.create(null);
         node.normals.forEach(({name: attrName, value: attrVal}) => {
-            attrName = attrName.replace(/\-([a-z])/g, (a: string, b: string) => {
+            let parsedName = attrName.replace(/\-([a-z])/g, (a: string, b: string) => {
                         return b.toUpperCase();
             });
-            attributes[attrName] = attrVal(own);
+            attributes[parsedName] = attrVal(own);
         });
         node.directives.forEach(({name, argument, value, triggers}) => {
              attributes[argument] = value(own);
         });
-        let build      = new registe(game, attributes);
+        let build = new registe(game, attributes);
         node.directives.forEach(({name, argument, value, triggers}) => {
              DirectiveManager.getDirective(name).bind(own, build, argument, value, triggers);
         });
         if (name === 'Container') {
-            node.children.forEach(v => {
-                if (Is.isPresent(ComponentManager.hasComponent(name))) {
-                    ComponentManager.buildComponent(own, v, build, game);
-                } else {
-                    build.add(DisplayObjectManager.buildDisplayObject(own, v, game));
+            let len = build['$$repeatCount'] || 1;
+            for (let i = 0; i < len; i++) {
+                if (build['$$repeatCount'] && build['$$repeatName']) {
+                    (<AbstractComponent>own).setRepeatIndex(build['$$repeatName'], i);
                 }
-            });
+                node.children.forEach(v => {
+                    if (ComponentManager.hasComponent(v.name)) {
+                        ComponentManager.buildComponent(own, v, build, game);
+                    } else {
+                        debugger;
+                        build.add(DisplayObjectManager.buildDisplayObject(own, v, game));
+                    }
+                });
+            }
         }
         return build;
     }

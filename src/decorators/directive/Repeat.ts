@@ -1,23 +1,18 @@
-import {AbstractComponent} from '../../component/AbstractComponent';
-import Application from '../../ctrl/Application';
-import {expressionVars, expToFunction} from '../../util/LayaParse';
+import {AbstractComponent} from '../../abstract/AbstractComponent';
+import {AbstractSence} from '../../abstract/AbstractSence';
+import {expressionVars, expToFunction} from '../../parser/Expression';
+import ViewModelManager from '../../ctrl/ViewModelManager';
+import Is from '../../util/Is';
 
 export default {
     name: 'repeat',
 
-    bind(cptName: string, cpt: AbstractComponent, target: any, argument: string, value: string, app: Application) {
-        expressionVars(value).forEach((v) => {
-            let fn: Function = expToFunction(value);
-            if (target instanceof AbstractComponent) {
-                app.addDependencies(cpt.getId(), v, (() => {
-                    app.activePropOrGetter(target.constructor.name, target, argument, fn(app.getDataVm(cptName, cpt)));
-                }));
-            } else {
-                app.addDependencies(cpt.getId(), v, (() => {
-                    target[argument] = fn(app.getDataVm(cptName, cpt));
-                }));
-            }
-        });
+    bind(cpt: AbstractComponent | AbstractSence, target: any, argument: string, value: (context) => any, triggers: Array<string>) {
+        let list = value(cpt);
+        let count = list.length;
+        target['$$repeatCount'] = count;
+        target['$$repeatName'] = argument;
+        (<AbstractComponent>cpt).addToRepeatScope(argument, value(cpt));
     },
 
     unbind() {

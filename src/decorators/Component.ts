@@ -9,7 +9,6 @@ export interface ComponentLike {
 }
 
 export default function (component: ComponentLike) {
-    console.log('componentcomponentcomponent');
     let template: string        = component.template;
     let paser:    DOMParser     = new DOMParser();
     let ele:      Element       = <Element>(paser.parseFromString(template, 'text/xml')).firstChild;

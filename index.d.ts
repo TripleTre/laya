@@ -50,8 +50,6 @@ export class AbstractComponent {
     setId(id: number): void;
     getOwn(): AbstractComponent | AbstractSence;
     setOwn(own: AbstractComponent | AbstractSence): void;
-    addToGetterProperty(getter: Getter, property: string): void;
-    getGetterProperty(getter: Getter): string;
 }
 
 export interface AbstractSenceConstructor {
@@ -71,8 +69,6 @@ export class AbstractSence {
     addSubComponent(component: AbstractComponent): void;
     getLayaGame(): Game;
     setLayaGame(game: Game): void;
-    addToGetterProperty(getter: Getter, property: string): void;
-    getGetterProperty(getter: Getter): string;
     destorySubComponents(): void;
     getWorld(): World;
     preload(): void;
@@ -119,6 +115,8 @@ export default class Laya {
     static registerComponent(components: Array<AbstractComponentConstructor>): void;
     static startSence(name: string, clearWorld: boolean, clearCache?: boolean): void;
     static useDisplayObject(impls: any): void;
+    static cancelComponent(name: string): void;
+    static rebuildSence(): void;
 }
 
 export interface Directive {

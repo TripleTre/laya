@@ -3,6 +3,7 @@ import {AbstractComponent} from './AbstractComponent';
 import {Getter} from '../ctrl/DirectiveManager';
 import ComponentManager from '../ctrl/ComponentManager';
 import ViewModelManager from '../ctrl/ViewModelManager';
+import StateManager from '../ctrl/StateManager';
 
 export interface AbstractSenceConstructor {
     new (): AbstractSence;
@@ -33,20 +34,13 @@ export abstract class AbstractSence {
         this.layaGame = game;
     }
 
-    addToGetterProperty(getter: Getter, property: string): void {
-        this.getterProperty.set(getter, property);
-    }
-
-    getGetterProperty(getter: Getter): string {
-        return this.getterProperty.get(getter);
-    }
-
-    destorySubComponents(): void {
+    destorySubComponent(): void {
         this.subComponents.forEach(v => {
-            ComponentManager.deleteComponent(v.getId());
-            ViewModelManager.deleteViewModel(v.getId());
             v.destroy();
+            ComponentManager.deleteComponent(v.getId());
+            StateManager.delete(v.getId());
         });
+        this.subComponents = [];
     }
 
     abstract getWorld(): World;

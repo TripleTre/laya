@@ -46,7 +46,7 @@ export default class StateManager {
                 let cpt = ComponentManager.getInstance(v);
                 let val = getter.getter(state, cpt);
                 let cptName = cpt.constructor['name'];
-                ViewModelManager.activePropertyForComponent(cpt, cpt.getGetterProperty(getter), val);
+                ViewModelManager.activePropertyForComponent(cpt, getter.name, val);
             });
         });
         let normals = StateManager.getters.keys();
@@ -57,7 +57,7 @@ export default class StateManager {
                 let val = getter.getter(state, cpt);
                 if (!equal(val, getter.getter(StateManager.last, cpt))) {
                     let cptName = cpt.constructor['name'];
-                    ViewModelManager.activePropertyForComponent(cpt, cpt.getGetterProperty(getter), val);
+                    ViewModelManager.activePropertyForComponent(cpt, getter.name, val);
                 }
             });
         });
@@ -69,7 +69,11 @@ export default class StateManager {
     }
 
     static getDefaultValue(): any {
-        return StateManager.default;
+        if (StateManager.last) {
+            return StateManager.last;
+        } else {
+            return StateManager.default;
+        }
     }
 
     static setDefaultValue(value: any): void {

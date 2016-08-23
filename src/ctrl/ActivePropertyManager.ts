@@ -66,4 +66,11 @@ export default class ActivePropertyManager {
     static getActiveProperties(name: string): ActiveProperties {
         return ActivePropertyManager.activeProperties.get(name);
     }
+
+    static cancelRegistData(name: string): void {
+        ActivePropertyManager.activeProperties.delete(name);
+        ActivePropertyManager.waiteExecute.delete(name);
+    }
 }
+
+window['_ActivePropertyManager'] = ActivePropertyManager;
