@@ -20,6 +20,10 @@ export default class DisplayObjectManager {
                               node: ComponentNode, game: Game): DisplayObject {
         let name       = node.name;
         let registe    = DisplayObjectManager.registers.get(name);
+        if (Is.isAbsent(registe)) {
+            console.error(name + '对象未注册');
+            return;
+        }
         let attributes = Object.create(null);
         node.normals.forEach(({name: attrName, value: attrVal}) => {
             let parsedName = attrName.replace(/\-([a-z])/g, (a: string, b: string) => {

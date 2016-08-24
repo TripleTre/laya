@@ -5,7 +5,8 @@ import {data,
         prop,
         sence,
         getter,
-        component} from './decorators/index';
+        component,
+        watch} from './decorators/index';
 import {AbstractSence,
         AbstractSenceConstructor} from './abstract/AbstractSence';
 import {AbstractComponent,
@@ -28,7 +29,8 @@ export {
     AbstractSenceConstructor,
     AbstractComponent,
     AbstractComponentConstructor,
-    LayaObjects
+    LayaObjects,
+    watch
 };
 
 export default laya;

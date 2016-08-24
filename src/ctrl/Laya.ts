@@ -9,13 +9,14 @@ import {AbstractComponentConstructor} from '../abstract/AbstractComponent';
 import ComponentManager from './ComponentManager';
 import Is from '../util/Is';
 import ActivePropertyManager from './ActivePropertyManager';
+import WatchFunctionManager from './WatchFunctionManager';
 
 export default class Laya {
     private static store:    Redux.Store<any>;
     private static curSence: AbstractSence;
     private static game:     Game;
 
-    static initRedux(reducers: Redux.ReducersMapObject, defaultValue: any): void {
+    static initRedux(reducers: any, defaultValue: any): void {
         StateManager.setLast(defaultValue);
         StateManager.setDefaultValue(defaultValue);
         let all = combineReducers(reducers);
@@ -75,6 +76,7 @@ export default class Laya {
     static cancelComponent(name: string): void {
         ComponentManager.cancelComponent(name);
         ActivePropertyManager.cancelRegistData(name);
+        WatchFunctionManager.deleteWatchs(name);
     }
 
     static rebuildSence(): void {

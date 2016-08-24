@@ -13,6 +13,7 @@ import Is from '../util/Is';
 import DisplayObjectManager from './DisplayObjectManager';
 import {forEachKey} from '../util/Iter';
 import {remove} from '../util/Array';
+import WatchFunctionManager from './WatchFunctionManager';
 
 export interface ComponentNode {
     name:       string;
@@ -82,6 +83,9 @@ export default class ComponentManager {
         this.nameIdMap.get(name).push(id);
         let activeProperties = ActivePropertyManager.getActiveProperties(name);
         ViewModelManager.initComponentViewModel(build, activeProperties);
+        WatchFunctionManager.getWatchs(name).forEach(({property, func}) => {
+            ViewModelManager.addDependences(id, property, build[func].bind(build));
+        });
         // 构建组件的具体实现
         let implement = DisplayObjectManager.buildDisplayObject(build, registe.node, game);
         build.setRootContainer(<any>implement);

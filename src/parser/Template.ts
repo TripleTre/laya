@@ -22,7 +22,10 @@ export function elementToComponentNode(ele: Element): ComponentNode {
                                               };
                                           });
     let children:   Array<Element>   = Dom.getChildren(ele);
-    let phaserCons: string           = ele.nodeName.replace(/^\w/, (a)        => a.toUpperCase());
+    let phaserCons: string           = ele.nodeName.replace(/^\w/, (a)        => a.toUpperCase())
+                                                   .replace(/\-([a-z])/g, (a: string, b: string) => {
+                                                        return b.toUpperCase();
+                                                    });
     let directives: Array<ParsedDirective> = Array.prototype.filter.call(attrs, (v) => /^l-/.test(v.name))
                                           .map(({name, value}): ParsedDirective => {
                                               let directive = parseDirective(name);

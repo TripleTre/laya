@@ -109,7 +109,7 @@ export default class Laya {
     static store:    Redux.Store<any>;
     static curSence: AbstractSence;
     static game:     Game;
-    static initRedux(reducers: Redux.ReducersMapObject, defaultValue: any): void;
+    static initRedux(reducers: any, defaultValue: any): void;
     static boot(game: Game, sence: string): void;
     static registerSence(sences: Array<AbstractSenceConstructor>): void;
     static registerComponent(components: Array<AbstractComponentConstructor>): void;
@@ -151,3 +151,5 @@ export function component(cpt: ComponentLike): any;
 export function prop(arg1: any, propertyName: string): any;
 
 export function getter(getter: (state: any, context: AbstractComponent | AbstractSence) => any, compare?: boolean);
+
+export function watch(property: string): any;
