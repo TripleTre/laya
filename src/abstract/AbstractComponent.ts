@@ -1,5 +1,5 @@
 import {Container,
-        DisplayObject} from './LayaObject';
+        DisplayObject} from './LayaAbstracts';
 import {AbstractSence} from './AbstractSence';
 import {Getter} from '../ctrl/DirectiveManager';
 

@@ -1,4 +1,4 @@
-import {DisplayObject, Container, Game} from '../abstract/LayaObject';
+import {DisplayObject, Container, Game} from '../abstract/LayaAbstracts';
 import {AbstractComponent} from '../abstract/AbstractComponent';
 import {AbstractSence} from '../abstract/AbstractSence';
 import {ComponentNode} from './ComponentManager';
@@ -29,10 +29,18 @@ export default class DisplayObjectManager {
             let parsedName = attrName.replace(/\-([a-z])/g, (a: string, b: string) => {
                         return b.toUpperCase();
             });
-            attributes[parsedName] = attrVal(own);
+            let calcValue = attrVal(own); // 表达式计算结果
+            if (calcValue === undefined) {
+                console.warn(name + ' 标签,' + parsedName + '属性计算结果为 undefined，检查标签中属性值是否拼写错误.');
+            }
+            attributes[parsedName] = calcValue;
         });
         node.directives.forEach(({name, argument, value, triggers}) => {
-             attributes[argument] = value(own);
+            let calcValue = value(own); // 表达式计算结果
+            if (calcValue === undefined) {
+                console.warn(name + ' 标签,' + argument + '属性计算结果为 undefined，检查标签中属性值是否拼写错误.');
+            }
+            attributes[argument] = calcValue;
         });
         let build = new registe(game, attributes);
         node.directives.forEach(({name, argument, value, triggers}) => {

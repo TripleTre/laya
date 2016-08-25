@@ -2,7 +2,7 @@ import {createStore, combineReducers} from 'redux';
 import * as Redux from 'redux/index.d.ts';
 import StateManager from './StateManager';
 import {AbstractSence, AbstractSenceConstructor} from '../abstract/AbstractSence';
-import {Game} from '../abstract/LayaObject';
+import {Game} from '../abstract/LayaAbstracts';
 import SenceManager from './SenceManager';
 import DisplayObjectManager from './DisplayObjectManager';
 import {AbstractComponentConstructor} from '../abstract/AbstractComponent';

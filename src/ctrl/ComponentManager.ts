@@ -1,6 +1,6 @@
 import {AbstractComponentConstructor, AbstractComponent} from '../abstract/AbstractComponent';
 import {AbstractSence} from '../abstract/AbstractSence';
-import {Container, DisplayObject, Game} from '../abstract/LayaObject';
+import {Container, DisplayObject, Game} from '../abstract/LayaAbstracts';
 import counter from './Counter';
 import {ActiveProperties} from './ActivePropertyManager';
 import ActivePropertyManager from './ActivePropertyManager';
@@ -72,10 +72,18 @@ export default class ComponentManager {
             let parsedName = attrName.replace(/\-([a-z])/g, (a: string, b: string) => {
                         return b.toUpperCase();
             });
-            build[parsedName] = attrVal(own);
+            let calcValue = attrVal(own); // 表达式计算结果
+            if (calcValue === undefined) {
+                console.warn(name + ' 组件,' + parsedName + '属性计算结果为 undefined，检查标签中属性值是否拼写错误.');
+            }
+            build[parsedName] = calcValue;
         });
         node.directives.forEach(({name, argument, value, triggers}) => {
-            build[argument] = value(own);
+            let calcValue = value(own); // 表达式计算结果
+            if (calcValue === undefined) {
+                console.warn(name + ' 组件,' + argument + '属性计算结果为 undefined，检查标签中属性值是否拼写错误.');
+            }
+            build[argument] = calcValue;
             DirectiveManager.getDirective(name).bind(own, build, argument, value, triggers);
         });
         let id = build.getId();
@@ -85,6 +93,7 @@ export default class ComponentManager {
         ViewModelManager.initComponentViewModel(build, activeProperties);
         WatchFunctionManager.getWatchs(name).forEach(({property, func}) => {
             ViewModelManager.addDependences(id, property, build[func].bind(build));
+            build[func].bind(build)(); // 根据现有 viewModel 重新build sence的时候
         });
         // 构建组件的具体实现
         let implement = DisplayObjectManager.buildDisplayObject(build, registe.node, game);

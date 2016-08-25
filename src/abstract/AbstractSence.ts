@@ -1,4 +1,4 @@
-import {World, Game} from './LayaObject';
+import {World, Game} from './LayaAbstracts';
 import {AbstractComponent} from './AbstractComponent';
 import {Getter} from '../ctrl/DirectiveManager';
 import ComponentManager from '../ctrl/ComponentManager';

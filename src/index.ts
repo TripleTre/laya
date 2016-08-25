@@ -11,7 +11,7 @@ import {AbstractSence,
         AbstractSenceConstructor} from './abstract/AbstractSence';
 import {AbstractComponent,
         AbstractComponentConstructor} from './abstract/AbstractComponent';
-import * as LayaObjects from './abstract/LayaObject';
+import * as LayaAbstracts from './abstract/LayaAbstracts';
 import DirectiveManager from './ctrl/DirectiveManager';
 import laya from './ctrl/Laya';
 
@@ -29,7 +29,7 @@ export {
     AbstractSenceConstructor,
     AbstractComponent,
     AbstractComponentConstructor,
-    LayaObjects,
+    LayaAbstracts,
     watch
 };
 

@@ -7,7 +7,7 @@ import ViewModelManager from './ViewModelManager';
 import {ActiveProperties} from './ActivePropertyManager';
 import ActivePropertyManager from './ActivePropertyManager';
 import DisplayObjectManager from './DisplayObjectManager';
-import {Game} from '../abstract/LayaObject';
+import {Game} from '../abstract/LayaAbstracts';
 
 interface NamedSenceData {
     node:             ComponentNode;

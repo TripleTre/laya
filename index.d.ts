@@ -38,12 +38,6 @@ export interface AbstractComponentConstructor {
 }
 
 export class AbstractComponent {
-    private own: AbstractComponent | AbstractSence;
-    private id: number;
-    private rootContainer: Container<DisplayObject>;
-    private getterProperty: Map<Getter, string>;
-    refs: Map<string, any>;
-
     destrop(): void;
     setRootContainer(value: Container<DisplayObject>): void;
     getId(): number;
@@ -57,11 +51,6 @@ export interface AbstractSenceConstructor {
 }
 
 export class AbstractSence {
-    private subComponents: Array<AbstractComponent>;
-    private layaGame:          Game;
-    private getterProperty: Map<Getter, string>;
-    refs: Map<string, any>;
-
     /**
      *  返回场景对象的所有子组件
      */
@@ -75,7 +64,7 @@ export class AbstractSence {
     destroy(): void; 
 }
 
-export namespace LayaObjects {
+export namespace LayaAbstracts {
     interface Container<T> {
         add(obj: T): void;
 
