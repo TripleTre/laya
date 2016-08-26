@@ -59,7 +59,7 @@ export default class ComponentManager {
      * @param container 父级容器
      */
     static buildComponent(own: AbstractComponent | AbstractSence, node: ComponentNode,
-                          container: Container<DisplayObject>, game: Game): AbstractComponent {
+                          container: Container, game: Game): AbstractComponent {
         let name    = node.name;
         let registe = this.registers.get(name);
         let subNode = registe.node;
@@ -95,14 +95,16 @@ export default class ComponentManager {
             ViewModelManager.addDependences(id, property, build[func].bind(build));
             build[func].bind(build)(); // 根据现有 viewModel 重新build sence的时候
         });
-        // 构建组件的具体实现
-        let implement = DisplayObjectManager.buildDisplayObject(build, registe.node, game);
+        // 构建组件的具体实现, 这必然是个container标签
+        let implement = DisplayObjectManager.buildDisplayObject(build, registe.node, game, container);
         build.setRootContainer(<any>implement);
-        container.add(implement);
-        node.children.forEach(v => {
-            // todo
-            new Error('这个node暂时不可能有children的, 明天再来处理, children在subContainer就处理了');
-        });
+        if (Is.isPresent(implement)) {
+            container.add(implement);
+        }
+        let hock = build['create']; // create 钩子
+        if (Is.isPresent(hock) && typeof hock === 'function') {
+            hock.apply(build);
+        }
         return build;
     }
 

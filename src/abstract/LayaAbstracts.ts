@@ -1,9 +1,9 @@
 import {AbstractSenceConstructor, AbstractSence} from './AbstractSence';
 
-export interface Container<T> {
-    add(obj: T): void;
+export interface Container extends DisplayObject {
+    add(obj: DisplayObject): void;
 
-    remove(obj: T, destory: boolean): boolean;
+    remove(obj: DisplayObject, destory: boolean): boolean;
 
     destroy(): void;
 }
@@ -26,4 +26,4 @@ export interface Sence {
     update?(): void;
 }
 
-export interface World extends Container<DisplayObject> {}
+export interface World extends Container {}

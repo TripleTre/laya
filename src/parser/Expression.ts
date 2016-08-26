@@ -27,7 +27,7 @@ export function expressionVars(expression: string): Array<string> {
         return [];
     }
     let ms: Array<string> = expression.replace(/'[^']*'/g, '')
-                                      .match(/\b[a-zA-Z._$]+\b/g);
+                                      .match(/\b[a-z]([a-zA-Z._$0-9]+)?\b/g);
     if (Is.isAbsent(ms)) {
         return [];
     } else {

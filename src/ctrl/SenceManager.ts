@@ -7,7 +7,7 @@ import ViewModelManager from './ViewModelManager';
 import {ActiveProperties} from './ActivePropertyManager';
 import ActivePropertyManager from './ActivePropertyManager';
 import DisplayObjectManager from './DisplayObjectManager';
-import {Game} from '../abstract/LayaAbstracts';
+import {Game, Container} from '../abstract/LayaAbstracts';
 
 interface NamedSenceData {
     node:             ComponentNode;
@@ -46,7 +46,8 @@ export default class SenceManager {
                 let c = ComponentManager.buildComponent(build, v, build.getWorld(), build.getLayaGame());
                 build.addSubComponent(c);
             } else {
-                build.getWorld().add(DisplayObjectManager.buildDisplayObject(build, v, build.getLayaGame()));
+                let ct: Container = build.getWorld();
+                ct.add(DisplayObjectManager.buildDisplayObject(build, v, build.getLayaGame(), ct));
             }
         });
         return build;

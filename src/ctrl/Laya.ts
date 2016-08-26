@@ -85,4 +85,8 @@ export default class Laya {
         let name = curSence.constructor['name'];
         SenceManager.buildSence(name, curSence, Laya.game);
     }
+
+    static dispatch(action: {type: any, value: any}): void {
+        Laya.store.dispatch(action);
+    }
 }

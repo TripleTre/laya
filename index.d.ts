@@ -38,6 +38,7 @@ export interface AbstractComponentConstructor {
 }
 
 export class AbstractComponent {
+    refs: Map<string, any>;
     destrop(): void;
     setRootContainer(value: Container<DisplayObject>): void;
     getId(): number;
@@ -65,10 +66,10 @@ export class AbstractSence {
 }
 
 export namespace LayaAbstracts {
-    interface Container<T> {
-        add(obj: T): void;
+    interface Container extends DisplayObject{
+        add(obj: DisplayObject): void;
 
-        remove(obj: T, destory: boolean): boolean;
+        remove(obj: DisplayObject, destory: boolean): boolean;
 
         destroy(): void;
     }
@@ -91,7 +92,7 @@ export namespace LayaAbstracts {
         update?(): void;
     }
 
-    interface World extends Container<DisplayObject> {}
+    interface World extends Container {}
 }
 
 export default class Laya {
@@ -106,6 +107,7 @@ export default class Laya {
     static useDisplayObject(impls: any): void;
     static cancelComponent(name: string): void;
     static rebuildSence(): void;
+    static dispatch(action: {type: any, value: any}): void;
 }
 
 export interface Directive {
