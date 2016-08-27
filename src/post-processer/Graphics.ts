@@ -6,7 +6,7 @@ import DisplayObjectManager from '../ctrl/DisplayObjectManager';
 import {collectAttributes} from '../ctrl/DisplayObjectManager';
 import Is from '../util/Is';
 
-export default function mask (instance: DisplayObject, own: AbstractComponent | AbstractSence, node: ComponentNode, game: Game, container: Container) {
+export default function graphics (instance: DisplayObject, own: AbstractComponent | AbstractSence, node: ComponentNode, game: Game, container: Container) {
     let graphics = instance.getRealObject<any>();
     node.children.forEach(v => {
         switch (v.name) {
@@ -17,5 +17,5 @@ export default function mask (instance: DisplayObject, own: AbstractComponent | 
             default:
         }
     });
-    container.getRealObject<any>().mask = graphics;
+    container.getRealObject<any>().add(graphics);
 }

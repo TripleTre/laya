@@ -98,9 +98,9 @@ export default class ComponentManager {
         // 构建组件的具体实现, 这必然是个container标签
         let implement = DisplayObjectManager.buildDisplayObject(build, registe.node, game, container);
         build.setRootContainer(<any>implement);
-        if (Is.isPresent(implement)) {
-            container.add(implement);
-        }
+        // if (Is.isPresent(implement)) {
+        //     container.add(implement);
+        // }
         let hock = build['create']; // create 钩子
         if (Is.isPresent(hock) && typeof hock === 'function') {
             hock.apply(build);

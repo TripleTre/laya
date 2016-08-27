@@ -1,13 +1,6 @@
-import {AbstractComponentConstructor} from '../abstract/AbstractComponent';
-import {ComponentNode} from '../ctrl/ComponentManager';
-import ComponentManager from '../ctrl/ComponentManager';
-import {elementToComponentNode} from '../parser/Template';
+import DisplayObjectManager from '../ctrl/DisplayObjectManager';
 
-export interface ComponentLike {
-    template: string;
-}
-
-export default function (component: ComponentLike) {
+export default function (component: {require: Array<string>, optional?: Array<string>}) {
     let template: string        = component.template;
     let paser:    DOMParser     = new DOMParser();
     let ele:      Element       = <Element>(paser.parseFromString(template, 'text/xml')).firstChild;

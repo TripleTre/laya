@@ -10,6 +10,8 @@ import ComponentManager from './ComponentManager';
 import Is from '../util/Is';
 import ActivePropertyManager from './ActivePropertyManager';
 import WatchFunctionManager from './WatchFunctionManager';
+import {AbstractSupportConstructor} from '../abstract/AbstractSupport';
+import SupportObjectManager from './SupportObjectManager';
 
 export default class Laya {
     private static store:    Redux.Store<any>;
@@ -44,6 +46,12 @@ export default class Laya {
     static registerComponent(components: Array<AbstractComponentConstructor>): void {
         components.forEach(value => {
             new value();
+        });
+    }
+
+    static registerSupportObject(supports: Array<AbstractSupportConstructor>): void {
+        supports.forEach(value => {
+            SupportObjectManager.registeSupportObject(value);
         });
     }
 

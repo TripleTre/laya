@@ -65,6 +65,14 @@ export class AbstractSence {
     destroy(): void; 
 }
 
+export interface AbstractSupportConstructor {
+    new(): AbstractSupport;
+}
+
+export class AbstractSupport {
+    //
+}
+
 export namespace LayaAbstracts {
     interface Container extends DisplayObject{
         add(obj: DisplayObject): void;
@@ -103,6 +111,7 @@ export default class Laya {
     static boot(game: Game, sence: string): void;
     static registerSence(sences: Array<AbstractSenceConstructor>): void;
     static registerComponent(components: Array<AbstractComponentConstructor>): void;
+    static registerSupportObject(supports: Array<AbstractSupportConstructor>): void;
     static startSence(name: string, clearWorld: boolean, clearCache?: boolean): void;
     static useDisplayObject(impls: any): void;
     static cancelComponent(name: string): void;
@@ -133,11 +142,18 @@ export interface ComponentLike {
     template: string;
 }
 
+export interface SupportLike {
+    require: Array<string>,
+    optional?: Array<string>
+}
+
 export function sence(sence?: SenceLike): any;
 
 export function data(arg1: any, propertyName: string): any;
 
 export function component(cpt: ComponentLike): any;
+
+export function support(support: SupportLike): any;
 
 export function prop(arg1: any, propertyName: string): any;
 
