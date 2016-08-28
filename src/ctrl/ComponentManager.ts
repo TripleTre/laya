@@ -83,7 +83,7 @@ export default class ComponentManager {
             if (calcValue === undefined) {
                 console.warn(name + ' 组件,' + argument + '属性计算结果为 undefined，检查标签中属性值是否拼写错误.');
             }
-            build[argument] = calcValue;
+            // build[argument] = calcValue;
             DirectiveManager.getDirective(name).bind(own, build, argument, value, triggers);
         });
         let id = build.getId();
@@ -101,7 +101,7 @@ export default class ComponentManager {
         if (Is.isPresent(implement)) {
             container.add(implement);
         }
-        let hock = build['create']; // create 钩子
+        let hock = build['$$create']; // create 钩子
         if (Is.isPresent(hock) && typeof hock === 'function') {
             hock.apply(build);
         }

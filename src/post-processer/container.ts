@@ -21,6 +21,8 @@ export default function container(build: LayaContainer, own: AbstractComponent |
                 ComponentManager.buildComponent(own, v, build, game);
             } else if (DisplayObjectManager.hasDisplay(v.name)) {
                 DisplayObjectManager.buildDisplayObject(own, v, game, build);
+            } else {
+                console.error(v.name + '标签没有对应的注册类!');
             }
         });
     }
