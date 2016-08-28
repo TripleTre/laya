@@ -2,7 +2,7 @@ import {createStore, combineReducers} from 'redux';
 import * as Redux from 'redux/index.d.ts';
 import StateManager from './StateManager';
 import {AbstractSence, AbstractSenceConstructor} from '../abstract/AbstractSence';
-import {Game} from '../abstract/LayaAbstracts';
+import {LayaGame} from '../abstract/LayaInterface';
 import SenceManager from './SenceManager';
 import DisplayObjectManager from './DisplayObjectManager';
 import {AbstractComponentConstructor} from '../abstract/AbstractComponent';
@@ -10,13 +10,14 @@ import ComponentManager from './ComponentManager';
 import Is from '../util/Is';
 import ActivePropertyManager from './ActivePropertyManager';
 import WatchFunctionManager from './WatchFunctionManager';
-import {AbstractSupportConstructor} from '../abstract/AbstractSupport';
+import {AbstractSupportObjectConstructor} from '../abstract/AbstractSupport';
+import {AbstractDisplayObjectConstructor} from '../abstract/AbstractDisplay';
 import SupportObjectManager from './SupportObjectManager';
 
 export default class Laya {
     private static store:    Redux.Store<any>;
     private static curSence: AbstractSence;
-    private static game:     Game;
+    private static game:     LayaGame;
 
     static initRedux(reducers: any, defaultValue: any): void {
         StateManager.setLast(defaultValue);
@@ -29,11 +30,8 @@ export default class Laya {
         });
     }
 
-    static boot(game: Game, sence: string): void {
+    static boot(game: LayaGame, sence: string): void {
         Laya.game = game;
-        // SenceManager.getAllRegisters().forEach((value) => {
-        //     Laya.game.registerSence(value['name'], value);
-        // });
         Laya.startSence(sence, true);
     }
 
@@ -49,9 +47,15 @@ export default class Laya {
         });
     }
 
-    static registerSupportObject(supports: Array<AbstractSupportConstructor>): void {
+    static registerSupportObject(supports: any): void {
         supports.forEach(value => {
-            SupportObjectManager.registeSupportObject(value);
+            SupportObjectManager.registerSupportObject(value);
+        });
+    }
+
+    static registerDisplayObject(displays: any): void {
+        displays.forEach(value => {
+            DisplayObjectManager.registerDisplayObject(value);
         });
     }
 
@@ -62,8 +66,8 @@ export default class Laya {
     static startSence(name: string, clearWorld: boolean, clearCache: boolean = false): void {
         let senceCons = SenceManager.getByName(name);
         let sence     = new senceCons();
-        let preload   = sence.preload;
-        sence.preload = function () {
+        let preload   = sence['preload'];
+        sence['preload'] = function () {
             SenceManager.buildSence(name, sence, Laya.game);
             if (Is.isPresent(preload)) {
                 preload.apply(sence);
@@ -72,10 +76,6 @@ export default class Laya {
         Laya.game.registerSence(name, sence);
         Laya.game.startSence(name, clearWorld, clearCache);
         Laya.curSence = sence;
-    }
-
-    static useDisplayObject(impls: any): void {
-        DisplayObjectManager.setLayaObjectImpl(impls);
     }
 
     /**

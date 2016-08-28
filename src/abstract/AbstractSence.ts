@@ -1,18 +1,19 @@
-import {World, Game} from './LayaAbstracts';
+import {LayaWorld, LayaGame} from './LayaInterface';
 import {AbstractComponent} from './AbstractComponent';
 import {Getter} from '../ctrl/DirectiveManager';
 import ComponentManager from '../ctrl/ComponentManager';
 import ViewModelManager from '../ctrl/ViewModelManager';
 import StateManager from '../ctrl/StateManager';
+import World from '../phaser/display/World';
 
 export interface AbstractSenceConstructor {
     new (): AbstractSence;
 }
 
-export abstract class AbstractSence {
-    refs: Map<string, any>;
+export class AbstractSence {
+    refs: Map<string, any> = new Map<string, any>();
     private subComponents: Array<AbstractComponent> = [];
-    private layaGame:          Game;
+    private layaGame: LayaGame;
     private getterProperty: Map<Getter, string> = new Map<Getter, string>();
 
     /**
@@ -26,11 +27,13 @@ export abstract class AbstractSence {
         this.subComponents.push(component);
     }
 
-    getLayaGame(): Game {
+    getLayaGame(): LayaGame {
         return this.layaGame;
     }
 
-    setLayaGame(game: Game): void {
+    setLayaGame(game: LayaGame): void {
+        let w = game.getRealObject<Phaser.Game>().world;
+        game.setWorld(new World(w));
         this.layaGame = game;
     }
 
@@ -42,8 +45,4 @@ export abstract class AbstractSence {
         });
         this.subComponents = [];
     }
-
-    abstract getWorld(): World;
-    abstract preload(): void;
-    abstract destroy(): void;
 }

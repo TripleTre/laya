@@ -1,5 +1,9 @@
 import {AbstractComponent} from '../abstract/AbstractComponent';
 import {AbstractSence} from '../abstract/AbstractSence';
+import Bind from '../directive/Bind';
+import Ref from '../directive/Ref';
+import Repeat from '../directive/Repeat';
+import Wref from '../directive/Wref';
 
 export interface ParsedDirective {
     name:     string;
@@ -34,3 +38,10 @@ export default class DirectiveManager {
         return DirectiveManager.directives.get(name);
     }
 }
+
+DirectiveManager.addDirective(Bind);
+DirectiveManager.addDirective(Ref);
+DirectiveManager.addDirective(Repeat);
+DirectiveManager.addDirective(Wref);
+
+window['_DirectiveManager'] = DirectiveManager;

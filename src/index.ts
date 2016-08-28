@@ -1,43 +1,33 @@
-import Bind from './decorators/directive/Bind';
-import Ref from './decorators/directive/Ref';
-import Repeat from './decorators/directive/Repeat';
-import {data,
+import * as layaAbstract from './abstract';
+import {component,
         prop,
         sence,
         getter,
-        component,
-        watch,
-        support} from './decorators/index';
-import {AbstractSence,
-        AbstractSenceConstructor} from './abstract/AbstractSence';
-import {AbstractComponent,
-        AbstractComponentConstructor} from './abstract/AbstractComponent';
-import {AbstractSupport, AbstractSupportConstructor} from './abstract/AbstractSupport';
-import * as LayaAbstracts from './abstract/LayaAbstracts';
-import DirectiveManager from './ctrl/DirectiveManager';
+        data,
+        support,
+        display,
+        watch} from './decorators/index';
+import * as layaInterface from './abstract/LayaInterface';
 import laya from './ctrl/Laya';
-import Wref from './decorators/directive/Wref';
+import displayObjects from './phaser/display';
+import supportObjects from './phaser/support';
+import GameBuilder from './util/GameBuilder';
 
-DirectiveManager.addDirective(Bind);
-DirectiveManager.addDirective(Ref);
-DirectiveManager.addDirective(Repeat);
-DirectiveManager.addDirective(Wref);
+laya.registerDisplayObject(displayObjects);
+laya.registerSupportObject(supportObjects);
 
 export {
+    layaAbstract,
+    layaInterface,
     prop,
     data,
     sence,
     getter,
-    support,
     component,
-    AbstractSence,
-    AbstractSenceConstructor,
-    AbstractComponent,
-    AbstractComponentConstructor,
-    LayaAbstracts,
     watch,
-    AbstractSupport,
-    AbstractSupportConstructor
+    support,
+    display,
+    GameBuilder
 };
 
 export default laya;

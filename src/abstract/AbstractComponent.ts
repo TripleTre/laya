@@ -1,5 +1,4 @@
-import {Container,
-        DisplayObject} from './LayaAbstracts';
+import {LayaContainer} from './LayaInterface';
 import {AbstractSence} from './AbstractSence';
 import {Getter} from '../ctrl/DirectiveManager';
 
@@ -18,14 +17,14 @@ export class AbstractComponent {
     private repeatIndex: Map<string, number> = new Map<string, number>();
     private own: AbstractComponent | AbstractSence;
     private id: number;
-    private rootContainer: Container;
+    private rootContainer: LayaContainer;
     private getterProperty: Map<Getter, string> = new Map<Getter, string>();
 
     destroy(): void {
         this.rootContainer.destroy();
     }
 
-    setRootContainer(value: Container): void {
+    setRootContainer(value: LayaContainer): void {
         this.rootContainer = value;
     }
 

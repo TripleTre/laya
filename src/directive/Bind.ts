@@ -1,7 +1,7 @@
-import {AbstractComponent} from '../../abstract/AbstractComponent';
-import {AbstractSence} from '../../abstract/AbstractSence';
-import {expressionVars, expToFunction} from '../../parser/Expression';
-import ViewModelManager from '../../ctrl/ViewModelManager';
+import {AbstractComponent} from '../abstract';
+import {AbstractSence} from '../abstract';
+import {expressionVars, expToFunction} from '../parser/Expression';
+import ViewModelManager from '../ctrl/ViewModelManager';
 
 export default {
     name: 'bind',

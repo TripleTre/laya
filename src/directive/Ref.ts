@@ -1,15 +1,15 @@
-import {AbstractComponent} from '../../abstract/AbstractComponent';
-import {AbstractSence} from '../../abstract/AbstractSence';
+import {AbstractComponent} from '../abstract/AbstractComponent';
+import {AbstractSence} from '../abstract/AbstractSence';
 
 export default {
-    name: 'wref',
+    name: 'ref',
 
     bind(cpt: AbstractComponent | AbstractSence, target: any, argument: string, value: (context) => any, triggers: Array<string>) {
         if (target instanceof AbstractComponent) {
-            console.warn('wref 指令不能使用在组件上');
+            console.warn('ref 指令不能使用在组件上');
             return;
         }
-        window[value(cpt).replace(/'/g, '')] = target;
+        cpt.refs.set(value(cpt).replace(/'/g, ''), target);
     },
 
     unbind() {

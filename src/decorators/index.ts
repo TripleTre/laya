@@ -5,6 +5,7 @@ import getter from './Getter';
 import component from './Component';
 import watch from './Watch';
 import support from './Support';
+import display from './Display';
 
 export {
     prop,
@@ -13,5 +14,6 @@ export {
     getter,
     component,
     watch,
-    support
+    support,
+    display
 }

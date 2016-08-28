@@ -1,6 +1,6 @@
 import {AbstractComponentConstructor, AbstractComponent} from '../abstract/AbstractComponent';
 import {AbstractSence} from '../abstract/AbstractSence';
-import {Container, DisplayObject, Game} from '../abstract/LayaAbstracts';
+import {LayaContainer, LayaGame} from '../abstract/LayaInterface';
 import counter from './Counter';
 import {ActiveProperties} from './ActivePropertyManager';
 import ActivePropertyManager from './ActivePropertyManager';
@@ -59,7 +59,7 @@ export default class ComponentManager {
      * @param container 父级容器
      */
     static buildComponent(own: AbstractComponent | AbstractSence, node: ComponentNode,
-                          container: Container, game: Game): AbstractComponent {
+                          container: LayaContainer, game: LayaGame): AbstractComponent {
         let name    = node.name;
         let registe = this.registers.get(name);
         let subNode = registe.node;
@@ -98,9 +98,9 @@ export default class ComponentManager {
         // 构建组件的具体实现, 这必然是个container标签
         let implement = DisplayObjectManager.buildDisplayObject(build, registe.node, game, container);
         build.setRootContainer(<any>implement);
-        // if (Is.isPresent(implement)) {
-        //     container.add(implement);
-        // }
+        if (Is.isPresent(implement)) {
+            container.add(implement);
+        }
         let hock = build['create']; // create 钩子
         if (Is.isPresent(hock) && typeof hock === 'function') {
             hock.apply(build);
