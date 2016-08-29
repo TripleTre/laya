@@ -1,11 +1,11 @@
-import {LayaWorld} from '../../abstract/LayaInterface';
+import {LayaWorld, LayaContainer} from '../../abstract/LayaInterface';
 import {AbstractDisplayObject} from '../../abstract/AbstractDisplay';
 
-export default class World implements LayaWorld {
+export default class World extends AbstractDisplayObject implements LayaContainer {
     realWorld: Phaser.World;
 
-    constructor(world: Phaser.World) {
-        this.realWorld = world;
+    constructor() {
+        super(-1);
     }
 
     add(obj: AbstractDisplayObject): void {
@@ -22,5 +22,9 @@ export default class World implements LayaWorld {
 
     getRealObject(): Phaser.World {
         return this.realWorld;
+    }
+
+    setWorld(w: Phaser.World) {
+        this.realWorld = w;
     }
 }

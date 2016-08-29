@@ -4,7 +4,8 @@ import {Getter} from '../ctrl/DirectiveManager';
 import ComponentManager from '../ctrl/ComponentManager';
 import ViewModelManager from '../ctrl/ViewModelManager';
 import StateManager from '../ctrl/StateManager';
-import World from '../phaser/display/World';
+import counter from './Counter';
+import DisplayObjectManager from '../ctrl/DisplayObjectManager';
 
 export interface AbstractSenceConstructor {
     new (): AbstractSence;
@@ -12,9 +13,14 @@ export interface AbstractSenceConstructor {
 
 export class AbstractSence {
     refs: Map<string, any> = new Map<string, any>();
+    private id: number;
     private subComponents: Array<AbstractComponent> = [];
     private layaGame: LayaGame;
     private getterProperty: Map<Getter, string> = new Map<Getter, string>();
+
+    constructor() {
+        this.id = counter();
+    }
 
     /**
      *  返回场景对象的所有子组件
@@ -32,17 +38,20 @@ export class AbstractSence {
     }
 
     setLayaGame(game: LayaGame): void {
-        let w = game.getRealObject<Phaser.Game>().world;
-        game.setWorld(new World(w));
         this.layaGame = game;
     }
 
     destorySubComponent(): void {
         this.subComponents.forEach(v => {
-            v.destroy();
-            ComponentManager.deleteComponent(v.getId());
-            StateManager.delete(v.getId());
+            let id = v.getId();
+            ComponentManager.deleteComponent(id);
+            ViewModelManager.deleteViewModel(id);
+            StateManager.delete(id);
         });
         this.subComponents = [];
+    }
+
+    getId(): number {
+        return this.id;
     }
 }

@@ -12,8 +12,8 @@ export default class Button extends AbstractDisplayObject {
     disableFrame: string;
     enableFrame:  string;
 
-    constructor(game: Game, require: any, optional: any) {
-        super();
+    constructor(game: Game, require: any, optional: any, id: number) {
+        super(id);
         this.button = new Phaser.Button(game.realGame, require.x, require.y, require.key,
                             optional.callBack, optional.callBackContext, optional.overFrame,
                             require.outFrame, optional.downFrame, optional.upFrame);

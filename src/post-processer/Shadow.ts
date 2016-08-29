@@ -7,8 +7,9 @@ import DisplayObjectManager from '../ctrl/DisplayObjectManager';
 import {collectAttributes} from '../ctrl/DisplayObjectManager';
 import Is from '../util/Is';
 import SupportObjectManager from '../ctrl/SupportObjectManager';
+import {AbstractSupportObject} from '../abstract/AbstractSupport';
 
-export default function shadow (instance: any, own: AbstractComponent | AbstractSence, node: ComponentNode, game: LayaGame, container: LayaContainer) {
+export default function shadow (instance: AbstractSupportObject, own: AbstractComponent | AbstractSence, node: ComponentNode, game: LayaGame, container: any) {
     let len = instance['$$repeatCount'] || 1;
     for (let i = 0; i < len; i++) {
         if (instance['$$repeatCount'] && instance['$$repeatName']) {
@@ -16,9 +17,10 @@ export default function shadow (instance: any, own: AbstractComponent | Abstract
         }
         node.children.forEach(v => {
             if (SupportObjectManager.hasSupport(v.name)) {
-                SupportObjectManager.buildSupportObject(own, v, game, container);
+                let s = SupportObjectManager.buildSupportObject(own, v, game, container);
+                instance.addChildren(s);
             } else if (ComponentManager.hasComponent(v.name)) {
-                ComponentManager.buildComponent(own, v, instance, game);
+                let c = ComponentManager.buildComponent(own, v, container, game);
             } else if (DisplayObjectManager.hasDisplay(v.name)) {
                 DisplayObjectManager.buildDisplayObject(own, v, game, container);
             }

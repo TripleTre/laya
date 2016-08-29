@@ -40,7 +40,7 @@ export default class ViewModelManager {
      *  @para activeProperties 该类 sence 对象的所有响应属性
      */
     static initSenceViewModel(sence: AbstractSence, activeProperties: ActiveProperties): void {
-        let id  = sence['id'];
+        let id  = sence.getId();
         let map = new Map<string, ViewModel>();
         ViewModelManager.viewModel.set(id, map);
         activeProperties.data.forEach(v => {
@@ -125,3 +125,5 @@ export default class ViewModelManager {
         ViewModelManager.viewModel.delete(id);
     }
 }
+
+window['_ViewModelManager'] = ViewModelManager;

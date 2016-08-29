@@ -1,6 +1,8 @@
 import {LayaContainer} from './LayaInterface';
 import {AbstractSence} from './AbstractSence';
 import {Getter} from '../ctrl/DirectiveManager';
+import counter from './Counter';
+import ComponentManager from '../ctrl/ComponentManager';
 
 /**
  * AbstractComponentConstructor 指定了Component 的构造函数规范
@@ -8,7 +10,7 @@ import {Getter} from '../ctrl/DirectiveManager';
  * 所有 Component 必须继承自 AbstractComponent 接口
  */
 export interface AbstractComponentConstructor {
-    new (): AbstractComponent;
+    new (id: number): AbstractComponent;
 }
 
 export class AbstractComponent {
@@ -20,6 +22,14 @@ export class AbstractComponent {
     private rootContainer: LayaContainer;
     private getterProperty: Map<Getter, string> = new Map<Getter, string>();
 
+    constructor(id) {
+        if (id < 0) {
+            this.id = counter();
+        } else {
+            this.id = id;
+        }
+    }
+
     destroy(): void {
         this.rootContainer.destroy();
     }
@@ -28,12 +38,12 @@ export class AbstractComponent {
         this.rootContainer = value;
     }
 
-    getId(): number {
-        return this.id;
+    getRootContainer(): LayaContainer {
+        return this.rootContainer;
     }
 
-    setId(id: number): void {
-        this.id = id;
+    getId(): number {
+        return this.id;
     }
 
     getOwn(): AbstractComponent | AbstractSence {

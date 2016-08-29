@@ -1,6 +1,6 @@
 import Game from '../display/Game';
 import support from '../../decorators/Support';
-import {AbstractSupportObject} from '../../abstract/AbstractSupport';
+import {AbstractDisplayObject} from '../../abstract/AbstractDisplay';
 
 /**
  *  shadow 并不是一个DisplayObject, shadow的子元素会添加到它的父container里.
@@ -9,9 +9,17 @@ import {AbstractSupportObject} from '../../abstract/AbstractSupport';
 @support({
     require: []
 })
-export default class Shadow extends AbstractSupportObject {
+export default class Shadow extends AbstractDisplayObject {
 
-    constructor(game: Game, require: any, optional: any) {
-        super();
+    constructor(game: Game, require: any, optional: any, id: number) {
+        super(id);
+    }
+
+    getRealObject() {
+        return undefined;
+    }
+
+    destroy() {
+        debugger;
     }
 }

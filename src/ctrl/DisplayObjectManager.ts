@@ -10,6 +10,8 @@ import postProcesser from '../post-processer';
 import SupportObjectManager from './SupportObjectManager';
 import {AbstractDisplayObject} from '../abstract/AbstractDisplay';
 import {AbstractDisplayObjectConstructor} from '../abstract/AbstractDisplay';
+import ViewModelManager from './ViewModelManager';
+import ifbind from '../directive/If';
 
 export function collectAttributes(node: ComponentNode, own: AbstractComponent | AbstractSence, requireAttrs: Array<string>, optionalAttrs: Array<string>): any {
     let setters  = Object.create(null);
@@ -62,6 +64,8 @@ export function collectAttributes(node: ComponentNode, own: AbstractComponent | 
  */
 export default class DisplayObjectManager {
     private static registers: Map<string, AbstractDisplayObjectConstructor> = new Map<string, AbstractDisplayObjectConstructor>();
+    private static instances: Map<number, AbstractDisplayObject> = new Map<number, AbstractDisplayObject>();
+
     /**
      *  构造DisplayObject时,必须传入构造函数的参数
      */
@@ -72,7 +76,7 @@ export default class DisplayObjectManager {
     private static optionalAttrs: Map<string, Array<string>> = new Map<string, Array<string>>();
 
     static buildDisplayObject(own: AbstractComponent | AbstractSence,
-                              node: ComponentNode, game: LayaGame, container: LayaContainer): AbstractDisplayObject {
+                              node: ComponentNode, game: LayaGame, container: LayaContainer, id: number = -1): AbstractDisplayObject {
         let name   = node.name;
         let registe = DisplayObjectManager.registers.get(name);
         if (Is.isAbsent(registe)) {
@@ -80,9 +84,15 @@ export default class DisplayObjectManager {
             return;
         }
         let {require, optional, setters} = collectAttributes(node, own, registe.$$require, registe.$$optional);
-        let build: AbstractDisplayObject = new registe(game, require, optional);
+        let build: AbstractDisplayObject = new registe(game, require, optional, id);
+        DisplayObjectManager.instances.set(build.getId(), build);
         node.directives.forEach(({name, argument, value, triggers}) => {
-             DirectiveManager.getDirective(name).bind(own, build, argument, value, triggers);
+            if (name === 'if') {
+                let d: any = DirectiveManager.getDirective(name);
+                d.bind(own, value, triggers, node, game, container, build.getId());
+            } else {
+                DirectiveManager.getDirective(name).bind(own, build, argument, value, triggers);
+            }
         });
         for (let attr in setters) { // 处理标签中的设置属性
             build[attr] = setters[attr];
@@ -106,6 +116,7 @@ export default class DisplayObjectManager {
                     }
                 });
             }
+            container.addChildren(build);
             container.add(build);
         }
         return build;
@@ -133,4 +144,27 @@ export default class DisplayObjectManager {
     static hasDisplay(name: string): boolean {
         return DisplayObjectManager.registers.has(name);
     }
+
+    static getInstance(id: number): AbstractDisplayObject {
+        return DisplayObjectManager.instances.get(id);
+    }
+
+    static addInstance(obj: AbstractDisplayObject) {
+        DisplayObjectManager.instances.set(obj.getId(), obj);
+    }
+
+    static deleteDisplay(id: number): void {
+        let instance = DisplayObjectManager.instances.get(id);
+        instance.destroy();
+        DisplayObjectManager.instances.delete(id);
+        instance.getChildren().forEach(v => {
+            if (v instanceof AbstractDisplayObject) {
+                DisplayObjectManager.deleteDisplay(v.getId());
+            } else {
+                // 
+            }
+        });
+    }
 }
+
+window['_DisplayObjectManager'] = DisplayObjectManager;

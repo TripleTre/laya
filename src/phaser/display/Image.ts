@@ -7,10 +7,11 @@ import display from '../../decorators/Display';
     require: ['x', 'y', 'key'],
     optional: ['frame']
 })
-class Image implements AbstractDisplayObject {
+class Image extends AbstractDisplayObject {
     private image: Phaser.Image;
 
-    constructor(game: Game, require: any, optional: any) {
+    constructor(game: Game, require: any, optional: any, id: number) {
+        super(id);
         this.image = new Phaser.Image(game.realGame, require.x, require.y, require.key, optional.frame);
     }
 

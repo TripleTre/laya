@@ -10,8 +10,8 @@ import {AbstractSupportObject} from '../../abstract/AbstractSupport';
 export default class Rectangle extends AbstractSupportObject {
     rectangle: Phaser.Rectangle;
 
-    constructor(game: Game, require: any, optional: any) {
-        super();
+    constructor(game: Game, require: any, optional: any, id: number) {
+        super(id);
         this.rectangle = new Phaser.Rectangle(optional.x, optional.y, optional.width, optional.height);
     }
 

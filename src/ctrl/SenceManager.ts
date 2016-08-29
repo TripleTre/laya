@@ -2,7 +2,6 @@ import {AbstractSence, AbstractSenceConstructor} from '../abstract/AbstractSence
 import {ComponentNode} from './ComponentManager';
 import ComponentManager from './ComponentManager';
 import {Getter} from './DirectiveManager';
-import counter from './Counter';
 import ViewModelManager from './ViewModelManager';
 import {ActiveProperties} from './ActivePropertyManager';
 import ActivePropertyManager from './ActivePropertyManager';
@@ -35,9 +34,7 @@ export default class SenceManager {
         let registe = SenceManager.registers.get(name);
         let newFunc = registe.newFunc;
         let node    = registe.node;
-        build['id'] = counter();
-        build.setLayaGame(game);
-        SenceManager.instances.set(build['id'], build);
+        SenceManager.instances.set(build.getId(), build);
         ViewModelManager.initSenceViewModel(build, ActivePropertyManager.getActiveProperties(name));
 
         node.children.forEach(v => {
@@ -46,8 +43,8 @@ export default class SenceManager {
                 let c = ComponentManager.buildComponent(build, v, build.getLayaGame().getWorld(), build.getLayaGame());
                 build.addSubComponent(c);
             } else {
-                let ct: LayaContainer = build.getLayaGame().getWorld();
-                ct.add(DisplayObjectManager.buildDisplayObject(build, v, build.getLayaGame(), ct));
+                let ct = build.getLayaGame().getWorld();
+                ct.add(DisplayObjectManager.buildDisplayObject(build, v, build.getLayaGame(), <any>ct));
             }
         });
         return build;
@@ -66,4 +63,4 @@ export default class SenceManager {
     }
 }
 
-window['_senceManager'] = SenceManager;
+window['_SenceManager'] = SenceManager;

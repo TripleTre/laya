@@ -1,7 +1,6 @@
 import {AbstractComponentConstructor, AbstractComponent} from '../abstract/AbstractComponent';
 import {AbstractSence} from '../abstract/AbstractSence';
-import {LayaContainer, LayaGame} from '../abstract/LayaInterface';
-import counter from './Counter';
+import {LayaContainer, LayaGame, LayaWorld} from '../abstract/LayaInterface';
 import {ActiveProperties} from './ActivePropertyManager';
 import ActivePropertyManager from './ActivePropertyManager';
 import {Getter, ParsedDirective} from './DirectiveManager';
@@ -59,14 +58,13 @@ export default class ComponentManager {
      * @param container 父级容器
      */
     static buildComponent(own: AbstractComponent | AbstractSence, node: ComponentNode,
-                          container: LayaContainer, game: LayaGame): AbstractComponent {
+                          container: LayaContainer | LayaWorld, game: LayaGame, id: number = -1): AbstractComponent {
+        let d1 = Date.now();
         let name    = node.name;
         let registe = this.registers.get(name);
         let subNode = registe.node;
         let newFunc = registe.newFunc;
-
-        let build = new newFunc();
-        build.setId(counter());
+        let build   = new newFunc(id);
         // 设置 component prop 属性的默认值
         node.normals.forEach(({name: attrName, value: attrVal}) => {
             let parsedName = attrName.replace(/\-([a-z])/g, (a: string, b: string) => {
@@ -86,13 +84,13 @@ export default class ComponentManager {
             // build[argument] = calcValue;
             DirectiveManager.getDirective(name).bind(own, build, argument, value, triggers);
         });
-        let id = build.getId();
-        this.instances.set(id, build);
-        this.nameIdMap.get(name).push(id);
+        let identify = build.getId();
+        this.instances.set(identify, build);
+        this.nameIdMap.get(name).push(identify);
         let activeProperties = ActivePropertyManager.getActiveProperties(name);
         ViewModelManager.initComponentViewModel(build, activeProperties);
         WatchFunctionManager.getWatchs(name).forEach(({property, func}) => {
-            ViewModelManager.addDependences(id, property, build[func].bind(build));
+            ViewModelManager.addDependences(identify, property, build[func].bind(build));
             build[func].bind(build)(); // 根据现有 viewModel 重新build sence的时候
         });
         // 构建组件的具体实现, 这必然是个container标签
@@ -105,6 +103,7 @@ export default class ComponentManager {
         if (Is.isPresent(hock) && typeof hock === 'function') {
             hock.apply(build);
         }
+        console.log(Date.now() - d1, node.name);
         return build;
     }
 
@@ -120,7 +119,7 @@ export default class ComponentManager {
     }
 
     /**
-     *  注销 component, 清楚注册信息
+     *  注销 component, 清除注册信息
      */
     static cancelComponent(name: string) {
         let cancels = ComponentManager.nameIdMap.get(name);
@@ -128,16 +127,23 @@ export default class ComponentManager {
 
         ComponentManager.registers.delete(name);
         ComponentManager.registed.delete(name);
-        forEachKey<number>(keys, (value) => {
-            if (cancels.indexOf(value) >= 0) {
-                ComponentManager.instances.delete(value);
-                ViewModelManager.deleteViewModel(value);
-            }
-        });
+        // forEachKey<number>(keys, (value) => {
+        //     if (cancels.indexOf(value) >= 0) {
+        //         ComponentManager.instances.delete(value);
+        //         ViewModelManager.deleteViewModel(value);
+        //     }
+        // });
         ComponentManager.nameIdMap.delete(name);
     }
 
+    /**
+     *  删除 component 实例
+     */
     static deleteComponent(id: number) {
+        let cpt = ComponentManager.instances.get(id);
+        let rootId = cpt.getRootContainer().getId();
+        DisplayObjectManager.deleteDisplay(rootId);
+        cpt.destroy();
         ComponentManager.instances.delete(id);
         ComponentManager.nameIdMap.forEach(v => {
             remove(v, id);

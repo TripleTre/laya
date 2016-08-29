@@ -7,8 +7,9 @@ import DisplayObjectManager from '../ctrl/DisplayObjectManager';
 import Is from '../util/Is';
 import SupportObjectManager from '../ctrl/SupportObjectManager';
 
-export default function container(build: LayaContainer, own: AbstractComponent | AbstractSence, node: ComponentNode, game: LayaGame, container: LayaContainer) {
+export default function container(build: any, own: AbstractComponent | AbstractSence, node: ComponentNode, game: LayaGame, container: LayaContainer) {
     container.add(build);
+    container.addChildren(build);
     let len = build['$$repeatCount'] || 1;
     for (let i = 0; i < len; i++) {
         if (build['$$repeatCount'] && build['$$repeatName']) {

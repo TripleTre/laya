@@ -9,7 +9,8 @@ export interface LayaContainer extends AbstractDisplayObject {
     destroy(): void;
 }
 
-export interface LayaGame extends AbstractDisplayObject {
+export interface LayaGame {
+    getRealObject<T>(): T;
     setWorld(world: LayaWorld);
     getWorld(): LayaWorld;
     startSence(name: string, clearWorld: boolean, clearCache?: boolean): void;
@@ -22,4 +23,10 @@ export interface Sence {
     update?(): void;
 }
 
-export interface LayaWorld extends LayaContainer {}
+export interface LayaWorld extends AbstractDisplayObject {
+    add(obj: AbstractDisplayObject): void;
+
+    remove(obj: AbstractDisplayObject, destory: boolean): boolean;
+
+    destroy(): void;
+}

@@ -7,7 +7,7 @@ export default {
     name: 'bind',
 
     bind(cpt: AbstractComponent | AbstractSence, target: any, argument: string, value: (context) => any, triggers: Array<string>) {
-        let id   = cpt instanceof AbstractComponent ? cpt.getId() : cpt['id'];
+        let id = cpt.getId();
         triggers.forEach((v) => {
             if (target instanceof AbstractComponent) {
                 ViewModelManager.addDependences(id, v, (() => {

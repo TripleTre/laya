@@ -29,10 +29,12 @@ export namespace layaInterface{
 
 export namespace layaAbstract{
     interface AbstractComponentConstructor {
-        new (): AbstractComponent;
+        new (id: number): AbstractComponent;
     }
 
     abstract class AbstractComponent {
+        constructor(id: number);
+
         refs: Map<string, any>;
 
         destroy(): void;
@@ -40,8 +42,6 @@ export namespace layaAbstract{
         setRootContainer(value: layaInterface.LayaContainer): void;
 
         getId(): number;
-
-        setId(id: number): void;
 
         getOwn(): AbstractComponent | AbstractSence;
 
@@ -55,10 +55,12 @@ export namespace layaAbstract{
     interface AbstractDisplayObjectConstructor {
         $$require: Array<string>;
         $$optional: Array<string>;
-        new(): AbstractDisplayObject;
+        new(game: layaInterface.LayaGame, require: any, optional: any, id: number): AbstractDisplayObject;
     }
 
     abstract class AbstractDisplayObject {
+        constructor(id: number);
+        getId(): number;
         abstract getRealObject<T>(): T;
         abstract destroy(): void;
     }
@@ -82,16 +84,19 @@ export namespace layaAbstract{
         setLayaGame(game: layaInterface.LayaGame): void;
 
         destorySubComponent(): void;
+        
+        getId(): number;
     }
 
     interface AbstractSupportObjectConstructor {
         $$require: Array<string>;
         $$optional: Array<string>;
-        new(): AbstractSupportObject;
+        new(game: layaInterface.LayaGame, require: any, optional: any, id: number): AbstractSupportObject;
     }
 
     abstract class AbstractSupportObject {
-        //
+        constructor(id: number);
+        getId(): number;
     }
 }
 

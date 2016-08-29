@@ -44,6 +44,6 @@ DirectiveManager.addDirective(Bind);
 DirectiveManager.addDirective(Ref);
 DirectiveManager.addDirective(Repeat);
 DirectiveManager.addDirective(Wref);
-DirectiveManager.addDirective(If);
+DirectiveManager.addDirective(<any>If);
 
 window['_DirectiveManager'] = DirectiveManager;

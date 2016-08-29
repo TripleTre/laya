@@ -13,6 +13,7 @@ import WatchFunctionManager from './WatchFunctionManager';
 import {AbstractSupportObjectConstructor} from '../abstract/AbstractSupport';
 import {AbstractDisplayObjectConstructor} from '../abstract/AbstractDisplay';
 import SupportObjectManager from './SupportObjectManager';
+import World from '../phaser/display/World';
 
 export default class Laya {
     private static store:    Redux.Store<any>;
@@ -30,21 +31,33 @@ export default class Laya {
         });
     }
 
-    static boot(game: LayaGame, sence: string): void {
+    static boot(game: LayaGame, senceName: string): void {
         Laya.game = game;
-        Laya.startSence(sence, true);
+        let world = new World();
+        Laya.game.setWorld(world);
+        DisplayObjectManager.addInstance(world);
+        let senceCons = SenceManager.getByName(senceName);
+        let sence     = new senceCons();
+        let preload   = sence['preload'];
+        sence['preload'] = function () {
+            world.setWorld(this.game.world);
+            sence.setLayaGame(Laya.game);
+            SenceManager.buildSence(senceName, sence, Laya.game);
+            if (Is.isPresent(preload)) {
+                preload.apply(sence);
+            }
+        };
+        Laya.game.registerSence(senceName, sence);
+        Laya.game.startSence(senceName, true, false);
+        Laya.curSence = sence;
     }
 
     static registerSence(sences: Array<AbstractSenceConstructor>): void {
-        sences.forEach((value) => {
-            new value();
-        });
+        //
     }
 
     static registerComponent(components: Array<AbstractComponentConstructor>): void {
-        components.forEach(value => {
-            new value();
-        });
+        //
     }
 
     static registerSupportObject(supports: any): void {
@@ -68,6 +81,7 @@ export default class Laya {
         let sence     = new senceCons();
         let preload   = sence['preload'];
         sence['preload'] = function () {
+            sence.setLayaGame(Laya.game);
             SenceManager.buildSence(name, sence, Laya.game);
             if (Is.isPresent(preload)) {
                 preload.apply(sence);

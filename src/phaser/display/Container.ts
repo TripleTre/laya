@@ -8,10 +8,11 @@ import Graphics from './Graphics';
     require: [],
     optional: ['name']
 })
-export default class Container implements LayaContainer {
+export default class Container extends AbstractDisplayObject implements LayaContainer {
     realContainer: Phaser.Group;
 
-    constructor(game: Game, require: any, optional: any) {
+    constructor(game: Game, require: any, optional: any, id: number) {
+        super(id);
         this.realContainer = new Phaser.Group(game.realGame, null, optional.name);
     }
 

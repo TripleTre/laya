@@ -20,11 +20,12 @@ export default class SupportObjectManger {
     private static optionalAttrs: Map<string, Array<string>> = new Map<string, Array<string>>();
 
     static buildSupportObject(own: AbstractComponent | AbstractSence,
-                              node: ComponentNode, game: LayaGame, target: AbstractDisplayObject | AbstractSupportObject): any {
+                              node: ComponentNode, game: LayaGame, target: AbstractDisplayObject | AbstractSupportObject, id: number = -1): AbstractSupportObject {
         let name       = node.name;
         let registe    = SupportObjectManger.registers.get(name);
         let {require, optional, setters} = collectAttributes(node, own, registe.$$require, registe.$$optional);
-        let build = new registe(game, require, optional);
+        let build = new registe(game, require, optional, id);
+        target.addChildren(build);
         node.directives.forEach(({name, argument, value, triggers}) => {
              DirectiveManager.getDirective(name).bind(own, build, argument, value, triggers);
         });
