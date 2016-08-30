@@ -104,6 +104,7 @@ export default class ComponentManager {
             hock.apply(build);
         }
         console.log(Date.now() - d1, node.name);
+        build.resetRepeatIndex();
         return build;
     }
 

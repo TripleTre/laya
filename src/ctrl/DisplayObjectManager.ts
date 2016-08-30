@@ -76,7 +76,7 @@ export default class DisplayObjectManager {
     private static optionalAttrs: Map<string, Array<string>> = new Map<string, Array<string>>();
 
     static buildDisplayObject(own: AbstractComponent | AbstractSence,
-                              node: ComponentNode, game: LayaGame, container: LayaContainer, {id, repeatName, repeatIndex}: any = {}): AbstractDisplayObject {
+                              node: ComponentNode, game: LayaGame, container: LayaContainer, id: number = -1): AbstractDisplayObject {
         let name   = node.name;
         let registe = DisplayObjectManager.registers.get(name);
         if (Is.isAbsent(registe)) {
@@ -117,7 +117,7 @@ export default class DisplayObjectManager {
             container.add(build);
         }
         node.directives.forEach(({name, argument, value, triggers}) => {
-            if (name === 'if') {
+            if (name === 'if' && id < 0) { // 带ID就是if在起作用,不能重复绑定
                 if (!value(own)) {
                     DisplayObjectManager.deleteDisplay(build.getId());
                 }

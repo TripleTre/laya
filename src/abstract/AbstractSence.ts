@@ -6,6 +6,7 @@ import ViewModelManager from '../ctrl/ViewModelManager';
 import StateManager from '../ctrl/StateManager';
 import counter from './Counter';
 import DisplayObjectManager from '../ctrl/DisplayObjectManager';
+import {forEachKey} from '../util/Iter';
 
 export interface AbstractSenceConstructor {
     new (): AbstractSence;
@@ -83,5 +84,19 @@ export class AbstractSence {
 
     hasRepeatAttr(name: string): boolean {
         return this.$$repeatAttrs.has(name);
+    }
+
+    resetRepeatIndex() {
+        forEachKey<string>(this.repeatIndex.keys(), (function (key) {
+            this.repeatIndex.set(key, 0);
+        }).bind(this));
+    }
+
+    generatorRepeatInfo() {
+        let ret = Object.create(null);
+        forEachKey<string>(this.repeatIndex.keys(), (function (key) {
+            ret[key] = this.repeatIndex.get(key);
+        }).bind(this));
+        return ret;
     }
 }

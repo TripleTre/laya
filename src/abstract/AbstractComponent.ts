@@ -3,6 +3,7 @@ import {AbstractSence} from './AbstractSence';
 import {Getter} from '../ctrl/DirectiveManager';
 import counter from './Counter';
 import ComponentManager from '../ctrl/ComponentManager';
+import {forEachKey} from '../util/Iter';
 
 /**
  * AbstractComponentConstructor 指定了Component 的构造函数规范
@@ -80,5 +81,19 @@ export class AbstractComponent {
 
     hasRepeatAttr(name: string): boolean {
         return this.$$repeatAttrs.has(name);
+    }
+
+    resetRepeatIndex() {
+        forEachKey<string>(this.repeatIndex.keys(), (function (key) {
+            this.repeatIndex.set(key, 0);
+        }).bind(this));
+    }
+
+    generatorRepeatInfo() {
+        let ret = Object.create(null);
+        forEachKey<string>(this.repeatIndex.keys(), (function (key) {
+            ret[key] = this.repeatIndex.get(key);
+        }).bind(this));
+        return ret;
     }
 }

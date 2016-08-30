@@ -11,7 +11,10 @@ export default {
 
     bind(context: AbstractComponent | AbstractSence,
                          value: Function, triggers: Array<string>, node: ComponentNode, game: LayaGame, container: LayaContainer, id: number, repeatName: string, repeatIndex: number) {
-        let dep = (function ([value, node, game, container, id]) {
+        let dep = (function ([value, node, game, container, id, repeatInfo]) {
+            for (let attr in repeatInfo) {
+                this.setRepeatIndex(attr, repeatInfo[attr]);
+            }
             if (value(this) === true) {
                 if (DisplayObjectManager.hasDisplay(node.name)) {
                     DisplayObjectManager.buildDisplayObject(this, node, game, container, id);
@@ -21,7 +24,7 @@ export default {
             } else {
                 DisplayObjectManager.deleteDisplay(id);
             }
-        }).bind(context, [value, node, game, container, id]);
+        }).bind(context, [value, node, game, container, id, context.generatorRepeatInfo()]);
         window['__dep'] = dep;
         triggers.forEach(v => {
             if (context.hasRepeatAttr(v)) {
