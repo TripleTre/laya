@@ -10,8 +10,12 @@ import display from '../../decorators/Display';
 class Image extends AbstractDisplayObject {
     private image: Phaser.Image;
 
-    constructor(game: Game, require: any, optional: any, id: number) {
-        super(id);
+    // constructor(game: Game, require: any, optional: any, id: number) {
+    //     super(id);
+    //     this.image = new Phaser.Image(game.realGame, require.x, require.y, require.key, optional.frame);
+    // }
+
+    buildRealObject(game, require, optional) {
         this.image = new Phaser.Image(game.realGame, require.x, require.y, require.key, optional.frame);
     }
 

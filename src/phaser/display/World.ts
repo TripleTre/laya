@@ -4,8 +4,12 @@ import {AbstractDisplayObject} from '../../abstract/AbstractDisplay';
 export default class World extends AbstractDisplayObject implements LayaContainer {
     realWorld: Phaser.World;
 
-    constructor() {
-        super(-1);
+    // constructor() {
+    //     super(-1);
+    // }
+
+    buildRealObject(game, require, optional) {
+        //
     }
 
     add(obj: AbstractDisplayObject): void {

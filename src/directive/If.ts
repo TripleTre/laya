@@ -4,21 +4,29 @@ import {ComponentNode} from '../ctrl/ComponentManager';
 import {LayaContainer, LayaGame} from '../abstract/LayaInterface';
 import DisplayObjectManager from '../ctrl/DisplayObjectManager';
 import ViewModelManager from '../ctrl/ViewModelManager';
+import SupportObjectManager from '../ctrl/SupportObjectManager';
 
 export default {
     name: 'if',
 
     bind(context: AbstractComponent | AbstractSence,
-                         value: Function, triggers: Array<string>, node: ComponentNode, game: LayaGame, container: LayaContainer, id: number) {
+                         value: Function, triggers: Array<string>, node: ComponentNode, game: LayaGame, container: LayaContainer, id: number, repeatName: string, repeatIndex: number) {
         let dep = (function ([value, node, game, container, id]) {
             if (value(this) === true) {
-                DisplayObjectManager.buildDisplayObject(this, node, game, container, id);
+                if (DisplayObjectManager.hasDisplay(node.name)) {
+                    DisplayObjectManager.buildDisplayObject(this, node, game, container, id);
+                } else if (SupportObjectManager) {
+                    // SupportObjectManager.buildSupportObject(this, node, game, container, container);
+                }
             } else {
-                DisplayObjectManager.getInstance(id).destroy();
+                DisplayObjectManager.deleteDisplay(id);
             }
         }).bind(context, [value, node, game, container, id]);
-        dep(value(context));
+        window['__dep'] = dep;
         triggers.forEach(v => {
+            if (context.hasRepeatAttr(v)) {
+                return;
+            }
             ViewModelManager.addDependences(context.getId(), v, dep);
         });
     },

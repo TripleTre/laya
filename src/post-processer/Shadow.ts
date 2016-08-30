@@ -17,7 +17,7 @@ export default function shadow (instance: AbstractSupportObject, own: AbstractCo
         }
         node.children.forEach(v => {
             if (SupportObjectManager.hasSupport(v.name)) {
-                let s = SupportObjectManager.buildSupportObject(own, v, game, container);
+                let s = SupportObjectManager.buildSupportObject(own, v, game, container, container);
                 instance.addChildren(s);
             } else if (ComponentManager.hasComponent(v.name)) {
                 let c = ComponentManager.buildComponent(own, v, container, game);

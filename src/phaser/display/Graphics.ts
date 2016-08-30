@@ -10,8 +10,12 @@ import Rectangle from '../support/Rectangle';
 export default class Graphics extends AbstractDisplayObject {
     graphics: Phaser.Graphics;
 
-    constructor(game: Game, require: any, optional: any, id: number) {
-        super(id);
+    // constructor(game: Game, require: any, optional: any, id: number) {
+    //     super(id);
+    //     this.graphics = new Phaser.Graphics(game.realGame, require.x, require.y);
+    // }
+
+    buildRealObject(game, require, optional) {
         this.graphics = new Phaser.Graphics(game.realGame, require.x, require.y);
     }
 

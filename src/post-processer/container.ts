@@ -11,17 +11,21 @@ export default function container(build: any, own: AbstractComponent | AbstractS
     container.add(build);
     container.addChildren(build);
     let len = build['$$repeatCount'] || 1;
+    debugger;
     for (let i = 0; i < len; i++) {
         if (build['$$repeatCount'] && build['$$repeatName']) {
             (<AbstractComponent>own).setRepeatIndex(build['$$repeatName'], i);
         }
         node.children.forEach(v => {
             if (SupportObjectManager.hasSupport(v.name)) {
-                SupportObjectManager.buildSupportObject(own, v, game, build);
+                SupportObjectManager.buildSupportObject(own, v, game, build, build);
             } else if (ComponentManager.hasComponent(v.name)) {
                 ComponentManager.buildComponent(own, v, build, game);
             } else if (DisplayObjectManager.hasDisplay(v.name)) {
-                DisplayObjectManager.buildDisplayObject(own, v, game, build);
+                DisplayObjectManager.buildDisplayObject(own, v, game, build, {
+                    repeatName: build['$$repeatName'],
+                    repeatIndex: own[build['$$repeatName'] + 'Index']
+                });
             } else {
                 console.error(v.name + '标签没有对应的注册类!');
             }

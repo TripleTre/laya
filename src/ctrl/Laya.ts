@@ -33,7 +33,7 @@ export default class Laya {
 
     static boot(game: LayaGame, senceName: string): void {
         Laya.game = game;
-        let world = new World();
+        let world = new World(undefined, undefined, undefined, -1);
         Laya.game.setWorld(world);
         DisplayObjectManager.addInstance(world);
         let senceCons = SenceManager.getByName(senceName);

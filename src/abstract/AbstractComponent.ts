@@ -17,6 +17,7 @@ export class AbstractComponent {
     refs: Map<string, any> = new Map<string, any>();
     private repeatScope: Map<string, Array<any>> = new Map<string, Array<any>>();
     private repeatIndex: Map<string, number> = new Map<string, number>();
+    private $$repeatAttrs: Set<string> = new Set<string>();
     private own: AbstractComponent | AbstractSence;
     private id: number;
     private rootContainer: LayaContainer;
@@ -56,6 +57,7 @@ export class AbstractComponent {
 
     addToRepeatScope(name: string, value: any) {
         this.repeatScope.set(name, value);
+        this.$$repeatAttrs.add(name);
         if (!this.hasOwnProperty(name)) {
             Object.defineProperty(this, name, {
                 get() {
@@ -74,5 +76,9 @@ export class AbstractComponent {
                 }
             });
         }
+    }
+
+    hasRepeatAttr(name: string): boolean {
+        return this.$$repeatAttrs.has(name);
     }
 }

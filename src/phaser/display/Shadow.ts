@@ -11,8 +11,12 @@ import {AbstractDisplayObject} from '../../abstract/AbstractDisplay';
 })
 export default class Shadow extends AbstractDisplayObject {
 
-    constructor(game: Game, require: any, optional: any, id: number) {
-        super(id);
+    // constructor(game: Game, require: any, optional: any, id: number) {
+    //     super(id);
+    // }
+
+    buildRealObject(game, require, optional) {
+        //
     }
 
     getRealObject() {
@@ -20,6 +24,6 @@ export default class Shadow extends AbstractDisplayObject {
     }
 
     destroy() {
-        debugger;
+        // todo shadow destroy 要删除被添加到上层 container 的 DisplayObject
     }
 }

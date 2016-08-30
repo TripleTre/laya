@@ -17,6 +17,9 @@ export class AbstractSence {
     private subComponents: Array<AbstractComponent> = [];
     private layaGame: LayaGame;
     private getterProperty: Map<Getter, string> = new Map<Getter, string>();
+    private repeatScope: Map<string, Array<any>> = new Map<string, Array<any>>();
+    private repeatIndex: Map<string, number> = new Map<string, number>();
+    private $$repeatAttrs: Set<string> = new Set<string>();
 
     constructor() {
         this.id = counter();
@@ -53,5 +56,32 @@ export class AbstractSence {
 
     getId(): number {
         return this.id;
+    }
+
+    addToRepeatScope(name: string, value: any) {
+        this.repeatScope.set(name, value);
+        this.$$repeatAttrs.add(name);
+        if (!this.hasOwnProperty(name)) {
+            Object.defineProperty(this, name, {
+                get() {
+                    return this.repeatScope.get(name)[this.repeatIndex.get(name)];
+                }
+            });
+        }
+    }
+
+    setRepeatIndex(name: string, index: number) {
+        this.repeatIndex.set(name, index);
+        if (!this.hasOwnProperty(name + 'Index')) {
+            Object.defineProperty(this, name + 'Index', {
+                get() {
+                    return this.repeatIndex.get(name);
+                }
+            });
+        }
+    }
+
+    hasRepeatAttr(name: string): boolean {
+        return this.$$repeatAttrs.has(name);
     }
 }

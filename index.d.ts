@@ -63,6 +63,7 @@ export namespace layaAbstract{
         getId(): number;
         abstract getRealObject<T>(): T;
         abstract destroy(): void;
+        abstract buildRealObject(game: layaInterface.LayaGame, require: any, optional: any): void;
     }
 
     export interface AbstractSenceConstructor {

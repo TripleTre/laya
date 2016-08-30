@@ -15,13 +15,14 @@ export abstract class AbstractDisplayObject {
     private id: number;
     private children: Set<AbstractDisplayObject | AbstractSupportObject>;
 
-    constructor(id) {
-        if (id < 0) {
+    constructor(game, require, optional, id) {
+        if (id < 0 || id === undefined) {
             this.id = counter();
         } else {
             this.id = id;
         }
         this.children = new Set<AbstractDisplayObject | AbstractSupportObject>();
+        this.buildRealObject(game, require, optional);
     }
 
     getId(): number {
@@ -38,4 +39,5 @@ export abstract class AbstractDisplayObject {
 
     abstract getRealObject<T>(): T;
     abstract destroy(): void;
+    abstract buildRealObject(game: LayaGame, require: any, optional: any): void;
 }

@@ -76,7 +76,7 @@ export default class DisplayObjectManager {
     private static optionalAttrs: Map<string, Array<string>> = new Map<string, Array<string>>();
 
     static buildDisplayObject(own: AbstractComponent | AbstractSence,
-                              node: ComponentNode, game: LayaGame, container: LayaContainer, id: number = -1): AbstractDisplayObject {
+                              node: ComponentNode, game: LayaGame, container: LayaContainer, {id, repeatName, repeatIndex}: any = {}): AbstractDisplayObject {
         let name   = node.name;
         let registe = DisplayObjectManager.registers.get(name);
         if (Is.isAbsent(registe)) {
@@ -87,10 +87,7 @@ export default class DisplayObjectManager {
         let build: AbstractDisplayObject = new registe(game, require, optional, id);
         DisplayObjectManager.instances.set(build.getId(), build);
         node.directives.forEach(({name, argument, value, triggers}) => {
-            if (name === 'if') {
-                let d: any = DirectiveManager.getDirective(name);
-                d.bind(own, value, triggers, node, game, container, build.getId());
-            } else {
+            if (name !== 'if') {
                 DirectiveManager.getDirective(name).bind(own, build, argument, value, triggers);
             }
         });
@@ -119,6 +116,15 @@ export default class DisplayObjectManager {
             container.addChildren(build);
             container.add(build);
         }
+        node.directives.forEach(({name, argument, value, triggers}) => {
+            if (name === 'if') {
+                if (!value(own)) {
+                    DisplayObjectManager.deleteDisplay(build.getId());
+                }
+                let d: any = DirectiveManager.getDirective(name);
+                d.bind(own, value, triggers, node, game, container, build.getId());
+            }
+        });
         return build;
     }
 
@@ -155,13 +161,14 @@ export default class DisplayObjectManager {
 
     static deleteDisplay(id: number): void {
         let instance = DisplayObjectManager.instances.get(id);
+        if (Is.isAbsent(instance)) {
+            return;
+        }
         instance.destroy();
         DisplayObjectManager.instances.delete(id);
         instance.getChildren().forEach(v => {
             if (v instanceof AbstractDisplayObject) {
                 DisplayObjectManager.deleteDisplay(v.getId());
-            } else {
-                // 
             }
         });
     }
