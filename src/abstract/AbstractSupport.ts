@@ -4,7 +4,7 @@ import counter from './Counter';
 export interface AbstractSupportObjectConstructor {
     $$require: Array<string>;
     $$optional: Array<string>;
-    new(game: LayaGame, require: any, optional: any, id: number): AbstractSupportObject;
+    new(game: LayaGame, target: any, require: any, optional: any, id: number): AbstractSupportObject;
 }
 
 export abstract class AbstractSupportObject {

@@ -27,23 +27,23 @@ export function expressionVars(expression: string): Array<string> {
         return [];
     }
     let list = [];
-    expression = expression.replace(/\{.*\}/g, (substring) => {
-        substring.replace(/[a-zA-Z_$]+\s*:\s*([a-zA-Z_$]+)/g, (a, b, index) => {
-            list.push(b);
-            return a;
-        });
+    expression = expression.replace(/\{.*:(.*)\}/g, (a, b, c, d) => {
+        let s = list.concat(b.replace(/'[^']*'/g, '')
+                    .match(/\b[a-z]([a-zA-Z._$0-9]+)?\b/g));
+        if (Is.isPresent(s)) {
+            list = list.concat(s);
+        }
         return '';
     });
     let ms: Array<string> = expression.replace(/'[^']*'/g, '')
                                       .match(/\b[a-z]([a-zA-Z._$0-9]+)?\b/g);
-    if (Is.isAbsent(ms)) {
-        return [];
-    } else {
-        return ms.concat(list).filter(v => !ignoreWordsRE.test(v));
+    if (Is.isPresent(ms)) {
+        list = list.concat(ms);
     }
+    return list.filter(v => !ignoreWordsRE.test(v));
 }
 
-let test = "'abc'+88* ppp ==={xxx: 'yyy', b: 0, c: false, d: vvv} ? true : false";
+let test = "'abc'+ 88 * ppp === {y: 150 * (reel.length - xxx - 3)} ? true : false";
 console.log(expressionVars(test));
 
 /**

@@ -11,7 +11,7 @@ export default class Mask extends AbstractSupportObject {
 
     graphics: Phaser.Graphics;
 
-    constructor(game: Game, require: any, optional: any, id: number) {
+    constructor(game: Game, target: any, require: any, optional: any, id: number) {
         super(id);
         this.graphics = new Phaser.Graphics(game.realGame, require.x, require.y);
     }

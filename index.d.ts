@@ -92,7 +92,7 @@ export namespace layaAbstract{
     interface AbstractSupportObjectConstructor {
         $$require: Array<string>;
         $$optional: Array<string>;
-        new(game: layaInterface.LayaGame, require: any, optional: any, id: number): AbstractSupportObject;
+        new(game: layaInterface.LayaGame, target: any, require: any, optional: any, id: number): AbstractSupportObject;
     }
 
     abstract class AbstractSupportObject {

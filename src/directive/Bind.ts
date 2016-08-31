@@ -19,7 +19,6 @@ export default {
                 }));
             } else { // 对于 displayObject 和 supportObject 直接给相应属性赋值即可
                 ViewModelManager.addDependences(id, v, (() => {
-                    console.log(target); // todo target被闭包引用了, 需要处理
                     target[argument] = value(cpt);
                 }));
             }

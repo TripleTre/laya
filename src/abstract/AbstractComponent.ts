@@ -80,7 +80,7 @@ export class AbstractComponent {
     }
 
     hasRepeatAttr(name: string): boolean {
-        return this.$$repeatAttrs.has(name);
+        return this.$$repeatAttrs.has(name.replace('Index', ''));
     }
 
     resetRepeatIndex() {

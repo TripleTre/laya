@@ -24,7 +24,7 @@ export default class SupportObjectManger {
         let name       = node.name;
         let registe    = SupportObjectManger.registers.get(name);
         let {require, optional, setters} = collectAttributes(node, own, registe.$$require, registe.$$optional);
-        let build = new registe(game, require, optional, id);
+        let build = new registe(game, target, require, optional, id);
         target.addChildren(build);
         node.directives.forEach(({name, argument, value, triggers}) => {
              if (name === 'if') {

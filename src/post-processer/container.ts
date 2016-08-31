@@ -17,7 +17,7 @@ export default function container(build: any, own: AbstractComponent | AbstractS
         }
         node.children.forEach(v => {
             if (SupportObjectManager.hasSupport(v.name)) {
-                SupportObjectManager.buildSupportObject(own, v, game, build, build);
+                SupportObjectManager.buildSupportObject(own, v, game, build);
             } else if (ComponentManager.hasComponent(v.name)) {
                 ComponentManager.buildComponent(own, v, build, game);
             } else if (DisplayObjectManager.hasDisplay(v.name)) {

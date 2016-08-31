@@ -9,34 +9,29 @@ import Graphics from './Graphics';
     optional: ['name']
 })
 export default class Container extends AbstractDisplayObject implements LayaContainer {
-    realContainer: Phaser.Group;
-
-    // constructor(game: Game, require: any, optional: any, id: number) {
-    //     // super(id);
-    //     this.realContainer = new Phaser.Group(game.realGame, null, optional.name);
-    // }
+    realObject: Phaser.Group;
 
     buildRealObject(game, require, optional) {
-        this.realContainer = new Phaser.Group(game.realGame, null, optional.name);
+        this.realObject = new Phaser.Group(game.realGame, null, optional.name);
     }
 
     add(obj: AbstractDisplayObject): void {
-        this.realContainer.add(obj.getRealObject());
+        this.realObject.add(obj.getRealObject());
     }
 
     remove(child, destroy): boolean {
-        return this.realContainer.remove(child, destroy);
+        return this.realObject.remove(child, destroy);
     }
 
     getRealObject(): Phaser.Group {
-        return this.realContainer;
+        return this.realObject;
     }
 
     destroy(): void {
-        this.realContainer.destroy(true);
+        this.realObject.destroy(true);
     }
 
     set Mask(value: Graphics) {
-        this.realContainer.mask = value.getRealObject();
+        this.realObject.mask = value.getRealObject();
     }
 }

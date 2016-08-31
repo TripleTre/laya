@@ -29,7 +29,9 @@ export function elementToComponentNode(ele: Element): ComponentNode {
     let directives: Array<ParsedDirective> = Array.prototype.filter.call(attrs, (v) => /^l-/.test(v.name))
                                           .map(({name, value}): ParsedDirective => {
                                               let directive = parseDirective(name);
-                                              let vars = expressionVars(value);
+                                              let vars = expressionVars(value).map(v => {
+                                                  return v.replace(/\..*/, '');
+                                              });
                                               return {
                                                   name: directive.name,
                                                   argument: directive.argument,
