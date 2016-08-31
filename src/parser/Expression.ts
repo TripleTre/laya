@@ -4,7 +4,7 @@ declare var process;
 const ignoreWords = 'true,false,null,undefined,Infinity,NaN';
 const ignoreWordsRE = new RegExp('\\b' + ignoreWords.replace(/,/g, '\\b|\\b') + '\\b');
 const improperKeywords =
-    '{,},this,Math,Date' +
+    'this,Math,Date' +
     'break,case,class,catch,const,continue,debugger,default,' +
     'delete,do,else,export,extends,finally,for,function,if,' +
     'import,in,instanceof,let,return,super,switch,throw,try,' +
@@ -26,14 +26,25 @@ export function expressionVars(expression: string): Array<string> {
         console.error('表达式包含不支持的关键字', improperKeywords, expression);
         return [];
     }
+    let list = [];
+    expression = expression.replace(/\{.*\}/g, (substring) => {
+        substring.replace(/[a-zA-Z_$]+\s*:\s*([a-zA-Z_$]+)/g, (a, b, index) => {
+            list.push(b);
+            return a;
+        });
+        return '';
+    });
     let ms: Array<string> = expression.replace(/'[^']*'/g, '')
                                       .match(/\b[a-z]([a-zA-Z._$0-9]+)?\b/g);
     if (Is.isAbsent(ms)) {
         return [];
     } else {
-        return ms.filter(v => !ignoreWordsRE.test(v));
+        return ms.concat(list).filter(v => !ignoreWordsRE.test(v));
     }
 }
+
+let test = "'abc'+88* ppp ==={xxx: 'yyy', b: 0, c: false, d: vvv} ? true : false";
+console.log(expressionVars(test));
 
 /**
  *  将表达式转化成函数
