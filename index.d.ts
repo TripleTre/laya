@@ -35,7 +35,7 @@ export namespace layaAbstract{
     abstract class AbstractComponent {
         constructor(id: number);
 
-        refs: Map<string, any>;
+        $$refs: any;
 
         destroy(): void;
 
@@ -71,7 +71,7 @@ export namespace layaAbstract{
     }
 
     export abstract class AbstractSence {
-        refs: Map<string, any>;
+        $$refs: any;
 
         /**
          *  返回场景对象的所有子组件

@@ -8,7 +8,6 @@ export default {
 
     bind(cpt: AbstractComponent | AbstractSence, target: any, argument: string, value: (context) => any, triggers: Array<string>) {
         let id     = cpt.getId();
-        let ignore = cpt['repeatScope'].keys();
         triggers.forEach((v) => {
             if (cpt.hasRepeatAttr(v)) {
                 return;

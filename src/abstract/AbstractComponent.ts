@@ -1,6 +1,5 @@
 import {LayaContainer} from './LayaInterface';
 import {AbstractSence} from './AbstractSence';
-import {Getter} from '../ctrl/DirectiveManager';
 import counter from './Counter';
 import ComponentManager from '../ctrl/ComponentManager';
 import {forEachKey} from '../util/Iter';
@@ -14,15 +13,46 @@ export interface AbstractComponentConstructor {
     new (id: number): AbstractComponent;
 }
 
+export interface ViewModel {
+    value: any;
+    dependences: Array<Function>;
+}
+
+export interface Getter {
+    /**
+     * getter 属性的值为一个函数, 参数为当前 state 对象和getter属性修饰的组件实例
+     */
+    getter:  (state: any, context: any) => any,
+    name:    string,
+    compare: boolean
+}
+
+export interface ComponentNode {
+    name:       string;
+    normals:    Array<{name: string, value: (context) => any}>;
+    directives: Array<ParsedDirective>;
+    children:   Array<ComponentNode>;
+}
+
+export interface ParsedDirective {
+    name:     string;
+    argument: string;
+    value:    (context) => any;
+    triggers: Array<string>;
+}
+
 export class AbstractComponent {
-    refs: Map<string, any> = new Map<string, any>();
-    private repeatScope: Map<string, Array<any>> = new Map<string, Array<any>>();
-    private repeatIndex: Map<string, number> = new Map<string, number>();
-    private $$repeatAttrs: Set<string> = new Set<string>();
-    private own: AbstractComponent | AbstractSence;
-    private id: number;
-    private rootContainer: LayaContainer;
-    private getterProperty: Map<Getter, string> = new Map<Getter, string>();
+    static $$registers:     Map<string, any> = new Map<string, any>();
+
+    $$refs:                any                  = Object.create(null);
+    $$vm:                  Map<string, ViewModel>  = new Map<string, ViewModel>();
+    private repeatScope:   Map<string, Array<any>> = new Map<string, Array<any>>();
+    private repeatIndex:   Map<string, number>     = new Map<string, number>();
+    private $$repeatAttrs: Set<string>             = new Set<string>();
+    private own:            AbstractComponent | AbstractSence;
+    private id:             number;
+    private rootContainer:  LayaContainer;
+    // private getterProperty: Map<Getter, string>     =  new Map<Getter, string>();
 
     constructor(id) {
         if (id < 0) {

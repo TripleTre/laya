@@ -11,7 +11,6 @@ import SupportObjectManager from './SupportObjectManager';
 import {AbstractDisplayObject} from '../abstract/AbstractDisplay';
 import {AbstractDisplayObjectConstructor} from '../abstract/AbstractDisplay';
 import ViewModelManager from './ViewModelManager';
-import ifbind from '../directive/If';
 
 export function collectAttributes(node: ComponentNode, own: AbstractComponent | AbstractSence, requireAttrs: Array<string>, optionalAttrs: Array<string>): any {
     let setters  = Object.create(null);
@@ -77,6 +76,9 @@ export default class DisplayObjectManager {
 
     static buildDisplayObject(own: AbstractComponent | AbstractSence,
                               node: ComponentNode, game: LayaGame, container: LayaContainer, id: number = -1): AbstractDisplayObject {
+        if (node.check.some(v => !v(own))) {
+            return;
+        }
         let name   = node.name;
         let registe = DisplayObjectManager.registers.get(name);
         if (Is.isAbsent(registe)) {

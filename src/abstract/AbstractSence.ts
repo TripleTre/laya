@@ -1,6 +1,6 @@
 import {LayaWorld, LayaGame} from './LayaInterface';
 import {AbstractComponent} from './AbstractComponent';
-import {Getter} from '../ctrl/DirectiveManager';
+import {Getter, ComponentNode} from './AbstractComponent';
 import ComponentManager from '../ctrl/ComponentManager';
 import ViewModelManager from '../ctrl/ViewModelManager';
 import StateManager from '../ctrl/StateManager';
@@ -12,12 +12,19 @@ export interface AbstractSenceConstructor {
     new (): AbstractSence;
 }
 
+interface SenceData {
+    node:             ComponentNode;
+    newFunc:          AbstractSenceConstructor;
+}
+
 export class AbstractSence {
-    refs: Map<string, any> = new Map<string, any>();
+    static $$registers: Map<string, SenceData> = new Map<string, SenceData>();
+
+    $$refs: any = Object.create(null);
     private id: number;
     private subComponents: Array<AbstractComponent> = [];
     private layaGame: LayaGame;
-    private getterProperty: Map<Getter, string> = new Map<Getter, string>();
+    // private getterProperty: Map<Getter, string> = new Map<Getter, string>();
     private repeatScope: Map<string, Array<any>> = new Map<string, Array<any>>();
     private repeatIndex: Map<string, number> = new Map<string, number>();
     private $$repeatAttrs: Set<string> = new Set<string>();

@@ -6,4 +6,8 @@ export default function(arg1: any, propertyName: string) {
     }
     let cptName = arg1.constructor.name;
     ActivePropertyManager.addWaiteExecute(cptName, propertyName, 'data');
+    if (arg1.constructor.$$data === undefined) {
+        arg1.constructor.$$data = [];
+    }
+    arg1.constructor.$$data.push(propertyName);
 }

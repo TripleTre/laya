@@ -5,13 +5,16 @@ import {ComponentNode} from '../ctrl/ComponentManager';
 import {expToFunction, expressionVars} from './Expression';
 import {ParsedDirective} from '../ctrl/DirectiveManager';
 import Dom from '../util/Dom';
+import Is from '../util/Is';
 
 /**
  * 将Dom Elment 转换成 ComponentNode 
  */
-export function elementToComponentNode(ele: Element): ComponentNode {
+export function elementToComponentNode(ele: Element, root?: ComponentNode): ComponentNode {
     let res:        ComponentNode    = Object.create(null);
     let attrs:      NamedNodeMap     = ele.attributes;
+    res.check = [];
+    res.condition = [];
     let normals:    Array<{name: string,
                            value: (context) => any}>
                                      = Array.prototype.filter.call(attrs, (v) => !/^l-/.test(v.name))
@@ -27,22 +30,41 @@ export function elementToComponentNode(ele: Element): ComponentNode {
                                                         return b.toUpperCase();
                                                     });
     let directives: Array<ParsedDirective> = Array.prototype.filter.call(attrs, (v) => /^l-/.test(v.name))
-                                          .map(({name, value}): ParsedDirective => {
-                                              let directive = parseDirective(name);
-                                              let vars = expressionVars(value).map(v => {
-                                                  return v.replace(/\..*/, '');
-                                              });
-                                              return {
-                                                  name: directive.name,
-                                                  argument: directive.argument,
-                                                  value: expToFunction(value, vars),
-                                                  triggers: vars
-                                              };
-                                          });
+                                                  .filter(({name, value}) => {
+                                                      let directive = parseDirective(name);
+                                                      if (directive.name === 'if') {
+                                                          let vars = expressionVars(value).map(v => {
+                                                              return v.replace(/\..*/, '');
+                                                          });
+                                                          let fun = expToFunction(value, vars);
+                                                          root.condition.push({
+                                                              name: directive.name,
+                                                              argument: directive.argument,
+                                                              value: fun,
+                                                              triggers: vars
+                                                          });
+                                                          res.check.push(fun);
+                                                          return false;
+                                                      } else {
+                                                          return true;
+                                                      }
+                                                  })
+                                                  .map(({name, value}): ParsedDirective => {
+                                                      let directive = parseDirective(name);
+                                                      let vars = expressionVars(value).map(v => {
+                                                          return v.replace(/\..*/, '');
+                                                      });
+                                                      return {
+                                                          name: directive.name,
+                                                          argument: directive.argument,
+                                                          value: expToFunction(value, vars),
+                                                          triggers: vars
+                                                      };
+                                                  });
     res.normals    = normals;
-    res.children   = children.map(v => elementToComponentNode(v));
     res.directives = directives;
     res.name       = phaserCons;
+    res.children   = children.map(v => elementToComponentNode(v, root ? root : res));
     return res;
 }
 

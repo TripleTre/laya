@@ -21,6 +21,9 @@ export default class SupportObjectManger {
 
     static buildSupportObject(own: AbstractComponent | AbstractSence,
                               node: ComponentNode, game: LayaGame, target: AbstractDisplayObject | AbstractSupportObject, id: number = -1): AbstractSupportObject {
+        if (node.check.some(v => !v(own))) {
+            return;
+        }
         let name       = node.name;
         let registe    = SupportObjectManger.registers.get(name);
         let {require, optional, setters} = collectAttributes(node, own, registe.$$require, registe.$$optional);

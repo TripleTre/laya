@@ -1,4 +1,4 @@
-/* tslint:disable */
+/
 export default function equals (a, b) {
   let typeA = typeof a
   let typeB = typeof b
@@ -11,10 +11,13 @@ export default function equals (a, b) {
     return a === b
   }
   if (typeA === 'undefined') {
-    return true
+    return true;
   }
   if (typeA === 'object') {
     return objectHandler(a, b)
+  }
+  if (typeA === 'function') {
+    return false;
   }
 }
 

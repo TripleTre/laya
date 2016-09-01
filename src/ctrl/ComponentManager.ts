@@ -13,12 +13,15 @@ import DisplayObjectManager from './DisplayObjectManager';
 import {forEachKey} from '../util/Iter';
 import {remove} from '../util/Array';
 import WatchFunctionManager from './WatchFunctionManager';
+import condition from '../directive/Condition';
 
 export interface ComponentNode {
     name:       string;
     normals:    Array<{name: string, value: (context) => any}>;
     directives: Array<ParsedDirective>;
     children:   Array<ComponentNode>;
+    check:      Array<(context) => any>;
+    condition:  Array<ParsedDirective>;
 }
 
 export interface NamedComponetData {
@@ -59,7 +62,9 @@ export default class ComponentManager {
      */
     static buildComponent(own: AbstractComponent | AbstractSence, node: ComponentNode,
                           container: LayaContainer | LayaWorld, game: LayaGame, id: number = -1): AbstractComponent {
-        let d1 = Date.now();
+        if (node.check.some(v => !v(own))) {
+            return;
+        }
         let name    = node.name;
         let registe = this.registers.get(name);
         let subNode = registe.node;
@@ -84,6 +89,9 @@ export default class ComponentManager {
             // build[argument] = calcValue;
             DirectiveManager.getDirective(name).bind(own, build, argument, value, triggers);
         });
+        node.condition.forEach(({name, argument, value, triggers}) => {
+            condition.bind(own, node, container, game, build.getId(), argument, value, triggers);
+        });
         let identify = build.getId();
         this.instances.set(identify, build);
         this.nameIdMap.get(name).push(identify);
@@ -94,7 +102,7 @@ export default class ComponentManager {
             build[func].bind(build)(); // 根据现有 viewModel 重新build sence的时候
         });
         // 构建组件的具体实现, 这必然是个container标签
-        let implement = DisplayObjectManager.buildDisplayObject(build, registe.node, game, container);
+        let implement = DisplayObjectManager.buildDisplayObject(build, subNode, game, container);
         build.setRootContainer(<any>implement);
         if (Is.isPresent(implement)) {
             container.add(implement);
@@ -103,7 +111,6 @@ export default class ComponentManager {
         if (Is.isPresent(hock) && typeof hock === 'function') {
             hock.apply(build);
         }
-        console.log(Date.now() - d1, node.name);
         build.resetRepeatIndex();
         return build;
     }

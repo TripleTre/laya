@@ -9,7 +9,7 @@ export default {
             console.warn('ref 指令不能使用在组件上');
             return;
         }
-        cpt.refs.set(value(cpt).replace(/'/g, ''), target);
+        cpt.$$refs[value(cpt).replace(/'/g, '')] = target;
     },
 
     unbind() {

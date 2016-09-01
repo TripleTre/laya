@@ -2,6 +2,7 @@ import {AbstractComponent} from '../abstract/AbstractComponent';
 import {AbstractSence} from '../abstract/AbstractSence';
 import {ActiveProperties} from './ActivePropertyManager';
 import StateManager from './StateManager';
+import equal from '../util/DeepEqual';
 
 export interface ViewModel {
     value: any;
@@ -64,6 +65,9 @@ export default class ViewModelManager {
                 return viewModel.value;
             },
             set(newValue) {
+                if (equal(viewModel.value, newValue)) {
+                    return;
+                }
                 viewModel.value = newValue;
                 viewModel.dependences.forEach(v => v.apply(null));
             }
@@ -77,6 +81,17 @@ export default class ViewModelManager {
             },
             set (value) {
                 console.warn('getter属性不能赋值。');
+            }
+        });
+    }
+
+    static defineProp(obj: AbstractComponent | AbstractSence, propertyName: string, viewModel: ViewModel) {
+        Object.defineProperty(obj, propertyName, {
+            get() {
+                return viewModel.value;
+            },
+            set(newValue) {
+                console.warn('prop属性不能赋值。');
             }
         });
     }
@@ -105,7 +120,7 @@ export default class ViewModelManager {
         });
         activeProperties.prop.forEach(v => {
             ViewModelManager.addViewModel(id, v, component[v]);
-            ViewModelManager.defineData(component, v, map.get(v));
+            ViewModelManager.defineProp(component, v, map.get(v));
         });
     }
 

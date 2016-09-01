@@ -4,7 +4,6 @@ import Bind from '../directive/Bind';
 import Ref from '../directive/Ref';
 import Repeat from '../directive/Repeat';
 import Wref from '../directive/Wref';
-import If from '../directive/If';
 
 export interface ParsedDirective {
     name:     string;
@@ -44,6 +43,5 @@ DirectiveManager.addDirective(Bind);
 DirectiveManager.addDirective(Ref);
 DirectiveManager.addDirective(Repeat);
 DirectiveManager.addDirective(Wref);
-DirectiveManager.addDirective(<any>If);
 
 window['_DirectiveManager'] = DirectiveManager;
