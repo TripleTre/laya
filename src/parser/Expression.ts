@@ -67,7 +67,6 @@ export function expToFunction(exp: string, vars?: Array<string>): (context: any)
         });
     });
     try {
-        console.log(exp);
         let fn = <(context: any) => any>new Function('vm', 'return ' + exp);
         cache[exp] = fn;
         return fn;

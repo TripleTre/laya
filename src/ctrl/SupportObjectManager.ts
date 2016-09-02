@@ -43,8 +43,8 @@ export default class SupportObjectManger {
         }
         node.children.forEach(v => {
             if (SupportObjectManger.hasSupport(v.name)) {
-                let sub = SupportObjectManger.buildSupportObject(own, v, game, build);
-                build[v.name] = sub;
+                SupportObjectManger.buildSupportObject(own, v, game, build);
+                // build[v.name] = sub;
             } else {
                 console.error('support 类型的标签只能包含 support 类型标签, 实际包含了: ' + v.name);
             }
