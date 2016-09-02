@@ -1,9 +1,8 @@
 import {AbstractComponent} from '../abstract/AbstractComponent';
 import {AbstractSence} from '../abstract/AbstractSence';
 import {ComponentNode} from './ComponentManager';
-import {LayaGame, LayaContainer} from '../abstract/LayaInterface';
+import {LayaGame} from '../abstract/LayaInterface';
 import {collectAttributes} from './DisplayObjectManager';
-import Is from '../util/Is';
 import DirectiveManager from './DirectiveManager';
 import {AbstractSupportObject, AbstractSupportObjectConstructor} from '../abstract/AbstractSupport';
 import {AbstractDisplayObject} from '../abstract/AbstractDisplay';

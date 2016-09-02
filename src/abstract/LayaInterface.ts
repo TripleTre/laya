@@ -1,4 +1,4 @@
-import {AbstractSenceConstructor, AbstractSence} from './AbstractSence';
+import {AbstractSence} from './AbstractSence';
 import {AbstractDisplayObject} from './AbstractDisplay';
 
 export interface LayaContainer extends AbstractDisplayObject {

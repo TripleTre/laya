@@ -1,13 +1,11 @@
 import {AbstractDisplayObject} from '../../abstract/AbstractDisplay';
-import Game from './Game';
-import Is from '../../util/Is';
 import display from '../../decorators/Display';
 
 @display({
     require: ['x', 'y', 'key'],
     optional: ['frame']
 })
-class Image extends AbstractDisplayObject {
+class Tmage extends AbstractDisplayObject {
     private image: Phaser.Image;
 
     // constructor(game: Game, require: any, optional: any, id: number) {
@@ -60,4 +58,4 @@ class Image extends AbstractDisplayObject {
     }
 }
 
-export default Image;
+export default Tmage;

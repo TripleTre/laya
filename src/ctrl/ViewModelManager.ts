@@ -85,17 +85,6 @@ export default class ViewModelManager {
         });
     }
 
-    static defineProp(obj: AbstractComponent | AbstractSence, propertyName: string, viewModel: ViewModel) {
-        Object.defineProperty(obj, propertyName, {
-            get() {
-                return viewModel.value;
-            },
-            set(newValue) {
-                console.warn('prop属性不能赋值。');
-            }
-        });
-    }
-
     /**
      *  为 component 对象初始化viewModel. 设置响应属性和属性默认值, 初始化依赖数组
      *  @para component component
@@ -120,7 +109,7 @@ export default class ViewModelManager {
         });
         activeProperties.prop.forEach(v => {
             ViewModelManager.addViewModel(id, v, component[v]);
-            ViewModelManager.defineProp(component, v, map.get(v));
+            ViewModelManager.defineData(component, v, map.get(v));
         });
     }
 

@@ -1,6 +1,4 @@
 import {AbstractDisplayObject} from '../../abstract/AbstractDisplay';
-import Game from './Game';
-import Is from '../../util/Is';
 import display from '../../decorators/Display';
 
 @display({

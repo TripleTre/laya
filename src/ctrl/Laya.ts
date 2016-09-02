@@ -10,8 +10,6 @@ import ComponentManager from './ComponentManager';
 import Is from '../util/Is';
 import ActivePropertyManager from './ActivePropertyManager';
 import WatchFunctionManager from './WatchFunctionManager';
-import {AbstractSupportObjectConstructor} from '../abstract/AbstractSupport';
-import {AbstractDisplayObjectConstructor} from '../abstract/AbstractDisplay';
 import SupportObjectManager from './SupportObjectManager';
 import World from '../phaser/display/World';
 

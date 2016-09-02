@@ -4,7 +4,6 @@ import {AbstractSence} from '../abstract/AbstractSence';
 import {ComponentNode} from '../ctrl/ComponentManager';
 import ComponentManager from '../ctrl/ComponentManager';
 import DisplayObjectManager from '../ctrl/DisplayObjectManager';
-import Is from '../util/Is';
 import SupportObjectManager from '../ctrl/SupportObjectManager';
 
 export default function container(build: any, own: AbstractComponent | AbstractSence, node: ComponentNode, game: LayaGame, container: LayaContainer) {

@@ -1,8 +1,5 @@
 import {AbstractComponent} from '../abstract';
 import {AbstractSence} from '../abstract';
-import {expressionVars, expToFunction} from '../parser/Expression';
-import ViewModelManager from '../ctrl/ViewModelManager';
-import Is from '../util/Is';
 
 export default {
     name: 'repeat',

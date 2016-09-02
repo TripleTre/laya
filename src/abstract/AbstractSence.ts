@@ -1,11 +1,10 @@
-import {LayaWorld, LayaGame} from './LayaInterface';
+import {LayaGame} from './LayaInterface';
 import {AbstractComponent} from './AbstractComponent';
-import {Getter, ComponentNode} from './AbstractComponent';
+import {ComponentNode} from './AbstractComponent';
 import ComponentManager from '../ctrl/ComponentManager';
 import ViewModelManager from '../ctrl/ViewModelManager';
 import StateManager from '../ctrl/StateManager';
 import counter from './Counter';
-import DisplayObjectManager from '../ctrl/DisplayObjectManager';
 import {forEachKey} from '../util/Iter';
 
 export interface AbstractSenceConstructor {
@@ -18,8 +17,6 @@ interface SenceData {
 }
 
 export class AbstractSence {
-    static $$registers: Map<string, SenceData> = new Map<string, SenceData>();
-
     $$refs: any = Object.create(null);
     private id: number;
     private subComponents: Array<AbstractComponent> = [];
@@ -89,8 +86,13 @@ export class AbstractSence {
         }
     }
 
-    hasRepeatAttr(name: string): boolean {
-        return this.$$repeatAttrs.has(name);
+    hasOwnActiveProperty(name: string): boolean {
+        let data = this.constructor['$$data'] || [];
+        let prop = this.constructor['$$prop'] || [];
+        let getter = this.constructor['$$getter'] || [];
+        return data.concat(prop)
+                   .concat(getter)
+                   .indexOf(name) >= 0;
     }
 
     resetRepeatIndex() {

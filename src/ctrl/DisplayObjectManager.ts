@@ -3,14 +3,12 @@ import {AbstractComponent} from '../abstract/AbstractComponent';
 import {AbstractSence} from '../abstract/AbstractSence';
 import {ComponentNode} from './ComponentManager';
 import ComponentManager from './ComponentManager';
-import {parseDirective} from '../parser/Template';
 import DirectiveManager from './DirectiveManager';
 import Is from '../util/Is';
 import postProcesser from '../post-processer';
 import SupportObjectManager from './SupportObjectManager';
 import {AbstractDisplayObject} from '../abstract/AbstractDisplay';
 import {AbstractDisplayObjectConstructor} from '../abstract/AbstractDisplay';
-import ViewModelManager from './ViewModelManager';
 
 export function collectAttributes(node: ComponentNode, own: AbstractComponent | AbstractSence, requireAttrs: Array<string>, optionalAttrs: Array<string>): any {
     let setters  = Object.create(null);
@@ -32,7 +30,7 @@ export function collectAttributes(node: ComponentNode, own: AbstractComponent | 
             setters[parsedName] = calcValue;
         }
     });
-    node.directives.forEach(({name, argument, value, triggers}) => {
+    node.directives.forEach(({argument, value}) => {
         let calcValue = value(own); // 表达式计算结果
         if (calcValue === undefined) {
             console.warn(node.name + ' 标签,' + argument + '属性计算结果为 undefined，检查标签中属性值是否拼写错误.');
@@ -89,9 +87,7 @@ export default class DisplayObjectManager {
         let build: AbstractDisplayObject = new registe(game, require, optional, id);
         DisplayObjectManager.instances.set(build.getId(), build);
         node.directives.forEach(({name, argument, value, triggers}) => {
-            if (name !== 'if') {
-                DirectiveManager.getDirective(name).bind(own, build, argument, value, triggers);
-            }
+             DirectiveManager.getDirective(name).bind(own, build, argument, value, triggers);
         });
         for (let attr in setters) { // 处理标签中的设置属性
             build[attr] = setters[attr];
@@ -118,15 +114,6 @@ export default class DisplayObjectManager {
             container.addChildren(build);
             container.add(build);
         }
-        node.directives.forEach(({name, argument, value, triggers}) => {
-            if (name === 'if' && id < 0) { // 带ID就是if在起作用,不能重复绑定
-                if (!value(own)) {
-                    DisplayObjectManager.deleteDisplay(build.getId());
-                }
-                let d: any = DirectiveManager.getDirective(name);
-                d.bind(own, value, triggers, node, game, container, build.getId());
-            }
-        });
         return build;
     }
 

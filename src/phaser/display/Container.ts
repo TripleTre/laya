@@ -1,6 +1,5 @@
 import {LayaContainer} from '../../abstract/LayaInterface';
 import {AbstractDisplayObject} from '../../abstract/AbstractDisplay';
-import Game from './Game';
 import display from '../../decorators/Display';
 import Graphics from './Graphics';
 

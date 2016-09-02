@@ -1,4 +1,3 @@
-import Game from '../display/Game';
 import support from '../../decorators/Support';
 import {AbstractDisplayObject} from '../../abstract/AbstractDisplay';
 

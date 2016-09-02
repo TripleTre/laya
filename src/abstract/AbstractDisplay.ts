@@ -1,9 +1,6 @@
 import {LayaGame} from './LayaInterface';
 import counter from './Counter';
-import Is from '../util/Is';
-import DisplayObjectManager from '../ctrl/DisplayObjectManager';
 import {AbstractSupportObject} from './AbstractSupport';
-import {AbstractComponent} from './AbstractComponent';
 
 export interface AbstractDisplayObjectConstructor {
     $$require: Array<string>;

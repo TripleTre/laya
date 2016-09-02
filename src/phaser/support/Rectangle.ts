@@ -1,6 +1,5 @@
 import Game from '../display/Game';
 import support from '../../decorators/Support';
-import Is from '../../util/Is';
 import {AbstractSupportObject} from '../../abstract/AbstractSupport';
 
 @support({

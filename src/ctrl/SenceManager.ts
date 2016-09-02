@@ -6,7 +6,7 @@ import ViewModelManager from './ViewModelManager';
 import {ActiveProperties} from './ActivePropertyManager';
 import ActivePropertyManager from './ActivePropertyManager';
 import DisplayObjectManager from './DisplayObjectManager';
-import {LayaGame, LayaContainer} from '../abstract/LayaInterface';
+import {LayaGame} from '../abstract/LayaInterface';
 
 interface NamedSenceData {
     node:             ComponentNode;
@@ -32,7 +32,6 @@ export default class SenceManager {
 
     static buildSence(name: string, build: AbstractSence, game: LayaGame): AbstractSence {
         let registe = SenceManager.registers.get(name);
-        let newFunc = registe.newFunc;
         let node    = registe.node;
         SenceManager.instances.set(build.getId(), build);
         ViewModelManager.initSenceViewModel(build, ActivePropertyManager.getActiveProperties(name));

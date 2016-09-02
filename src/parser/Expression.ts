@@ -61,9 +61,13 @@ export function expToFunction(exp: string, vars?: Array<string>): (context: any)
         vars = expressionVars(exp);
     }
     vars.forEach(v => {
-        exp = exp.replace(v, 'vm.' + v);
+        let reg = new RegExp('([^.a-zA-Z]|^)(' + v + ')');
+        exp = exp.replace(reg, (a, b, c) => {
+            return a.replace(c, 'vm.' + c);
+        });
     });
     try {
+        console.log(exp);
         let fn = <(context: any) => any>new Function('vm', 'return ' + exp);
         cache[exp] = fn;
         return fn;

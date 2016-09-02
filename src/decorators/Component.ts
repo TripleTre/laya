@@ -10,7 +10,7 @@ export interface ComponentLike {
 export default function (component: ComponentLike) {
     let template: string        = component.template;
     let paser:    DOMParser     = new DOMParser();
-    let ele:      Element       = <Element>(paser.parseFromString(template, 'text/xml')).firstChild;
+    let ele:      Element       = (paser.parseFromString(template, 'text/html')).body.firstElementChild;
     let cn:       ComponentNode = elementToComponentNode(ele);
     return function (targetConstructor: AbstractComponentConstructor) {
         ComponentManager.registerComponent(targetConstructor, cn);

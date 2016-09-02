@@ -1,7 +1,6 @@
 import {LayaGame} from '../../abstract/LayaInterface';
 import World from './World';
 import * as Phaser from 'phaser';
-import GameBuilder from '../../util/GameBuilder';
 import {AbstractSence} from '../../abstract/AbstractSence';
 
 export default class Game implements LayaGame {

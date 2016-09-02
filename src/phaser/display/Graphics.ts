@@ -1,5 +1,3 @@
-import Game from './Game';
-import Is from '../../util/Is';
 import {AbstractDisplayObject} from '../../abstract/AbstractDisplay';
 import display from '../../decorators/Display';
 import Rectangle from '../support/Rectangle';

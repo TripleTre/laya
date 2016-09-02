@@ -1,12 +1,11 @@
 import {LayaContainer} from './LayaInterface';
 import {AbstractSence} from './AbstractSence';
 import counter from './Counter';
-import ComponentManager from '../ctrl/ComponentManager';
 import {forEachKey} from '../util/Iter';
 
 /**
- * AbstractComponentConstructor 指定了Component 的构造函数规范
- * AbstractComponent 指定了Component 实例的规范
+ * AbstractComponentConstructor 指定了 Component 的构造函数规范
+ * AbstractComponent 指定了 Component 实例的规范
  * 所有 Component 必须继承自 AbstractComponent 接口
  */
 export interface AbstractComponentConstructor {
@@ -20,7 +19,7 @@ export interface ViewModel {
 
 export interface Getter {
     /**
-     * getter 属性的值为一个函数, 参数为当前 state 对象和getter属性修饰的组件实例
+     * getter 属性的值为一个函数, 参数为当前 state 对象和 getter 属性修饰的组件实例
      */
     getter:  (state: any, context: any) => any,
     name:    string,
@@ -42,8 +41,6 @@ export interface ParsedDirective {
 }
 
 export class AbstractComponent {
-    static $$registers:     Map<string, any> = new Map<string, any>();
-
     $$refs:                any                  = Object.create(null);
     $$vm:                  Map<string, ViewModel>  = new Map<string, ViewModel>();
     private repeatScope:   Map<string, Array<any>> = new Map<string, Array<any>>();
@@ -109,8 +106,13 @@ export class AbstractComponent {
         }
     }
 
-    hasRepeatAttr(name: string): boolean {
-        return this.$$repeatAttrs.has(name.replace('Index', ''));
+    hasOwnActiveProperty(name: string): boolean {
+        let data = this.constructor['$$data'] || [];
+        let prop = this.constructor['$$prop'] || [];
+        let getter = this.constructor['$$getter'] || [];
+        return data.concat(prop)
+                   .concat(getter)
+                   .indexOf(name) >= 0;
     }
 
     resetRepeatIndex() {

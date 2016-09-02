@@ -1,4 +1,4 @@
-import {LayaWorld, LayaContainer} from '../../abstract/LayaInterface';
+import {LayaContainer} from '../../abstract/LayaInterface';
 import {AbstractDisplayObject} from '../../abstract/AbstractDisplay';
 
 export default class World extends AbstractDisplayObject implements LayaContainer {

@@ -6,11 +6,8 @@ import ActivePropertyManager from './ActivePropertyManager';
 import {Getter, ParsedDirective} from './DirectiveManager';
 import DirectiveManager from './DirectiveManager';
 import ViewModelManager from './ViewModelManager';
-import {parseDirective} from '../parser/Template';
-import {expToFunction} from '../parser/Expression';
 import Is from '../util/Is';
 import DisplayObjectManager from './DisplayObjectManager';
-import {forEachKey} from '../util/Iter';
 import {remove} from '../util/Array';
 import WatchFunctionManager from './WatchFunctionManager';
 import condition from '../directive/Condition';
@@ -70,6 +67,8 @@ export default class ComponentManager {
         let subNode = registe.node;
         let newFunc = registe.newFunc;
         let build   = new newFunc(id);
+        let activeProperties = ActivePropertyManager.getActiveProperties(name);
+        ViewModelManager.initComponentViewModel(build, activeProperties);
         // 设置 component prop 属性的默认值
         node.normals.forEach(({name: attrName, value: attrVal}) => {
             let parsedName = attrName.replace(/\-([a-z])/g, (a: string, b: string) => {
@@ -89,14 +88,12 @@ export default class ComponentManager {
             // build[argument] = calcValue;
             DirectiveManager.getDirective(name).bind(own, build, argument, value, triggers);
         });
-        node.condition.forEach(({name, argument, value, triggers}) => {
-            condition.bind(own, node, container, game, build.getId(), argument, value, triggers);
+        registe.node.condition.forEach(({argument, value, triggers}) => {
+            condition.bind(build, node, container, game, build.getId(), argument, value, triggers);
         });
         let identify = build.getId();
         this.instances.set(identify, build);
         this.nameIdMap.get(name).push(identify);
-        let activeProperties = ActivePropertyManager.getActiveProperties(name);
-        ViewModelManager.initComponentViewModel(build, activeProperties);
         WatchFunctionManager.getWatchs(name).forEach(({property, func}) => {
             ViewModelManager.addDependences(identify, property, build[func].bind(build));
             build[func].bind(build)(); // 根据现有 viewModel 重新build sence的时候
@@ -130,17 +127,8 @@ export default class ComponentManager {
      *  注销 component, 清除注册信息
      */
     static cancelComponent(name: string) {
-        let cancels = ComponentManager.nameIdMap.get(name);
-        let keys    = ComponentManager.instances.keys();
-
         ComponentManager.registers.delete(name);
         ComponentManager.registed.delete(name);
-        // forEachKey<number>(keys, (value) => {
-        //     if (cancels.indexOf(value) >= 0) {
-        //         ComponentManager.instances.delete(value);
-        //         ViewModelManager.deleteViewModel(value);
-        //     }
-        // });
         ComponentManager.nameIdMap.delete(name);
     }
 
