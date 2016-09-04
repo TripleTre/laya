@@ -124,10 +124,12 @@ interface SupportLike {
 
 interface SenceLike {
     template: string;
+    injector?: any
 }
 
 interface ComponentLike {
     template: string;
+    injector?: any
 }
 
 interface DisplayLike {

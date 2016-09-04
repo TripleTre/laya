@@ -25,36 +25,41 @@ class Tmage extends AbstractDisplayObject {
         return this.image;
     }
 
-    set x (value) {
+    set x(value) {
         this.image.x = value;
     }
 
-    set y (value) {
+    set y(value) {
         this.image.y = value;
     }
 
-    set key (value) {
+    set key(value) {
         // console.warn('image 的 key 属性不能做绑定');
     }
 
-    set anchorX (value) {
+    set anchorX(value) {
         this.image.anchor.x = value;
     }
 
-    set anchorY (value) {
+    set anchorY(value) {
         this.image.anchor.y = value;
     }
 
-    set scaleX (value) {
+    set scaleX(value) {
         this.image.scale.x = value;
     }
 
-    set scaleY (value) {
+    set scaleY(value) {
         this.image.scale.y = value;
     }
 
-    set visible (value) {
+    set visible(value) {
         this.image.visible = value;
+    }
+
+    set frame(value) {
+        let key: any = this.image.key;
+        this.image.setFrame(this.image.game.cache.getFrameByName(key, value));
     }
 }
 

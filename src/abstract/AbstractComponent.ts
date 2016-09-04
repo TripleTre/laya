@@ -109,7 +109,7 @@ export class AbstractComponent {
     hasOwnActiveProperty(name: string): boolean {
         let data = this.constructor['$$data'] || [];
         let prop = this.constructor['$$prop'] || [];
-        let getter = this.constructor['$$getter'] || [];
+        let getter = (this.constructor['$$getter'] || []).map(v => v.name);
         return data.concat(prop)
                    .concat(getter)
                    .indexOf(name) >= 0;

@@ -11,7 +11,8 @@ const DEFAULT = {
 };
 
 export interface SenceLike {
-    template: string;
+    template: string,
+    injector?: any
 }
 
 export default function (component: SenceLike = DEFAULT) {
