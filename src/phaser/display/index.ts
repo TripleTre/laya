@@ -5,6 +5,7 @@ import Tmage from './Tmage';
 import World from './World';
 import Graphics from './Graphics';
 import Shadow from './Shadow';
+import BitmapText from './BitmapText';
 
 export default [
     Button,
@@ -13,5 +14,6 @@ export default [
     Tmage,
     World,
     Graphics,
-    Shadow
+    Shadow,
+    BitmapText
 ];

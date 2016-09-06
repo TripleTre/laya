@@ -6,42 +6,45 @@ import Rectangle from '../support/Rectangle';
     require: ['x', 'y']
 })
 export default class Graphics extends AbstractDisplayObject {
-    graphics: Phaser.Graphics;
-
-    // constructor(game: Game, require: any, optional: any, id: number) {
-    //     super(id);
-    //     this.graphics = new Phaser.Graphics(game.realGame, require.x, require.y);
-    // }
+    private realObject: Phaser.Graphics;
 
     buildRealObject(game, require, optional) {
-        this.graphics = new Phaser.Graphics(game.realGame, require.x, require.y);
+        this.realObject = new Phaser.Graphics(game.realGame, require.x, require.y);
     }
 
     getRealObject(): Phaser.Graphics {
-        return this.graphics;
+        return this.realObject;
     }
 
     destroy(): void {
-        this.graphics.destroy(true);
+        this.realObject.destroy(true);
     }
 
     set alpha(value: number) {
-        this.graphics.alpha = value;
+        this.realObject.alpha = value;
     }
 
     set beginFill(value: number) {
-        this.graphics.beginFill(value);
+        this.realObject.beginFill(value);
     }
 
     set x(value: number) {
-        this.graphics.x = value;
+        this.realObject.x = value;
     }
 
     set y(value: number) {
-        this.graphics.y = value;
+        this.realObject.y = value;
     }
 
     set Rectangle (value: Rectangle) {
-        this.graphics.drawShape(<any>value.getRealObject());
+        this.realObject.drawShape(<any>value.getRealObject());
+    }
+
+    set inputEnabled(value: boolean) {
+        this.realObject.inputEnabled = value;
+    }
+
+    set visible(value: boolean) {
+        this.realObject.visible = value;
     }
 }

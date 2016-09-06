@@ -10,15 +10,6 @@ export default class Button extends AbstractDisplayObject {
     disableFrame: string;
     enableFrame:  string;
 
-    // constructor(game: Game, require: any, optional: any, id: number) {
-    //     super(id);
-    //     this.button = new Phaser.Button(game.realGame, require.x, require.y, require.key,
-    //                         optional.callBack, optional.callBackContext, optional.overFrame,
-    //                         require.outFrame, optional.downFrame, optional.upFrame);
-    //     this.disableFrame = optional.disableFrame;
-    //     this.enableFrame  = optional.enableFrame;
-    // }
-
     buildRealObject(game, require, optional) {
         this.button = new Phaser.Button(game.realGame, require.x, require.y, require.key,
                             optional.callBack, optional.callBackContext, optional.overFrame,
@@ -33,6 +24,14 @@ export default class Button extends AbstractDisplayObject {
 
     destroy() {
         this.button.destroy();
+    }
+
+    set scaleX(value) {
+        this.button.scale.x = value;
+    }
+
+    set scaleY(value) {
+        this.button.scale.y = value;
     }
 
     set visible(value: boolean) {

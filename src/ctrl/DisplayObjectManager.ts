@@ -10,6 +10,19 @@ import SupportObjectManager from './SupportObjectManager';
 import {AbstractDisplayObject} from '../abstract/AbstractDisplay';
 import {AbstractDisplayObjectConstructor} from '../abstract/AbstractDisplay';
 
+function preHook(calcValue, node, own, argument) {
+    argument = argument.replace(/[A-Z]/g, (a) => {
+        return '-' + a.toLowerCase();
+    });
+    if (calcValue === undefined) {
+        console.warn(own.constructor['name'] + ' 组件 ', node.name + ' 标签, ' + argument + ' 属性计算结果为 undefined，检查标签中属性值是否拼写错误.');
+    }
+    if (typeof calcValue === 'function') {
+        return calcValue.bind(own);
+    }
+    return calcValue;
+}
+
 export function collectAttributes(node: ComponentNode, own: AbstractComponent | AbstractSence, requireAttrs: Array<string>, optionalAttrs: Array<string>): any {
     let setters  = Object.create(null);
     let require  = Object.create(null);
@@ -18,10 +31,7 @@ export function collectAttributes(node: ComponentNode, own: AbstractComponent | 
         let parsedName = attrName.replace(/\-([a-z])/g, (a: string, b: string) => {
                     return b.toUpperCase();
         });
-        let calcValue = attrVal(own); // 表达式计算结果
-        if (calcValue === undefined) {
-            console.warn(node.name + ' 标签,' + parsedName + '属性计算结果为 undefined，检查标签中属性值是否拼写错误.');
-        }
+        let calcValue = preHook(attrVal(own), node, own, parsedName); // 表达式计算结果
         if (requireAttrs.indexOf(parsedName) >= 0) {
             require[parsedName] = calcValue;
         } else if (optionalAttrs.indexOf(parsedName) >= 0) {
@@ -31,10 +41,7 @@ export function collectAttributes(node: ComponentNode, own: AbstractComponent | 
         }
     });
     node.directives.forEach(({argument, value}) => {
-        let calcValue = value(own); // 表达式计算结果
-        if (calcValue === undefined) {
-            console.warn(node.name + ' 标签,' + argument + '属性计算结果为 undefined，检查标签中属性值是否拼写错误.');
-        }
+        let calcValue = preHook(value(own), node, own, argument);
         if (requireAttrs.indexOf(argument) >= 0) {
             require[argument] = calcValue;
         } else if (optionalAttrs.indexOf(argument) >= 0) {

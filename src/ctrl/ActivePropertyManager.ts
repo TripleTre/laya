@@ -27,6 +27,9 @@ export default class ActivePropertyManager {
 
     static doWaiteExecute(name: string) {
         let set = ActivePropertyManager.waiteExecute.get(name);
+        if (Is.isAbsent(set)) {
+            return;
+        }
         set.forEach(v => {
             if (v.type === 'data') {
                 ActivePropertyManager.activeProperties.get(name).data.add(v.property);

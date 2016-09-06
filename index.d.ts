@@ -124,17 +124,19 @@ interface SupportLike {
 
 interface SenceLike {
     template: string;
-    injector?: any
+    injector?: any;
+     prop?: Array<string>;
 }
 
 interface ComponentLike {
     template: string;
-    injector?: any
+    injector?: any;
+    prop?: Array<string>;
 }
 
 interface DisplayLike {
-    require: Array<string>,
-    optional?: Array<string>
+    require: Array<string>;
+    optional?: Array<string>;
 }
 
 export class GameBuilder {

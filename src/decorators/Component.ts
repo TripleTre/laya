@@ -5,7 +5,8 @@ import {elementToComponentNode} from '../parser/Template';
 
 export interface ComponentLike {
     template: string,
-    injector?: any
+    injector?: any,
+    prop?: Array<string>
 }
 
 export default function (component: ComponentLike) {
