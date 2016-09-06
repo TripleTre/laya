@@ -105,7 +105,7 @@ export default class Laya {
     static store:    Redux.Store<any>;
     static curSence: layaAbstract.AbstractSence;
     static game:     layaInterface.LayaGame;
-    static initRedux(reducers: any, defaultValue: any): void;
+    static initRedux(reducers: any): void;
     static boot(game: layaInterface.LayaGame, sence: string): void;
     static registerSence(sences: Array<layaAbstract.AbstractSenceConstructor>): void;
     static registerComponent(components: Array<layaAbstract.AbstractComponentConstructor>): void;

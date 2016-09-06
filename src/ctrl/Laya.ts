@@ -18,15 +18,15 @@ export default class Laya {
     private static curSence: AbstractSence;
     private static game:     LayaGame;
 
-    static initRedux(reducers: any, defaultValue: any): void {
-        StateManager.setLast(defaultValue);
-        StateManager.setDefaultValue(defaultValue);
+    static initRedux(reducers: any): void {
         let all = combineReducers(reducers);
-        Laya.store = createStore(all, defaultValue,
+        Laya.store = createStore(all, Object.create(null),
           window['devToolsExtension'] && window['devToolsExtension']());
         Laya.store.subscribe(() => {
             StateManager.updateState(Laya.store.getState());
         });
+        StateManager.setLast(Laya.store.getState());
+        window['_store'] = Laya.store;
     }
 
     static boot(game: LayaGame, senceName: string): void {

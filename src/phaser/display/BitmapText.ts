@@ -10,7 +10,7 @@ export default class BitmapText extends AbstractDisplayObject {
 
     buildRealObject(game, require, optional) {
        this.realObject = new Phaser.BitmapText(game.realGame, require.x, require.y, require.font,
-              optional.text, optional.size, optional.align);
+              optional.text.toString(), optional.size, optional.align);
     }
 
     getRealObject(): Phaser.BitmapText {
@@ -22,7 +22,7 @@ export default class BitmapText extends AbstractDisplayObject {
     }
 
     set text(value) {
-        this.realObject.text = value;
+        this.realObject.text = value.toString();
     }
 
     set anchorX(value) {

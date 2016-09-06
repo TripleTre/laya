@@ -1,6 +1,6 @@
 import ActivePropertyManager from '../ctrl/ActivePropertyManager';
 
-export default function (getter: (state: any, context: any) => any, compare: boolean = false) {
+export default function (getter: (state: any, context: any) => any, compare: boolean = true) {
     return function (arg1: any, name: string) {
         if (typeof arg1 === 'function') {
             console.error('@getter 不应该修饰静态变量。 ---> ' + arg1);
