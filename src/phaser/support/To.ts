@@ -18,22 +18,6 @@ export default class To extends AbstractSupportObject {
         super(id);
     }
 
-    set Properties(propInfo: any) {
-        this.properties = propInfo;
-    }
-
-    set Easing(easing: string) {
-        this.easing = easing;
-    }
-
-    set Delay(delay: number) {
-        this.delay = delay;
-    }
-
-    set Duration(value: number) {
-        this.duration = value;
-    }
-
     getDelay() {
         return this.delay;
     }
