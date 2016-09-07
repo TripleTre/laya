@@ -74,6 +74,10 @@ export default class ActivePropertyManager {
         ActivePropertyManager.activeProperties.delete(name);
         ActivePropertyManager.waiteExecute.delete(name);
     }
+
+    static hasProp(cptName: string, propName: string) {
+        return ActivePropertyManager.activeProperties.get(cptName).prop.has(propName);
+    }
 }
 
 window['_ActivePropertyManager'] = ActivePropertyManager;

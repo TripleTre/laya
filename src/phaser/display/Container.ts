@@ -33,4 +33,12 @@ export default class Container extends AbstractDisplayObject implements LayaCont
     set Mask(value: Graphics) {
         this.realObject.mask = value.getRealObject();
     }
+
+    set alpha(value: number) {
+        this.realObject.alpha = value;
+    }
+
+    set inputEnable(value: boolean) {
+        this.realObject.ignoreChildInput = !value;
+    }
 }
