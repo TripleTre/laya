@@ -173,5 +173,5 @@ export function prop(arg1: any, propertyName: string): any;
 
 export function getter(getter: (state: any, context: layaAbstract.AbstractComponent | layaAbstract.AbstractSence) => any, compare?: boolean);
 
-export function watch(property: string): any;
+export function watch(property: Array<string>): any;
 

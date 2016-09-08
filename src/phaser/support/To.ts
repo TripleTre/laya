@@ -13,9 +13,17 @@ export default class To extends AbstractSupportObject {
     private duration:   number;
     private repeat:     number;
     private yoyo:       boolean;
+    private parent:     Phaser.Tween;
+    private index:      number;
 
     constructor(game: Game, target: any, require: any, optional: any, id: number) {
         super(id);
+    }
+
+    set skip(value: boolean) {
+        if (value === true) {
+            this.parent.updateTweenData('duration', 100, this.index);
+        }
     }
 
     getDelay() {
@@ -40,5 +48,13 @@ export default class To extends AbstractSupportObject {
 
     getYoyo() {
         return this.yoyo;
+    }
+
+    setParent(tween: Phaser.Tween) {
+        this.parent = tween;
+    }
+
+    setIndex(value: number) {
+        this.index = value;
     }
 }

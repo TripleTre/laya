@@ -88,6 +88,10 @@ export default class ComponentManager {
             // build[argument] = calcValue;
             DirectiveManager.getDirective(name).bind(own, build, argument, value, triggers);
         });
+        let beforeHock = build['$$init']; // init 钩子, 在vm初始化完成后
+        if (Is.isPresent(beforeHock) && typeof beforeHock === 'function') {
+            beforeHock.apply(build);
+        }
         registe.node.condition.forEach(({argument, value, triggers}) => {
             condition.bind(build, node, container, game, build.getId(), argument, value, triggers);
         });
@@ -104,9 +108,9 @@ export default class ComponentManager {
         if (Is.isPresent(implement)) {
             container.add(implement);
         }
-        let hock = build['$$create']; // create 钩子
-        if (Is.isPresent(hock) && typeof hock === 'function') {
-            hock.apply(build);
+        let afterhock = build['$$create']; // create 钩子
+        if (Is.isPresent(afterhock) && typeof afterhock === 'function') {
+            afterhock.apply(build);
         }
         build.resetRepeatIndex();
         return build;

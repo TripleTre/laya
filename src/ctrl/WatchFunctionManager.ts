@@ -26,3 +26,5 @@ export default class WatchFunctionManager {
         WatchFunctionManager.watchs.delete(name);
     }
 }
+
+window['_WatchFunctionManger'] = WatchFunctionManager;

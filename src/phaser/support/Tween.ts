@@ -9,6 +9,7 @@ import To from './To';
 })
 export default class Tween extends AbstractSupportObject {
     private tween: Phaser.Tween;
+    private count: number = 0;
 
     constructor(game: Game, target: any, require: any, optional: any, id: number) {
         super(id);
@@ -17,6 +18,8 @@ export default class Tween extends AbstractSupportObject {
     }
 
     set To(to: To) {
+        to.setParent(this.tween);
+        to.setIndex(this.count++);
         this.tween.to(to.getProperties(), to.getDuration(), to.getEasing(), false, to.getDelay(), to.getRepeat(), to.getYoyo());
     }
 

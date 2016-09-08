@@ -103,7 +103,7 @@ export default class Laya {
         let curSence = Laya.curSence;
         curSence.destorySubComponent();
         let name = curSence.constructor['name'];
-        SenceManager.buildSence(name, curSence, Laya.game);
+        SenceManager.buildSence(name, curSence, Laya.game, true);
     }
 
     static dispatch(action: {type: any, value: any}): void {

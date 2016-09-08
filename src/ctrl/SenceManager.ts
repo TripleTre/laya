@@ -7,6 +7,7 @@ import {ActiveProperties} from './ActivePropertyManager';
 import ActivePropertyManager from './ActivePropertyManager';
 import DisplayObjectManager from './DisplayObjectManager';
 import {LayaGame} from '../abstract/LayaInterface';
+import WatchFunctionManager from './WatchFunctionManager';
 
 interface NamedSenceData {
     node:             ComponentNode;
@@ -28,14 +29,22 @@ export default class SenceManager {
             newFunc: newFunc
         });
         ActivePropertyManager.initActiveProperty(name, activeProperties);
+        ActivePropertyManager.doWaiteExecute(name);
     }
 
-    static buildSence(name: string, build: AbstractSence, game: LayaGame): AbstractSence {
+    static buildSence(name: string, build: AbstractSence, game: LayaGame, rebuild: boolean = false): AbstractSence {
         let registe = SenceManager.registers.get(name);
         let node    = registe.node;
         SenceManager.instances.set(build.getId(), build);
-        ViewModelManager.initSenceViewModel(build, ActivePropertyManager.getActiveProperties(name));
-
+        if (rebuild === false) {
+            ViewModelManager.initSenceViewModel(build, ActivePropertyManager.getActiveProperties(name));
+        }
+        WatchFunctionManager.getWatchs(name).forEach(({property, func}) => {
+            if (rebuild === false) {
+                ViewModelManager.addDependences(build.getId(), property, build[func].bind(build));
+            }
+            build[func].bind(build)(); // 根据现有 viewModel 重新build sence的时候
+        });
         node.children.forEach(v => {
             let name = v.name;
             if (ComponentManager.hasComponent(name)) {
@@ -59,6 +68,10 @@ export default class SenceManager {
 
     static getByName(name: string): AbstractSenceConstructor {
         return SenceManager.registers.get(name).newFunc;
+    }
+
+    static getInstance(id: number) {
+        return SenceManager.instances.get(id);
     }
 }
 

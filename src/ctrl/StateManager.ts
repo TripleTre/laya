@@ -2,6 +2,7 @@ import * as Iter from '../util/Iter';
 import equal from '../util/DeepEqual';
 import Is from '../util/Is';
 import ComponentManager from './ComponentManager';
+import SenceManager from './SenceManager';
 import ViewModelManager from './ViewModelManager';
 import {Getter} from './DirectiveManager';
 
@@ -43,7 +44,10 @@ export default class StateManager {
         Iter.forEachKey<Getter>(forces, (getter: Getter) => {
             let componentIds = StateManager.forceGetters.get(getter);
             componentIds.forEach(v => {
-                let cpt = ComponentManager.getInstance(v);
+                let cpt: any = ComponentManager.getInstance(v);
+                if (Is.isAbsent(cpt)) {
+                    cpt = SenceManager.getInstance(v);
+                }
                 let val = getter.getter(state, cpt);
                 ViewModelManager.activePropertyForComponent(cpt, getter.name, val);
             });
@@ -52,7 +56,10 @@ export default class StateManager {
         Iter.forEachKey<Getter>(normals, (getter: Getter) => {
             let componentIds = StateManager.getters.get(getter);
             componentIds.forEach(v => {
-                let cpt = ComponentManager.getInstance(v);
+                let cpt: any = ComponentManager.getInstance(v);
+                if (Is.isAbsent(cpt)) {
+                    cpt = SenceManager.getInstance(v);
+                }
                 let val = getter.getter(state, cpt);
                 if (!equal(val, getter.getter(StateManager.last, cpt))) {
                     ViewModelManager.activePropertyForComponent(cpt, getter.name, val);
