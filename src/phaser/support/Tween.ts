@@ -28,4 +28,12 @@ export default class Tween extends AbstractSupportObject {
             this.tween.start();
         }
     }
+
+    set onComplete(func: Function | Array<Function>) {
+        if (Array.isArray(func)) {
+            func.forEach(v => this.tween.onComplete.add(v));
+        } else {
+             this.tween.onComplete.add(func);
+        }
+    }
 }

@@ -7,6 +7,8 @@ import DirectiveManager from './DirectiveManager';
 import {AbstractSupportObject, AbstractSupportObjectConstructor} from '../abstract/AbstractSupport';
 import {AbstractDisplayObject} from '../abstract/AbstractDisplay';
 
+const ignoreList = ['SoundTask', 'Tween'];
+
 export default class SupportObjectManger {
     private static registers: Map<string, AbstractSupportObjectConstructor> = new Map<string, AbstractSupportObjectConstructor>();
     /**
@@ -49,7 +51,13 @@ export default class SupportObjectManger {
                 console.error('support 类型的标签只能包含 support 类型标签, 实际包含了: ' + v.name);
             }
         });
-        target[node.name] = build;
+        if (target.constructor.prototype.hasOwnProperty(node.name)) {
+            target[node.name] = build;
+        } else {
+            if (ignoreList.indexOf(node.name) < 0) {
+                console.warn(target.constructor['name'] + '不存在 ' + node.name + ' set 属性！');
+            }
+        }
         return build;
     }
 
