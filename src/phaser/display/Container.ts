@@ -28,6 +28,9 @@ export default class Container extends AbstractDisplayObject implements LayaCont
 
     destroy(): void {
         this.realObject.destroy(true);
+        this.realObject = null;
+        this.getChildren().forEach(v => v.destroy());
+        this.getChildren().clear();
     }
 
     set Mask(value: Graphics) {
@@ -40,5 +43,17 @@ export default class Container extends AbstractDisplayObject implements LayaCont
 
     set inputEnable(value: boolean) {
         this.realObject.ignoreChildInput = !value;
+    }
+
+    set y(value: number) {
+        this.realObject.y = value;
+    }
+
+    set x(value: number) {
+        this.realObject.x = value;
+    }
+
+    set visible(value) {
+        this.realObject.visible = value;
     }
 }

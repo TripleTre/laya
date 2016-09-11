@@ -31,4 +31,6 @@ export abstract class AbstractSupportObject {
     getChildren() {
         return this.children;
     }
+
+    abstract destroy();
 }

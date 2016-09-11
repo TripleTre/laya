@@ -31,14 +31,7 @@ export default class SupportObjectManger {
         let build = new registe(game, target, require, optional, id);
         target.addChildren(build);
         node.directives.forEach(({name, argument, value, triggers}) => {
-             if (name === 'if') {
-                if (id < 0) {
-                    let d: any = DirectiveManager.getDirective(name);
-                    d.bind(own, value, triggers, node, game, build.getId());
-                }
-            } else {
-                DirectiveManager.getDirective(name).bind(own, build, argument, value, triggers);
-            }
+            DirectiveManager.getDirective(name).bind(own, build, argument, value, triggers);
         });
         for (let attr in setters) { // 处理标签中的设置属性
             build[attr] = setters[attr];

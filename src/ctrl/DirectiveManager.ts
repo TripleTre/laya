@@ -22,9 +22,8 @@ export interface Getter {
     /**
      * getter 属性的值为一个函数, 参数为当前 state 对象和getter属性修饰的组件实例
      */
-    getter:  (state: any, context: any) => any,
-    name:    string,
-    compare: boolean
+    path: string,
+    name: string
 }
 
 export default class DirectiveManager {

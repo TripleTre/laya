@@ -6,7 +6,7 @@ import ViewModelManager from '../ctrl/ViewModelManager';
 import ComponentManager from '../ctrl/ComponentManager';
 
 export default {
-    name: 'if',
+    name: 'update',
 
     bind(own: AbstractComponent | AbstractSence, node: ComponentNode,
                           container: LayaContainer | LayaWorld, game: LayaGame, id: number = -1, argument: string, value: (context) => any, triggers: Array<string>) {

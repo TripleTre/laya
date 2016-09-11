@@ -21,6 +21,9 @@ export default class Mask extends AbstractSupportObject {
 
     destroy(): void {
         this.graphics.destroy(true);
+        this.graphics = null;
+        this.getChildren().forEach(v => v.destroy());
+        this.getChildren().clear();
     }
 
     set alpha(value: number) {

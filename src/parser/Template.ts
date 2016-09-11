@@ -10,8 +10,11 @@ import Dom from '../util/Dom';
  * 将Dom Elment 转换成 ComponentNode 
  */
 export function elementToComponentNode(ele: Element, root?: ComponentNode): ComponentNode {
-    let res:        ComponentNode    = Object.create(null);
-    let attrs:      NamedNodeMap     = ele.attributes;
+    let res: ComponentNode = Object.create(null);
+    let attrs: NamedNodeMap = ele.attributes;
+    if (root === undefined) {
+        root = res;
+    }
     res.check = [];
     res.condition = [];
     let normals:    Array<{name: string,
@@ -29,34 +32,30 @@ export function elementToComponentNode(ele: Element, root?: ComponentNode): Comp
                                                    .replace(/\-([a-z])/g, (a: string, b: string) => {
                                                         return b.toUpperCase();
                                                     });
-    let directives: Array<ParsedDirective> = Array.prototype.filter.call(attrs, (v) => /^l-/.test(v.name))
-                                                  .filter(({name, value}) => {
-                                                      let directive = parseDirective(name);
-                                                      if (directive.name === 'if') {
-                                                          let vars = expressionVars(value);
-                                                          let fun = expToFunction(value, vars);
-                                                          root.condition.push({
-                                                              name: directive.name,
-                                                              argument: directive.argument,
-                                                              value: fun,
-                                                              triggers: vars.map(v => v.replace(/\..*/, ''))
-                                                          });
-                                                          res.check.push(fun);
-                                                          return false;
-                                                      } else {
-                                                          return true;
-                                                      }
-                                                  })
-                                                  .map(({name, value}): ParsedDirective => {
-                                                      let directive = parseDirective(name);
-                                                      let vars = expressionVars(value);
-                                                      return {
-                                                          name: directive.name,
-                                                          argument: directive.argument,
-                                                          value: expToFunction(value, vars),
-                                                          triggers: vars.map(v => v.replace(/\..*/, ''))
-                                                      };
-                                                  });
+    let directives: Array<ParsedDirective> =
+        Array.prototype.filter.call(attrs, (v) => /^l-/.test(v.name))
+            .filter(({name, value}) => {
+                let directive = parseDirective(name);
+                if (directive.name === 'if') {
+                    conditionBind(root, value, directive, res);
+                    return false;
+                } else if (directive.name === 'update') {
+                    updateBind(root, value, directive);
+                    return false;
+                } else {
+                    return true;
+                }
+            })
+            .map(({name, value}): ParsedDirective => {
+                let directive = parseDirective(name);
+                let vars = expressionVars(value);
+                return {
+                    name: directive.name,
+                    argument: directive.argument,
+                    value: expToFunction(value, vars),
+                    triggers: vars.map(v => v.replace(/\..*/, ''))
+                };
+            });
     res.normals    = normals;
     res.directives = directives;
     res.name       = phaserCons;
@@ -78,4 +77,27 @@ export function parseDirective(name: string): {name: string, argument: string} {
         console.error('指令格式有誤: ', name, e);
     }
     return {name: dn, argument: da};
+}
+
+function updateBind(root, value, directive) {
+    let vars = expressionVars(value);
+    let fun = expToFunction(value, vars);
+    root.condition.push({
+        name: directive.name,
+        argument: directive.argument,
+        value: fun,
+        triggers: vars.map(v => v.replace(/\..*/, ''))
+    });
+}
+
+function conditionBind(root, value, directive, res) {
+    let vars = expressionVars(value);
+    let fun = expToFunction(value, vars);
+    root.condition.push({
+        name: directive.name,
+        argument: directive.argument,
+        value: fun,
+        triggers: vars.map(v => v.replace(/\..*/, ''))
+    });
+    res.check.push(fun);
 }

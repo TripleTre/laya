@@ -24,6 +24,10 @@ export default class Button extends AbstractDisplayObject {
 
     destroy() {
         this.button.destroy();
+        this.button.destroy(true);
+        this.button = null;
+        this.getChildren().forEach(v => v.destroy());
+        this.getChildren().clear();
     }
 
     set scaleX(value) {

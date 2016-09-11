@@ -63,10 +63,13 @@ export default class ComponentManager {
             return;
         }
         let name    = node.name;
-        let registe = this.registers.get(name);
+        let registe = ComponentManager.registers.get(name);
         let subNode = registe.node;
         let newFunc = registe.newFunc;
         let build   = new newFunc(id);
+        if (id > 0) {
+            newFunc['$$data'].forEach(v => {build[v] = own[v]; });
+        }
         let activeProperties = ActivePropertyManager.getActiveProperties(name);
         ViewModelManager.initComponentViewModel(build, activeProperties);
         // 设置 component prop 属性的默认值
@@ -92,15 +95,17 @@ export default class ComponentManager {
         if (Is.isPresent(beforeHock) && typeof beforeHock === 'function') {
             beforeHock.apply(build);
         }
+        // condition 绑定， 保留当前上下文
         registe.node.condition.forEach(({argument, value, triggers}) => {
+            // 这里没有使用上级做上下文对象， 而是用组件自身， 这在 rebuild 的时候是可以也是必须的， 因为还要还原 data 属性(70行)
             condition.bind(build, node, container, game, build.getId(), argument, value, triggers);
         });
         let identify = build.getId();
-        this.instances.set(identify, build);
-        this.nameIdMap.get(name).push(identify);
+        ComponentManager.instances.set(identify, build);
+        ComponentManager.nameIdMap.get(name).push(identify);
         WatchFunctionManager.getWatchs(name).forEach(({property, func}) => {
             ViewModelManager.addDependences(identify, property, build[func].bind(build));
-            build[func].bind(build)(); // 根据现有 viewModel 重新build sence的时候
+            // build[func].bind(build)(); // 根据现有 viewModel 重新build sence的时候
         });
         // 构建组件的具体实现, 这必然是个container标签
         let implement = DisplayObjectManager.buildDisplayObject(build, subNode, game, container);
@@ -114,6 +119,22 @@ export default class ComponentManager {
         }
         build.resetRepeatIndex();
         return build;
+    }
+
+    /**
+     *  用于if标签， 组件实例没有删除的情况下， 根据组件上下文重新构建根 container
+     */
+    static buildRootContainer(id: number, game: LayaGame, container: LayaContainer | LayaWorld) {
+        let instance = ComponentManager.getInstance(id);
+        let name = instance.constructor['name'];
+        let registe = ComponentManager.registers.get(name);
+        let subNode = registe.node;
+        let implement = DisplayObjectManager.buildDisplayObject(instance, subNode, game, container);
+        instance.setRootContainer(<any>implement);
+        if (Is.isPresent(implement)) {
+            container.add(implement);
+        }
+        instance.resetRepeatIndex();
     }
 
     /**
@@ -143,11 +164,24 @@ export default class ComponentManager {
         let cpt = ComponentManager.instances.get(id);
         let rootId = cpt.getRootContainer().getId();
         DisplayObjectManager.deleteDisplay(rootId);
-        cpt.destroy();
+        // todo 9.11 号， 等待删除
+        // cpt.destroy();
         ComponentManager.instances.delete(id);
         ComponentManager.nameIdMap.forEach(v => {
             remove(v, id);
         });
+    }
+
+    /**
+     *  刪除组件 root container, root container 下面的 displayObject, component, supportObject 都一并
+     *  删除， 但是会保留组件实例。 这个用在 if 标签时。
+     */
+    static deleteComponentRootCootainer(id) {
+        let cpt = ComponentManager.instances.get(id);
+        let rootId = cpt.getRootContainer().getId();
+        DisplayObjectManager.deleteDisplay(rootId);
+        // todo 9.11 号， 等待删除
+        // cpt.destroy();
     }
 
     static getAllRegisters(): Array<AbstractComponentConstructor> {

@@ -18,6 +18,10 @@ export default class Graphics extends AbstractDisplayObject {
 
     destroy(): void {
         this.realObject.destroy(true);
+        this.realObject.destroy(true);
+        this.realObject = null;
+        this.getChildren().forEach(v => v.destroy());
+        this.getChildren().clear();
     }
 
     set alpha(value: number) {

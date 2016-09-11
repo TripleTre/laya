@@ -21,6 +21,11 @@ export default class SoundTask extends AbstractSupportObject {
         return 'custome support object, has no realObject';
     }
 
+    destroy() {
+        this.getChildren().forEach(v => v.destroy());
+        this.getChildren().clear();
+    }
+
     set start(value) {
         if (value === true) {
             if (this.list === undefined) {
@@ -42,8 +47,14 @@ export default class SoundTask extends AbstractSupportObject {
         // do nothing
     }
 
+    set onStop(value) {
+        if (Is.isPresent(this.list) && this.list.length > 0) {
+            this.list[this.list.length - 1].onStop = value;
+        }
+    }
+
     initList() {
-        this.list = <Array<Sound>>Array['from'](this.getRealObject());
+        this.list = <Array<Sound>>Array['from'](this.getChildren());
         this.list.forEach(v => {
             v.getRealObject().onStop.add((() => {
                 this.playNext();
@@ -52,7 +63,7 @@ export default class SoundTask extends AbstractSupportObject {
     }
 
     playNext() {
-        if (this.next) {
+        if (this.next !== undefined) {
             this.next++;
             this.current = this.next;
             let next = this.list[this.next];

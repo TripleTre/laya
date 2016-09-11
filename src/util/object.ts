@@ -20,7 +20,8 @@ export default {
         return ret;
     },
 
-    getValueByPath(obj: any, path: string): any {
+    deepGet(obj: any, path: string): any {
         let nodes = path.split('.');
+        return nodes.reduce((cur, node) => cur[node], obj);
     }
 };

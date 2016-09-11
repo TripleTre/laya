@@ -14,7 +14,7 @@ import SupportObjectManager from './SupportObjectManager';
 import World from '../phaser/display/World';
 
 export default class Laya {
-    private static store:    Redux.Store<any>;
+    private static store:  Redux.Store<any>;
     private static curSence: AbstractSence;
     private static game:     LayaGame;
 
@@ -26,7 +26,6 @@ export default class Laya {
             StateManager.updateState(Laya.store.getState());
         });
         StateManager.setLast(Laya.store.getState());
-        window['_store'] = Laya.store;
     }
 
     static boot(game: LayaGame, senceName: string): void {
@@ -107,6 +106,12 @@ export default class Laya {
     }
 
     static dispatch(action: {type: any, value: any}): void {
+        // setTimeout(() => {
         Laya.store.dispatch(action);
+        // }, 50);
+    }
+
+    static getState(): any {
+        return Laya.store.getState();
     }
 }

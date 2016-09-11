@@ -9,6 +9,7 @@ import postProcesser from '../post-processer';
 import SupportObjectManager from './SupportObjectManager';
 import {AbstractDisplayObject} from '../abstract/AbstractDisplay';
 import {AbstractDisplayObjectConstructor} from '../abstract/AbstractDisplay';
+import {AbstractSupportObject} from '../abstract/AbstractSupport';
 
 function preHook(calcValue, node, own, argument) {
     argument = argument.replace(/[A-Z]/g, (a) => {
@@ -165,6 +166,10 @@ export default class DisplayObjectManager {
         instance.getChildren().forEach(v => {
             if (v instanceof AbstractDisplayObject) {
                 DisplayObjectManager.deleteDisplay(v.getId());
+            } else if (v instanceof AbstractComponent) {
+                ComponentManager.deleteComponent(v.getId());
+            } else if (v instanceof AbstractSupportObject) {
+                v.destroy();
             }
         });
     }

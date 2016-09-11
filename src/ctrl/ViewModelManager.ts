@@ -3,6 +3,9 @@ import {AbstractSence} from '../abstract/AbstractSence';
 import {ActiveProperties} from './ActivePropertyManager';
 import StateManager from './StateManager';
 import equal from '../util/DeepEqual';
+import objectUtil from '../util/Object';
+import laya from './Laya';
+import {Getter} from './DirectiveManager';
 
 export interface ViewModel {
     value: any;
@@ -49,17 +52,14 @@ export default class ViewModelManager {
              ViewModelManager.defineData(sence, v, map.get(v));
         });
         activeProperties.getter.forEach(v => {
-            ViewModelManager.addViewModel(id, v.name, v.getter(StateManager.getDefaultValue(), sence));
-            if (v.compare === false) {
-                StateManager.addToForce(v, id);
-            } else {
-                StateManager.addToGetters(v, id);
-            }
-            ViewModelManager.defineGetter(sence, v.name, map.get(v.name));
+            ViewModelManager.addViewModel(id, v.name, 'getter');
+            StateManager.addToGetters(v, id);
+            ViewModelManager.defineGetter(sence, v);
         });
     }
 
     static defineData(obj: AbstractComponent | AbstractSence, propertyName: string, viewModel: ViewModel) {
+         delete obj[propertyName];
          Object.defineProperty(obj, propertyName, {
             get() {
                 return viewModel.value;
@@ -74,10 +74,11 @@ export default class ViewModelManager {
         });
     }
 
-    static defineGetter(obj: AbstractComponent | AbstractSence, propertyName: string, viewModel: ViewModel) {
-        Object.defineProperty(obj, propertyName, {
+    static defineGetter(obj: AbstractComponent | AbstractSence, getter: Getter) {
+        delete obj[getter.name];
+        Object.defineProperty(obj, getter.name, {
             get() {
-                return viewModel.value;
+                return objectUtil.deepGet(laya.getState(), getter.path);
             },
             set (value) {
                 console.warn('getter属性不能赋值。');
@@ -99,13 +100,9 @@ export default class ViewModelManager {
             ViewModelManager.defineData(component, v, map.get(v));
         });
         activeProperties.getter.forEach(v => {
-            ViewModelManager.addViewModel(id, v.name, v.getter(StateManager.getDefaultValue(), component));
-            if (v.compare === false) {
-                StateManager.addToForce(v, id);
-            } else {
-                StateManager.addToGetters(v, id);
-            }
-            ViewModelManager.defineGetter(component, v.name, map.get(v.name));
+            ViewModelManager.addViewModel(id, v.name, 'getter');
+            StateManager.addToGetters(v, id);
+            ViewModelManager.defineGetter(component, v);
         });
         activeProperties.prop.forEach(v => {
             ViewModelManager.addViewModel(id, v, component[v]);
@@ -118,10 +115,10 @@ export default class ViewModelManager {
      *  @para component 属性值改变了的组件实例
      *  @para property 改变的属性名
      *  @para value 改变后的属性值
+     *  @para compare 是否需要比较， 有時候需要強制更新
      */
     static activePropertyForComponent(component: AbstractComponent, property: string, value: any): void {
         let viewModel = ViewModelManager.viewModel.get(component.getId()).get(property);
-        viewModel.value = value;
         viewModel.dependences.forEach(v => {v.apply(null); });
     }
 

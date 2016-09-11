@@ -23,6 +23,6 @@ export default class Shadow extends AbstractDisplayObject {
     }
 
     destroy() {
-        // todo shadow destroy 要删除被添加到上层 container 的 DisplayObject
+        // shadow destroy 要删除被添加到上层 container 的 DisplayObject
     }
 }

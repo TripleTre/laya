@@ -102,7 +102,6 @@ export namespace layaAbstract{
 }
 
 export default class Laya {
-    static store:    Redux.Store<any>;
     static curSence: layaAbstract.AbstractSence;
     static game:     layaInterface.LayaGame;
     static initRedux(reducers: any): void;
@@ -115,6 +114,7 @@ export default class Laya {
     static cancelComponent(name: string): void;
     static rebuildSence(): void;
     static dispatch(action: {type: any, value: any}): void;
+    static getState(): any;
 }
 
 interface SupportLike {
@@ -171,7 +171,7 @@ export function support(support: SupportLike): any;
 
 export function prop(arg1: any, propertyName: string): any;
 
-export function getter(getter: (state: any, context: layaAbstract.AbstractComponent | layaAbstract.AbstractSence) => any, compare?: boolean);
+export function getter(path: string);
 
 export function watch(property: Array<string>): any;
 

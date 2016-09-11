@@ -7,7 +7,9 @@ import {AbstractSupportObject} from '../../abstract/AbstractSupport';
     optional: ['volumn', 'loop']
 })
 export default class Sound extends AbstractSupportObject {
-    realObject: Phaser.Sound;
+    private realObject: Phaser.Sound;
+    private loop: boolean;
+    private duration: number;
 
     constructor(game: Game, target: any, require: any, optional: any, id: number) {
         super(id);
@@ -18,11 +20,31 @@ export default class Sound extends AbstractSupportObject {
         return this.realObject;
     }
 
+    destroy() {
+        this.realObject.destroy();
+        this.realObject = null;
+        this.getChildren().forEach(v => v.destroy());
+        this.getChildren().clear();
+    }
+
     start() {
-        this.realObject.play();
+        this.realObject.play(undefined, undefined, undefined, this.loop);
+        if (this.duration !== undefined) {
+            setTimeout(() => {
+                this.realObject.stop();
+            }, this.duration);
+        }
     }
 
     stop() {
         this.realObject.stop();
+    }
+
+    set onStart(value) {
+        this.realObject.onPlay.add(value);
+    }
+
+    set onStop(value) {
+        this.realObject.onStop.add(value);
     }
 }

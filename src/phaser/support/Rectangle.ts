@@ -14,6 +14,12 @@ export default class Rectangle extends AbstractSupportObject {
         this.rectangle = new Phaser.Rectangle(optional.x, optional.y, optional.width, optional.height);
     }
 
+    destroy() {
+        this.rectangle = null;
+        this.getChildren().forEach(v => v.destroy());
+        this.getChildren().clear();
+    }
+
     getRealObject(): Phaser.Rectangle {
         return this.rectangle;
     }
