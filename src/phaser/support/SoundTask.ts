@@ -3,10 +3,12 @@ import support from '../../decorators/Support';
 import {AbstractSupportObject} from '../../abstract/AbstractSupport';
 import Sound from './Sound';
 import Is from '../../util/Is';
+import ObjectManager from '../../ctrl/ObjectManager';
 
 @support({
     require: [],
-    optional: []
+    optional: [],
+    name: 'SoundTask'
 })
 export default class SoundTask extends AbstractSupportObject {
     current: number = -1;
@@ -22,8 +24,7 @@ export default class SoundTask extends AbstractSupportObject {
     }
 
     destroy() {
-        this.getChildren().forEach(v => v.destroy());
-        this.getChildren().clear();
+        // this.getChildren().clear();
     }
 
     set start(value) {
@@ -54,7 +55,7 @@ export default class SoundTask extends AbstractSupportObject {
     }
 
     initList() {
-        this.list = <Array<Sound>>Array['from'](this.getChildren());
+        this.list = this.getChildren().map(v => ObjectManager.getObject<Sound>(v));
         this.list.forEach(v => {
             v.getRealObject().onStop.add((() => {
                 this.playNext();

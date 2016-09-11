@@ -16,11 +16,11 @@ export default function shadow (instance: AbstractSupportObject, own: AbstractCo
         node.children.forEach(v => {
             if (SupportObjectManager.hasSupport(v.name)) {
                 let s = SupportObjectManager.buildSupportObject(own, v, game, container);
-                instance.addChildren(s);
+                instance.addChildren(s.getId());
             } else if (ComponentManager.hasComponent(v.name)) {
                 ComponentManager.buildComponent(own, v, container, game);
             } else if (DisplayObjectManager.hasDisplay(v.name)) {
-                DisplayObjectManager.buildDisplayObject(own, v, game, container);
+                DisplayObjectManager.buildDisplayObject(own, v, container);
             }
         });
     }

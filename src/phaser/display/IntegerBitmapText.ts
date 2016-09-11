@@ -1,5 +1,11 @@
 import BitmapText from './BitmapText';
+import display from '../../decorators/Display';
 
+@display({
+  require: ['x', 'y', 'font'],
+  optional: ['rtext', 'size', 'align'],
+  name: 'IntegerBitmapText'
+})
 export default class IntegerBitmapText extends BitmapText {
     buildRealObject(game, require, optional) {
        super.buildRealObject(game, require, optional);

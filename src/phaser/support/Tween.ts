@@ -3,10 +3,12 @@ import Game from '../display/Game';
 import support from '../../decorators/Support';
 import To from './To';
 import Is from '../../util/Is';
+import ObjectManager from '../../ctrl/ObjectManager';
 
 @support({
     require: [],
-    optional: []
+    optional: [],
+    name: 'Tween'
 })
 export default class Tween extends AbstractSupportObject {
     private tween: Phaser.Tween;
@@ -21,8 +23,6 @@ export default class Tween extends AbstractSupportObject {
     destroy() {
         this.tween.game.tweens.removeFrom(this.tween.target);
         this.tween = null;
-        this.getChildren().forEach(v => v.destroy());
-        this.getChildren().clear();
     }
 
     getRealObject() {
@@ -30,8 +30,10 @@ export default class Tween extends AbstractSupportObject {
     }
 
     updateTo(index: number) {
-        let to = <To>Array['from'](this.getChildren())[index];
-        console.log('updateTo', to);
+        if (this.tween === null) {
+            return;
+        }
+        let to = <To>ObjectManager.getObject(this.getChildren()[index]);
         if (Is.isPresent(to)) {
             let ease = to.easing;
             if (typeof to.easing === 'string' && this.tween.manager['easeMap'][to.easing]) {
@@ -47,6 +49,9 @@ export default class Tween extends AbstractSupportObject {
     }
 
     set To(to: To) {
+        if (this.tween === null) {
+            return;
+        }
         to.setParent(this);
         to.index = this.count++;
         let ease = to.easing;
@@ -62,12 +67,18 @@ export default class Tween extends AbstractSupportObject {
     }
 
     set start(value) {
+        if (this.tween === null) {
+            return;
+        }
         if (value === true && Is.isPresent(this.tween)) {
             this.tween.start();
         }
     }
 
     set onComplete(func: Function | Array<Function>) {
+        if (this.tween === null) {
+            return;
+        }
         if (Array.isArray(func)) {
             func.forEach(v => this.tween.onComplete.add(v));
         } else {

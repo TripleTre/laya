@@ -1,6 +1,5 @@
 import {LayaGame} from './LayaInterface';
 import counter from './Counter';
-import {AbstractSupportObject} from './AbstractSupport';
 
 export interface AbstractDisplayObjectConstructor {
     $$require: Array<string>;
@@ -10,7 +9,7 @@ export interface AbstractDisplayObjectConstructor {
 
 export abstract class AbstractDisplayObject {
     private id: number;
-    private children: Set<AbstractDisplayObject | AbstractSupportObject>;
+    private children: Array<number>;
 
     constructor(game, require, optional, id) {
         if (id < 0 || id === undefined) {
@@ -18,7 +17,7 @@ export abstract class AbstractDisplayObject {
         } else {
             this.id = id;
         }
-        this.children = new Set<AbstractDisplayObject | AbstractSupportObject>();
+        this.children = [];
         this.buildRealObject(game, require, optional);
     }
 
@@ -26,8 +25,8 @@ export abstract class AbstractDisplayObject {
         return this.id;
     }
 
-    addChildren(obj: AbstractDisplayObject | AbstractSupportObject): void {
-        this.children.add(obj);
+    addChildren(id: number): void {
+        this.children.push(id);
     }
 
     getChildren() {

@@ -1,30 +1,52 @@
-import Is from '../util/Is';
+// import Is from '../util/Is';
 
-export default class WatchFunctionManager {
-    private static watchs: Map<string, Array<{property: string, func: string}>> = new Map<string, Array<{property: string, func: string}>>();
+// export default class WatchFunctionManager {
+//     private static watchs: Map<string, Array<{property: string, func: string}>> = new Map<string, Array<{property: string, func: string}>>();
+//     private static wateExecute: Map<string, Array<{name: string, property: string, func: string}>> = new Map<string, Array<{name: string, property: string, func: string}>>();
 
-    static addToWatchs(cptName: string, property: string, func: string): void {
-      let ws = WatchFunctionManager.watchs.get(cptName);
-      if (Is.isAbsent(ws)) {
-          WatchFunctionManager.watchs.set(cptName, []);
-      }
-      WatchFunctionManager.watchs.get(cptName).push({
-        property,
-        func
-      });
-    }
+//     static addWateExecute(name, property, func) {
+//         if (Is.isAbsent(WatchFunctionManager.wateExecute.get(name))) {
+//             WatchFunctionManager.wateExecute.set(name, []);
+//         }
+//         WatchFunctionManager.wateExecute.get(name).push({
+//             name,
+//             property,
+//             func
+//         });
+//     }
 
-    static getWatchs(name: string) {
-        let list = WatchFunctionManager.watchs.get(name);
-        if (Is.isAbsent(list)) {
-          return [];
-        }
-        return list;
-    }
+//     static doExecute(name) {
+//         let wate = WatchFunctionManager.wateExecute.get(name);
+//         if (Is.isAbsent(wate)) {
+//             return;
+//         }
+//         wate.forEach(v => {
+//             WatchFunctionManager.addToWatchs(v.name, v.property, v.func);
+//         });
+//     }
 
-    static deleteWatchs(name: string) {
-        WatchFunctionManager.watchs.delete(name);
-    }
-}
+//     static addToWatchs(cptName: string, property: string, func: string): void {
+//       let ws = WatchFunctionManager.watchs.get(cptName);
+//       if (Is.isAbsent(ws)) {
+//           WatchFunctionManager.watchs.set(cptName, []);
+//       }
+//       WatchFunctionManager.watchs.get(cptName).push({
+//         property,
+//         func
+//       });
+//     }
 
-window['_WatchFunctionManger'] = WatchFunctionManager;
+//     static getWatchs(name: string) {
+//         let list = WatchFunctionManager.watchs.get(name);
+//         if (Is.isAbsent(list)) {
+//           return [];
+//         }
+//         return list;
+//     }
+
+//     static deleteWatchs(name: string) {
+//         WatchFunctionManager.watchs.delete(name);
+//     }
+// }
+
+// window['_WatchFunctionManger'] = WatchFunctionManager;

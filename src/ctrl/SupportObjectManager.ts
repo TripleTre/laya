@@ -6,6 +6,9 @@ import {collectAttributes} from './DisplayObjectManager';
 import DirectiveManager from './DirectiveManager';
 import {AbstractSupportObject, AbstractSupportObjectConstructor} from '../abstract/AbstractSupport';
 import {AbstractDisplayObject} from '../abstract/AbstractDisplay';
+import ObjectManager from './ObjectManager';
+import Is from '../util/Is';
+import SupportObjectManager from './SupportObjectManager';
 
 const ignoreList = ['SoundTask', 'Tween'];
 
@@ -29,7 +32,8 @@ export default class SupportObjectManger {
         let registe    = SupportObjectManger.registers.get(name);
         let {require, optional, setters} = collectAttributes(node, own, registe.$$require, registe.$$optional);
         let build = new registe(game, target, require, optional, id);
-        target.addChildren(build);
+        ObjectManager.setObject(build.getId(), build);
+        target.addChildren(build.getId());
         node.directives.forEach(({name, argument, value, triggers}) => {
             DirectiveManager.getDirective(name).bind(own, build, argument, value, triggers);
         });
@@ -48,14 +52,14 @@ export default class SupportObjectManger {
             target[node.name] = build;
         } else {
             if (ignoreList.indexOf(node.name) < 0) {
-                console.warn(target.constructor['name'] + '不存在 ' + node.name + ' set 属性！');
+                console.warn(target.constructor['$$name'] + '不存在 ' + node.name + ' set 属性！');
             }
         }
         return build;
     }
 
     static registerSupportObject(newFunc: AbstractSupportObjectConstructor) {
-        let name = newFunc['name'];
+        let name = newFunc['$$name'];
         SupportObjectManger.registers.set(name, newFunc);
         SupportObjectManger.requireAttrs.set(name, []);
         SupportObjectManger.optionalAttrs.set(name, []);
@@ -67,6 +71,21 @@ export default class SupportObjectManger {
 
     static getSupport(name: string): AbstractSupportObjectConstructor {
         return SupportObjectManger.registers.get(name);
+    }
+
+    static deleteSupportObject (id) {
+        let instance = ObjectManager.getObject<AbstractDisplayObject>(id);
+        if (Is.isAbsent(instance)) {
+            return;
+        }
+        instance.destroy();
+        instance.getChildren().forEach(id => {
+            let child = ObjectManager.getObject(id);
+            if (child instanceof AbstractSupportObject) {
+                SupportObjectManager.deleteSupportObject(id);
+            }
+        });
+        ObjectManager.deleteObject(id);
     }
 }
 

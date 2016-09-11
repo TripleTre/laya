@@ -8,7 +8,7 @@ import SupportObjectManager from '../ctrl/SupportObjectManager';
 
 export default function container(build: any, own: AbstractComponent | AbstractSence, node: ComponentNode, game: LayaGame, container: LayaContainer) {
     container.add(build);
-    container.addChildren(build);
+    container.addChildren(build.getId());
     let len = build['$$repeatCount'] || 1;
     for (let i = 0; i < len; i++) {
         if (build['$$repeatCount'] && build['$$repeatName']) {
@@ -20,7 +20,7 @@ export default function container(build: any, own: AbstractComponent | AbstractS
             } else if (ComponentManager.hasComponent(v.name)) {
                 ComponentManager.buildComponent(own, v, build, game);
             } else if (DisplayObjectManager.hasDisplay(v.name)) {
-                DisplayObjectManager.buildDisplayObject(own, v, game, build);
+                DisplayObjectManager.buildDisplayObject(own, v, build);
             } else {
                 console.error(v.name + '标签没有对应的注册类!');
             }

@@ -14,7 +14,7 @@ export default {
             if (own.hasOwnActiveProperty(v)) {
                 ViewModelManager.addDependences(id, v, () => {
                     ComponentManager.deleteComponentRootCootainer(id);
-                    ComponentManager.buildRootContainer(id, game, container);
+                    ComponentManager.buildRootContainer(id);
                 });
             }
         });

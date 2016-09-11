@@ -6,7 +6,8 @@ import {elementToComponentNode} from '../parser/Template';
 export interface ComponentLike {
     template: string,
     injector?: any,
-    prop?: Array<string>
+    prop?: Array<string>,
+    name: string
 }
 
 export default function (component: ComponentLike) {
@@ -20,7 +21,8 @@ export default function (component: ComponentLike) {
         for (let attr in injects) {
             targetConstructor.prototype[attr] = injects[attr];
         }
-        ComponentManager.registerComponent(targetConstructor, cn);
+        targetConstructor['$$name'] = component.name;
+        ComponentManager.registerComponent(component.name, targetConstructor, cn);
     };
 }
 

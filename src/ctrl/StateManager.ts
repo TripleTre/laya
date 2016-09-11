@@ -1,7 +1,5 @@
 import * as Iter from '../util/Iter';
 import Is from '../util/Is';
-import ComponentManager from './ComponentManager';
-import SenceManager from './SenceManager';
 import ViewModelManager from './ViewModelManager';
 import {Getter} from './DirectiveManager';
 import diff from '../util/Diff';
@@ -37,11 +35,7 @@ export default class StateManager {
                 let changes = StateManager.getters.get(path);
                 if (Is.isPresent(changes)) {
                     changes.forEach(v => {
-                        let cpt: any = ComponentManager.getInstance(v.id);
-                        if (Is.isAbsent(cpt)) {
-                            cpt = SenceManager.getInstance(v.id);
-                        }
-                        ViewModelManager.activePropertyForComponent(cpt, v.propertyName, result.newVal);
+                        ViewModelManager.activePropertyForComponent(v.id, v.propertyName, result.newVal);
                     });
                 }
             });

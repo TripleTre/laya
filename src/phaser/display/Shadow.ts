@@ -6,7 +6,8 @@ import {AbstractDisplayObject} from '../../abstract/AbstractDisplay';
  *  shadow 只是为了方便使用 l-repeat 指令而存在
  */
 @support({
-    require: []
+    require: [],
+    name: 'Shadow'
 })
 export default class Shadow extends AbstractDisplayObject {
 
@@ -23,6 +24,6 @@ export default class Shadow extends AbstractDisplayObject {
     }
 
     destroy() {
-        // shadow destroy 要删除被添加到上层 container 的 DisplayObject
+        // this.getChildren().clear();
     }
 }

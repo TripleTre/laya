@@ -1,16 +1,20 @@
 import {AbstractComponentConstructor, AbstractComponent} from '../abstract/AbstractComponent';
 import {AbstractSence} from '../abstract/AbstractSence';
 import {LayaContainer, LayaGame, LayaWorld} from '../abstract/LayaInterface';
-import {ActiveProperties} from './ActivePropertyManager';
-import ActivePropertyManager from './ActivePropertyManager';
 import {Getter, ParsedDirective} from './DirectiveManager';
 import DirectiveManager from './DirectiveManager';
 import ViewModelManager from './ViewModelManager';
 import Is from '../util/Is';
 import DisplayObjectManager from './DisplayObjectManager';
 import {remove} from '../util/Array';
-import WatchFunctionManager from './WatchFunctionManager';
 import condition from '../directive/Condition';
+import ObjectManager from './ObjectManager';
+
+export interface ActiveProperties {
+    data:   Set<string>;
+    prop?:  Set<string>;
+    getter: Set<Getter>;
+}
 
 export interface ComponentNode {
     name:       string;
@@ -30,11 +34,9 @@ export interface NamedComponetData {
 export default class ComponentManager {
     private static registed:  Set<string>                    = new Set<string>();
     private static registers: Map<string, NamedComponetData> = new Map<string, NamedComponetData>();
-    private static instances: Map<number, AbstractComponent> = new Map<number, AbstractComponent>();
     private static nameIdMap: Map<string, Array<number>>     = new Map<string, Array<number>>();
 
-    static registerComponent(newFunc: AbstractComponentConstructor, cptNode: ComponentNode) {
-        let name:   string         = newFunc['name'];
+    static registerComponent(name: string, newFunc: AbstractComponentConstructor, cptNode: ComponentNode) {
         let dpg:    ActiveProperties = {
                                          data:   new Set<string>(),
                                          prop:   new Set<string>(),
@@ -47,8 +49,6 @@ export default class ComponentManager {
         });
         ComponentManager.nameIdMap.set(name, []);
         ComponentManager.registed.add(name);
-        ActivePropertyManager.initActiveProperty(name, dpg);
-        ActivePropertyManager.doWaiteExecute(name);
     }
 
     /**
@@ -70,8 +70,9 @@ export default class ComponentManager {
         if (id > 0) {
             newFunc['$$data'].forEach(v => {build[v] = own[v]; });
         }
-        let activeProperties = ActivePropertyManager.getActiveProperties(name);
-        ViewModelManager.initComponentViewModel(build, activeProperties);
+        build.setLayaGame(game);
+        build.setOwn(own);
+        ViewModelManager.initComponentViewModel(build);
         // 设置 component prop 属性的默认值
         node.normals.forEach(({name: attrName, value: attrVal}) => {
             let parsedName = attrName.replace(/\-([a-z])/g, (a: string, b: string) => {
@@ -101,14 +102,16 @@ export default class ComponentManager {
             condition.bind(build, node, container, game, build.getId(), argument, value, triggers);
         });
         let identify = build.getId();
-        ComponentManager.instances.set(identify, build);
+        ObjectManager.setObject(identify, build);
         ComponentManager.nameIdMap.get(name).push(identify);
-        WatchFunctionManager.getWatchs(name).forEach(({property, func}) => {
-            ViewModelManager.addDependences(identify, property, build[func].bind(build));
-            // build[func].bind(build)(); // 根据现有 viewModel 重新build sence的时候
-        });
+        if (Is.isPresent(newFunc['$$watch'])) {
+            newFunc['$$watch'].forEach(({propertyName, propertyKey}) => {
+                ViewModelManager.addDependences(identify, propertyName, build[propertyKey].bind(build));
+                // build[func].bind(build)(); // 根据现有 viewModel 重新build sence的时候
+            });
+        }
         // 构建组件的具体实现, 这必然是个container标签
-        let implement = DisplayObjectManager.buildDisplayObject(build, subNode, game, container);
+        let implement = DisplayObjectManager.buildDisplayObject(build, subNode, container);
         build.setRootContainer(<any>implement);
         if (Is.isPresent(implement)) {
             container.add(implement);
@@ -124,15 +127,15 @@ export default class ComponentManager {
     /**
      *  用于if标签， 组件实例没有删除的情况下， 根据组件上下文重新构建根 container
      */
-    static buildRootContainer(id: number, game: LayaGame, container: LayaContainer | LayaWorld) {
-        let instance = ComponentManager.getInstance(id);
-        let name = instance.constructor['name'];
+    static buildRootContainer(id: number) {
+        let instance = ObjectManager.getObject<AbstractComponent>(id);
+        let name = instance.constructor['$$name'];
         let registe = ComponentManager.registers.get(name);
         let subNode = registe.node;
-        let implement = DisplayObjectManager.buildDisplayObject(instance, subNode, game, container);
+        let implement = DisplayObjectManager.buildDisplayObject(instance, subNode, instance.getOwn().getRootContainer());
         instance.setRootContainer(<any>implement);
         if (Is.isPresent(implement)) {
-            container.add(implement);
+            instance.getOwn().getRootContainer().add(implement);
         }
         instance.resetRepeatIndex();
     }
@@ -142,10 +145,6 @@ export default class ComponentManager {
      */
     static hasComponent(name: string): boolean {
         return ComponentManager.registed.has(name);
-    }
-
-    static getInstance(id: number): AbstractComponent {
-        return ComponentManager.instances.get(id);
     }
 
     /**
@@ -161,12 +160,12 @@ export default class ComponentManager {
      *  删除 component 实例
      */
     static deleteComponent(id: number) {
-        let cpt = ComponentManager.instances.get(id);
+        let cpt = ObjectManager.getObject<AbstractComponent>(id);
         let rootId = cpt.getRootContainer().getId();
         DisplayObjectManager.deleteDisplay(rootId);
         // todo 9.11 号， 等待删除
         // cpt.destroy();
-        ComponentManager.instances.delete(id);
+        ObjectManager.deleteObject(id);
         ComponentManager.nameIdMap.forEach(v => {
             remove(v, id);
         });
@@ -177,7 +176,7 @@ export default class ComponentManager {
      *  删除， 但是会保留组件实例。 这个用在 if 标签时。
      */
     static deleteComponentRootCootainer(id) {
-        let cpt = ComponentManager.instances.get(id);
+        let cpt = ObjectManager.getObject<AbstractComponent>(id);
         let rootId = cpt.getRootContainer().getId();
         DisplayObjectManager.deleteDisplay(rootId);
         // todo 9.11 号， 等待删除

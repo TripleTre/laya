@@ -4,12 +4,13 @@ import {AbstractSupportObject} from '../../abstract/AbstractSupport';
 
 @support({
     require: ['key'],
-    optional: ['volumn', 'loop']
+    optional: ['volumn', 'loop'],
+    name: 'Sound'
 })
 export default class Sound extends AbstractSupportObject {
     private realObject: Phaser.Sound;
     private loop: boolean;
-    private duration: number;
+    private _duration: number;
 
     constructor(game: Game, target: any, require: any, optional: any, id: number) {
         super(id);
@@ -23,8 +24,6 @@ export default class Sound extends AbstractSupportObject {
     destroy() {
         this.realObject.destroy();
         this.realObject = null;
-        this.getChildren().forEach(v => v.destroy());
-        this.getChildren().clear();
     }
 
     start() {
@@ -46,5 +45,14 @@ export default class Sound extends AbstractSupportObject {
 
     set onStop(value) {
         this.realObject.onStop.add(value);
+    }
+
+    set duration(value) {
+        console.log(value);
+        this._duration = value;
+    }
+
+    get duration(){
+        return this._duration;
     }
 }

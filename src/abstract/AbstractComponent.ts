@@ -1,4 +1,4 @@
-import {LayaContainer} from './LayaInterface';
+import {LayaContainer, LayaGame} from './LayaInterface';
 import {AbstractSence} from './AbstractSence';
 import counter from './Counter';
 import {forEachKey} from '../util/Iter';
@@ -42,65 +42,65 @@ export interface ParsedDirective {
 
 export class AbstractComponent {
     $$refs:                any                  = Object.create(null);
-    $$vm:                  Map<string, ViewModel>  = new Map<string, ViewModel>();
-    private repeatScope:   Map<string, Array<any>> = new Map<string, Array<any>>();
-    private repeatIndex:   Map<string, number>     = new Map<string, number>();
+    private $$repeatScope:   Map<string, Array<any>> = new Map<string, Array<any>>();
+    private $$repeatIndex:   Map<string, number>     = new Map<string, number>();
     private $$repeatAttrs: Set<string>             = new Set<string>();
-    private own:            AbstractComponent | AbstractSence;
-    private id:             number;
-    private rootContainer:  LayaContainer;
+    private $$own:            AbstractComponent | AbstractSence;
+    private $$id:             number;
+    private $$rootContainer:  LayaContainer;
+    private $$game : LayaGame;
     // private getterProperty: Map<Getter, string>     =  new Map<Getter, string>();
 
     constructor(id) {
         if (id < 0) {
-            this.id = counter();
+            this.$$id = counter();
         } else {
-            this.id = id;
+            this.$$id = id;
         }
     }
 
     destroy(): void {
-        this.rootContainer.destroy();
+        this.$$rootContainer.destroy();
     }
 
     setRootContainer(value: LayaContainer): void {
-        this.rootContainer = value;
+        this.$$rootContainer = value;
     }
 
     getRootContainer(): LayaContainer {
-        return this.rootContainer;
+        return this.$$rootContainer;
     }
 
     getId(): number {
-        return this.id;
+        return this.$$id;
     }
 
     getOwn(): AbstractComponent | AbstractSence {
-        return this.own;
+        return this.$$own;
     }
 
     setOwn(own: AbstractComponent | AbstractSence): void {
-        this.own = own;
+        this.$$own = own;
     }
 
     addToRepeatScope(name: string, value: any) {
-        this.repeatScope.set(name, value);
+        this.$$repeatScope.set(name, value);
         this.$$repeatAttrs.add(name);
         if (!this.hasOwnProperty(name)) {
             Object.defineProperty(this, name, {
                 get() {
-                    return this.repeatScope.get(name)[this.repeatIndex.get(name)];
+                    return this.$$repeatScope.get(name)[this.$$repeatIndex.get(name)];
                 }
             });
         }
     }
 
     setRepeatIndex(name: string, index: number) {
-        this.repeatIndex.set(name, index);
+        this.$$repeatIndex.set(name, index);
         if (!this.hasOwnProperty(name + 'Index')) {
             Object.defineProperty(this, name + 'Index', {
                 get() {
-                    return this.repeatIndex.get(name);
+                    return this.$$repeatIndex.get(name);
                 }
             });
         }
@@ -116,16 +116,24 @@ export class AbstractComponent {
     }
 
     resetRepeatIndex() {
-        forEachKey<string>(this.repeatIndex.keys(), (function (key) {
-            this.repeatIndex.set(key, 0);
+        forEachKey<string>(this.$$repeatIndex.keys(), (function (key) {
+            this.$$repeatIndex.set(key, 0);
         }).bind(this));
     }
 
     generatorRepeatInfo() {
         let ret = Object.create(null);
-        forEachKey<string>(this.repeatIndex.keys(), (function (key) {
-            ret[key] = this.repeatIndex.get(key);
+        forEachKey<string>(this.$$repeatIndex.keys(), (function (key) {
+            ret[key] = this.$$repeatIndex.get(key);
         }).bind(this));
         return ret;
+    }
+
+    getLayaGame(): LayaGame {
+        return this.$$game;
+    }
+
+    setLayaGame(value: LayaGame) {
+        this.$$game = value;
     }
 }

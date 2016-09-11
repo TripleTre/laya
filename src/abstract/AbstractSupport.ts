@@ -9,7 +9,7 @@ export interface AbstractSupportObjectConstructor {
 
 export abstract class AbstractSupportObject {
     private id: number;
-    private children: Set<AbstractSupportObject>;
+    private children: Array<number>;
 
     constructor(id) {
         if (id < 0) {
@@ -17,15 +17,15 @@ export abstract class AbstractSupportObject {
         } else {
             this.id = id;
         }
-        this.children = new Set<AbstractSupportObject>();
+        this.children = [];
     }
 
     getId(): number {
         return this.id;
     }
 
-    addChildren(obj: AbstractSupportObject): void {
-        this.children.add(obj);
+    addChildren(id: number): void {
+        this.children.push(id);
     }
 
     getChildren() {

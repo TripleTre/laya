@@ -118,25 +118,29 @@ export default class Laya {
 }
 
 interface SupportLike {
-    require: Array<string>,
-    optional?: Array<string>
+    require: Array<string>;
+    optional?: Array<string>;
+    name: string;
 }
 
 interface SenceLike {
     template: string;
     injector?: any;
-     prop?: Array<string>;
+    prop?: Array<string>;
+    name: string;
 }
 
 interface ComponentLike {
     template: string;
     injector?: any;
     prop?: Array<string>;
+    name: string;
 }
 
 interface DisplayLike {
     require: Array<string>;
     optional?: Array<string>;
+    name: string;
 }
 
 export class GameBuilder {

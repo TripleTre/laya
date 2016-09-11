@@ -3,20 +3,14 @@ import {ComponentNode} from '../ctrl/ComponentManager';
 import {elementToComponentNode} from '../parser/Template';
 import {errorHandler} from './Component';
 
-const DEFAULT = {
-    template: `
-        <sence>
-        </sence>
-    `
-};
-
 export interface SenceLike {
     template: string,
     injector?: any,
-    prop?: Array<string>
+    prop?: Array<string>,
+    name: string
 }
 
-export default function (component: SenceLike = DEFAULT) {
+export default function (component: SenceLike) {
     let template: string        = component.template;
     let injects:  any           = component.injector; //tslint:disable-line
     let paser:    DOMParser     = new DOMParser();
@@ -27,6 +21,7 @@ export default function (component: SenceLike = DEFAULT) {
         for (let attr in injects) {
             targetConstructor.prototype[attr] = injects[attr];
         }
-        SenceManager.reigsterSence(targetConstructor, cn);
+        targetConstructor['$$name'] = component.name;
+        SenceManager.reigsterSence(component.name, targetConstructor, cn);
     };
 }

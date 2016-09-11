@@ -3,7 +3,8 @@ import display from '../../decorators/Display';
 
 @display({
     require: ['x', 'y', 'key'],
-    optional: ['frame']
+    optional: ['frame'],
+    name: 'Tmage'
 })
 class Tmage extends AbstractDisplayObject {
     private image: Phaser.Image;
@@ -20,8 +21,6 @@ class Tmage extends AbstractDisplayObject {
     destroy(): void {
         this.image.destroy(true);
         this.image = null;
-        this.getChildren().forEach(v => v.destroy());
-        this.getChildren().clear();
     }
 
     getRealObject(): Phaser.Image {

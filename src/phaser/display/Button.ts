@@ -3,7 +3,8 @@ import display from '../../decorators/Display';
 
 @display({
     require: ['x', 'y', 'key', 'outFrame'],
-    optional: ['callBack', 'callBackContext', 'overFrame', 'downFrame', 'upFrame', 'disableFrame']
+    optional: ['callBack', 'callBackContext', 'overFrame', 'downFrame', 'upFrame', 'disableFrame'],
+    name: 'Button'
 })
 export default class Button extends AbstractDisplayObject {
     button:       Phaser.Button;
@@ -23,11 +24,8 @@ export default class Button extends AbstractDisplayObject {
     }
 
     destroy() {
-        this.button.destroy();
         this.button.destroy(true);
         this.button = null;
-        this.getChildren().forEach(v => v.destroy());
-        this.getChildren().clear();
     }
 
     set scaleX(value) {

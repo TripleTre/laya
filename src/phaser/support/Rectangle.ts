@@ -4,7 +4,8 @@ import {AbstractSupportObject} from '../../abstract/AbstractSupport';
 
 @support({
     require: [],
-    optional: ['x', 'y', 'width', 'height']
+    optional: ['x', 'y', 'width', 'height'],
+    name: 'Rectangle'
 })
 export default class Rectangle extends AbstractSupportObject {
     rectangle: Phaser.Rectangle;
@@ -16,8 +17,6 @@ export default class Rectangle extends AbstractSupportObject {
 
     destroy() {
         this.rectangle = null;
-        this.getChildren().forEach(v => v.destroy());
-        this.getChildren().clear();
     }
 
     getRealObject(): Phaser.Rectangle {

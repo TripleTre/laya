@@ -5,7 +5,8 @@ import Graphics from './Graphics';
 
 @display({
     require: [],
-    optional: ['name']
+    optional: ['name'],
+    name: 'Container'
 })
 export default class Container extends AbstractDisplayObject implements LayaContainer {
     realObject: Phaser.Group;
@@ -29,8 +30,6 @@ export default class Container extends AbstractDisplayObject implements LayaCont
     destroy(): void {
         this.realObject.destroy(true);
         this.realObject = null;
-        this.getChildren().forEach(v => v.destroy());
-        this.getChildren().clear();
     }
 
     set Mask(value: Graphics) {

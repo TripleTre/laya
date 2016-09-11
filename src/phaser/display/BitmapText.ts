@@ -3,7 +3,8 @@ import {AbstractDisplayObject} from '../../abstract/AbstractDisplay';
 
 @display({
   require: ['x', 'y', 'font'],
-  optional: ['rtext', 'size', 'align']
+  optional: ['rtext', 'size', 'align'],
+  name: 'BitmapText'
 })
 export default class BitmapText extends AbstractDisplayObject {
     protected realObject: Phaser.BitmapText;
@@ -20,8 +21,6 @@ export default class BitmapText extends AbstractDisplayObject {
     destroy() {
         this.realObject.destroy(true);
         this.realObject = null;
-        this.getChildren().forEach(v => v.destroy());
-        this.getChildren().clear();
     }
 
     set text(value) {

@@ -1,4 +1,4 @@
-import {LayaContainer, LayaGame} from '../abstract/LayaInterface';
+import {LayaContainer} from '../abstract/LayaInterface';
 import {AbstractComponent} from '../abstract/AbstractComponent';
 import {AbstractSence} from '../abstract/AbstractSence';
 import {ComponentNode} from './ComponentManager';
@@ -10,13 +10,14 @@ import SupportObjectManager from './SupportObjectManager';
 import {AbstractDisplayObject} from '../abstract/AbstractDisplay';
 import {AbstractDisplayObjectConstructor} from '../abstract/AbstractDisplay';
 import {AbstractSupportObject} from '../abstract/AbstractSupport';
+import ObjectManager from './ObjectManager';
 
 function preHook(calcValue, node, own, argument) {
     argument = argument.replace(/[A-Z]/g, (a) => {
         return '-' + a.toLowerCase();
     });
     if (calcValue === undefined) {
-        console.warn(own.constructor['name'] + ' 组件 ', node.name + ' 标签, ' + argument + ' 属性计算结果为 undefined，检查标签中属性值是否拼写错误.');
+        console.warn(own.constructor['$$name'] + ' 组件 ', node.name + ' 标签, ' + argument + ' 属性计算结果为 undefined，检查标签中属性值是否拼写错误.');
     }
     if (typeof calcValue === 'function') {
         return calcValue.bind(own);
@@ -69,7 +70,6 @@ export function collectAttributes(node: ComponentNode, own: AbstractComponent | 
  */
 export default class DisplayObjectManager {
     private static registers: Map<string, AbstractDisplayObjectConstructor> = new Map<string, AbstractDisplayObjectConstructor>();
-    private static instances: Map<number, AbstractDisplayObject> = new Map<number, AbstractDisplayObject>();
 
     /**
      *  构造DisplayObject时,必须传入构造函数的参数
@@ -81,9 +81,13 @@ export default class DisplayObjectManager {
     private static optionalAttrs: Map<string, Array<string>> = new Map<string, Array<string>>();
 
     static buildDisplayObject(own: AbstractComponent | AbstractSence,
-                              node: ComponentNode, game: LayaGame, container: LayaContainer, id: number = -1): AbstractDisplayObject {
+                              node: ComponentNode, container: LayaContainer, id: number = -1): AbstractDisplayObject {
         if (node.check.some(v => !v(own))) {
             return;
+        }
+        let game = own.getLayaGame();
+        if (container === undefined) {
+            container = own.getRootContainer();
         }
         let name   = node.name;
         let registe = DisplayObjectManager.registers.get(name);
@@ -93,7 +97,7 @@ export default class DisplayObjectManager {
         }
         let {require, optional, setters} = collectAttributes(node, own, registe.$$require, registe.$$optional);
         let build: AbstractDisplayObject = new registe(game, require, optional, id);
-        DisplayObjectManager.instances.set(build.getId(), build);
+        ObjectManager.setObject(build.getId(), build);
         node.directives.forEach(({name, argument, value, triggers}) => {
              DirectiveManager.getDirective(name).bind(own, build, argument, value, triggers);
         });
@@ -119,14 +123,14 @@ export default class DisplayObjectManager {
                     }
                 });
             }
-            container.addChildren(build);
+            container.addChildren(build.getId());
             container.add(build);
         }
         return build;
     }
 
     static registerDisplayObject(newFunc: AbstractDisplayObjectConstructor) {
-        let name = newFunc['name'];
+        let name = newFunc['$$name'];
         DisplayObjectManager.registers.set(name, newFunc);
         DisplayObjectManager.requireAttrs.set(name, []);
         DisplayObjectManager.optionalAttrs.set(name, []);
@@ -149,29 +153,26 @@ export default class DisplayObjectManager {
     }
 
     static getInstance(id: number): AbstractDisplayObject {
-        return DisplayObjectManager.instances.get(id);
-    }
-
-    static addInstance(obj: AbstractDisplayObject) {
-        DisplayObjectManager.instances.set(obj.getId(), obj);
+        return ObjectManager.getObject<AbstractDisplayObject>(id);
     }
 
     static deleteDisplay(id: number): void {
-        let instance = DisplayObjectManager.instances.get(id);
+        let instance = ObjectManager.getObject<AbstractDisplayObject>(id);
         if (Is.isAbsent(instance)) {
             return;
         }
         instance.destroy();
-        DisplayObjectManager.instances.delete(id);
-        instance.getChildren().forEach(v => {
-            if (v instanceof AbstractDisplayObject) {
-                DisplayObjectManager.deleteDisplay(v.getId());
-            } else if (v instanceof AbstractComponent) {
-                ComponentManager.deleteComponent(v.getId());
-            } else if (v instanceof AbstractSupportObject) {
-                v.destroy();
+        instance.getChildren().forEach(id => {
+            let child = ObjectManager.getObject(id);
+            if (child instanceof AbstractDisplayObject) {
+                DisplayObjectManager.deleteDisplay(id);
+            } else if (child instanceof AbstractComponent) {
+                ComponentManager.deleteComponent(id);
+            } else if (child instanceof AbstractSupportObject) {
+                SupportObjectManager.deleteSupportObject(id);
             }
         });
+        ObjectManager.deleteObject(id);
     }
 }
 

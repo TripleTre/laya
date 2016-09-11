@@ -23,8 +23,6 @@ export default class World extends AbstractDisplayObject implements LayaContaine
     destroy() {
         this.realWorld.destroy(true);
         this.realWorld = null;
-        this.getChildren().forEach(v => v.destroy());
-        this.getChildren().clear();
     }
 
     getRealObject(): Phaser.World {

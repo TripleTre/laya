@@ -4,7 +4,8 @@ import {AbstractSupportObject} from '../../abstract/AbstractSupport';
 import Rectangle from './Rectangle';
 
 @support({
-    require: ['x', 'y']
+    require: ['x', 'y'],
+    name: 'Mask'
 })
 export default class Mask extends AbstractSupportObject {
 
@@ -22,8 +23,6 @@ export default class Mask extends AbstractSupportObject {
     destroy(): void {
         this.graphics.destroy(true);
         this.graphics = null;
-        this.getChildren().forEach(v => v.destroy());
-        this.getChildren().clear();
     }
 
     set alpha(value: number) {

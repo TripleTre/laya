@@ -1,11 +1,11 @@
 import {AbstractComponent} from '../abstract/AbstractComponent';
 import {AbstractSence} from '../abstract/AbstractSence';
-import {ActiveProperties} from './ActivePropertyManager';
 import StateManager from './StateManager';
 import equal from '../util/DeepEqual';
 import objectUtil from '../util/Object';
 import laya from './Laya';
 import {Getter} from './DirectiveManager';
+import Is from '../util/Is';
 
 export interface ViewModel {
     value: any;
@@ -20,7 +20,7 @@ export default class ViewModelManager {
      * @param name 组件类的属性名称
      * @param dependence 依赖, name属性改变后,要执行的回调函数
      */
-    static addDependences(id: number, name: string, dependence: Function) {
+    static addDependences(id: number, name: string, dependence: (val) => any) {
         ViewModelManager.viewModel.get(id).get(name).dependences.push(dependence);
     }
 
@@ -43,19 +43,24 @@ export default class ViewModelManager {
      *  @para sence sence对象
      *  @para activeProperties 该类 sence 对象的所有响应属性
      */
-    static initSenceViewModel(sence: AbstractSence, activeProperties: ActiveProperties): void {
+    static initSenceViewModel(sence: AbstractSence): void {
         let id  = sence.getId();
         let map = new Map<string, ViewModel>();
         ViewModelManager.viewModel.set(id, map);
-        activeProperties.data.forEach(v => {
-             ViewModelManager.addViewModel(id, v, sence[v]);
-             ViewModelManager.defineData(sence, v, map.get(v));
-        });
-        activeProperties.getter.forEach(v => {
-            ViewModelManager.addViewModel(id, v.name, 'getter');
-            StateManager.addToGetters(v, id);
-            ViewModelManager.defineGetter(sence, v);
-        });
+        let cons: any = sence.constructor;
+        if (Is.isPresent(cons.$$data)) {
+            cons.$$data.forEach(v => {
+                ViewModelManager.addViewModel(id, v, sence[v]);
+                ViewModelManager.defineData(sence, v, map.get(v));
+            });
+        }
+        if (Is.isPresent(cons.$$getter)) {
+            cons.$$getter.forEach(v => {
+                ViewModelManager.addViewModel(id, v.name, 'getter');
+                StateManager.addToGetters(v, id);
+                ViewModelManager.defineGetter(sence, v);
+            });
+        }
     }
 
     static defineData(obj: AbstractComponent | AbstractSence, propertyName: string, viewModel: ViewModel) {
@@ -69,7 +74,7 @@ export default class ViewModelManager {
                     return;
                 }
                 viewModel.value = newValue;
-                viewModel.dependences.forEach(v => v.apply(null));
+                viewModel.dependences.forEach(v => v.apply(null, [newValue]));
             }
         });
     }
@@ -91,23 +96,30 @@ export default class ViewModelManager {
      *  @para component component
      *  @para activeProperties 该类 component 对象的所有响应属性
      */
-    static initComponentViewModel(component: AbstractComponent, activeProperties: ActiveProperties): void {
+    static initComponentViewModel(component: AbstractComponent): void {
         let id = component.getId();
         let map = new Map<string, ViewModel>();
+        let cons: any = component.constructor;
         ViewModelManager.viewModel.set(id, map);
-        activeProperties.data.forEach(v => {
-            ViewModelManager.addViewModel(id, v, component[v]);
-            ViewModelManager.defineData(component, v, map.get(v));
-        });
-        activeProperties.getter.forEach(v => {
-            ViewModelManager.addViewModel(id, v.name, 'getter');
-            StateManager.addToGetters(v, id);
-            ViewModelManager.defineGetter(component, v);
-        });
-        activeProperties.prop.forEach(v => {
-            ViewModelManager.addViewModel(id, v, component[v]);
-            ViewModelManager.defineData(component, v, map.get(v));
-        });
+        if (Is.isPresent(cons.$$data)) {
+            cons.$$data.forEach(v => {
+                ViewModelManager.addViewModel(id, v, component[v]);
+                ViewModelManager.defineData(component, v, map.get(v));
+            });
+        }
+        if (Is.isPresent(cons.$$getter)) {
+            cons.$$getter.forEach(v => {
+                ViewModelManager.addViewModel(id, v.name, 'getter');
+                StateManager.addToGetters(v, id);
+                ViewModelManager.defineGetter(component, v);
+            });
+        }
+        if (Is.isPresent(cons.$$prop)) {
+            cons.$$prop.forEach(v => {
+                ViewModelManager.addViewModel(id, v, component[v]);
+                ViewModelManager.defineData(component, v, map.get(v));
+            });
+        }
     }
 
     /**
@@ -117,9 +129,9 @@ export default class ViewModelManager {
      *  @para value 改变后的属性值
      *  @para compare 是否需要比较， 有時候需要強制更新
      */
-    static activePropertyForComponent(component: AbstractComponent, property: string, value: any): void {
-        let viewModel = ViewModelManager.viewModel.get(component.getId()).get(property);
-        viewModel.dependences.forEach(v => {v.apply(null); });
+    static activePropertyForComponent(componentId: number, property: string, value: any): void {
+        let viewModel = ViewModelManager.viewModel.get(componentId).get(property);
+        viewModel.dependences.forEach(v => {v.apply(null, [value]); });
     }
 
     static deleteViewModel(id: number) {

@@ -1,4 +1,4 @@
-import {LayaGame} from './LayaInterface';
+import {LayaGame, LayaWorld} from './LayaInterface';
 import {AbstractComponent} from './AbstractComponent';
 import {ComponentNode} from './AbstractComponent';
 import ComponentManager from '../ctrl/ComponentManager';
@@ -25,6 +25,7 @@ export class AbstractSence {
     private repeatScope: Map<string, Array<any>> = new Map<string, Array<any>>();
     private repeatIndex: Map<string, number> = new Map<string, number>();
     private $$repeatAttrs: Set<string> = new Set<string>();
+    private $$rootContainer: LayaWorld;
 
     constructor() {
         this.id = counter();
@@ -107,5 +108,13 @@ export class AbstractSence {
             ret[key] = this.repeatIndex.get(key);
         }).bind(this));
         return ret;
+    }
+
+    setRootContainer(value: LayaWorld): void {
+        this.$$rootContainer = value;
+    }
+
+    getRootContainer(): LayaWorld {
+        return this.$$rootContainer;
     }
 }

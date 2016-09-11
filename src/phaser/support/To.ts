@@ -6,7 +6,8 @@ import Is from '../../util/Is';
 
 @support({
     require: [],
-    optional: []
+    optional: [],
+    name: 'To'
 })
 export default class To extends AbstractSupportObject {
     index: number = 0;
@@ -23,12 +24,18 @@ export default class To extends AbstractSupportObject {
     }
 
     destroy() {
-        this.getChildren().forEach(v => v.destroy());
-        this.getChildren().clear();
+        // this.getChildren().clear();
+    }
+
+    forceSkip() {
+        let tween = this.parent.getRealObject();
+        if (Is.isPresent(tween)) {
+            tween.updateTweenData('duration', 100, this.index);
+        }
     }
 
     set skip(value: boolean) {
-        if (value === true) {
+        if (value === true && Is.isPresent(this.parent)) {
             let tween = this.parent.getRealObject();
             if (Is.isPresent(tween)) {
                 tween.updateTweenData('duration', 100, this.index);
