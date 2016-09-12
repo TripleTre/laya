@@ -63,4 +63,8 @@ export default class Button extends AbstractDisplayObject {
     set anchorY (value) {
         this.button.anchor.y = value;
     }
+
+    set DownSound(value) {
+        this.button.onDownSound = value.getRealObject();
+    }
 }

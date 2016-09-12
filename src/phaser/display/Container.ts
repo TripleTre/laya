@@ -55,4 +55,9 @@ export default class Container extends AbstractDisplayObject implements LayaCont
     set visible(value) {
         this.realObject.visible = value;
     }
+
+    // set SoundTask(value) {
+    //     // debugger
+    //     debugger;
+    // }
 }

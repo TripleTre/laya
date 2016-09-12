@@ -4,6 +4,7 @@ import To from './To';
 import Tween from './Tween';
 import Sound from './Sound';
 import SoundTask from './SoundTask';
+import DownSound from './DownSound';
 
 export default [
     Mask,
@@ -11,5 +12,6 @@ export default [
     To,
     Tween,
     Sound,
-    SoundTask
+    SoundTask,
+    DownSound
 ];

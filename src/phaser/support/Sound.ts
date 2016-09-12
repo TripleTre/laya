@@ -51,6 +51,10 @@ export default class Sound extends AbstractSupportObject {
         this._duration = value;
     }
 
+    set key(value) {
+        this.realObject.key = value;
+    }
+
     get duration(){
         return this._duration;
     }
