@@ -1,5 +1,6 @@
 import {AbstractDisplayObject} from '../../abstract/AbstractDisplay';
 import display from '../../decorators/Display';
+import Is from '../../util/Is';
 
 @display({
     require: ['x', 'y', 'key', 'outFrame'],
@@ -44,6 +45,9 @@ export default class Button extends AbstractDisplayObject {
         this.button.inputEnabled = value;
         // phaser button 自己的 setStateFrame 后执行， 因此延迟
         setTimeout(() => {
+            if (Is.isAbsent(this.button)) {
+                return;
+            }
             if (value === false) {
                 this.button['frameName'] = this.disableFrame;
             } else {

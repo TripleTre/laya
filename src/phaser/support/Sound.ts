@@ -48,7 +48,6 @@ export default class Sound extends AbstractSupportObject {
     }
 
     set duration(value) {
-        console.log(value);
         this._duration = value;
     }
 

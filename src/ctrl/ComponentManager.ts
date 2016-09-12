@@ -67,9 +67,10 @@ export default class ComponentManager {
         let subNode = registe.node;
         let newFunc = registe.newFunc;
         let build   = new newFunc(id);
-        if (id > 0) {
-            newFunc['$$data'].forEach(v => {build[v] = own[v]; });
-        }
+        // if (id > 0) {
+        //     debugger;
+        //     newFunc['$$data'].forEach(v => {build[v] = own[v]; });
+        // }
         build.setLayaGame(game);
         build.setOwn(own);
         ViewModelManager.initComponentViewModel(build);
@@ -107,7 +108,7 @@ export default class ComponentManager {
         if (Is.isPresent(newFunc['$$watch'])) {
             newFunc['$$watch'].forEach(({propertyName, propertyKey}) => {
                 ViewModelManager.addDependences(identify, propertyName, build[propertyKey].bind(build));
-                // build[func].bind(build)(); // 根据现有 viewModel 重新build sence的时候
+                build[propertyKey].bind(build)(); // 根据现有 viewModel 重新build sence的时候
             });
         }
         // 构建组件的具体实现, 这必然是个container标签
@@ -129,6 +130,9 @@ export default class ComponentManager {
      */
     static buildRootContainer(id: number) {
         let instance = ObjectManager.getObject<AbstractComponent>(id);
+        if (typeof instance['$$update'] === 'function') {
+            instance['$$update'].apply(instance);
+        }
         let name = instance.constructor['$$name'];
         let registe = ComponentManager.registers.get(name);
         let subNode = registe.node;
@@ -161,10 +165,10 @@ export default class ComponentManager {
      */
     static deleteComponent(id: number) {
         let cpt = ObjectManager.getObject<AbstractComponent>(id);
-        let rootId = cpt.getRootContainer().getId();
-        DisplayObjectManager.deleteDisplay(rootId);
-        // todo 9.11 号， 等待删除
-        // cpt.destroy();
+        if (Is.isPresent(cpt.getRootContainer())) {
+            let rootId = cpt.getRootContainer().getId();
+            DisplayObjectManager.deleteDisplay(rootId);
+        }
         ObjectManager.deleteObject(id);
         ComponentManager.nameIdMap.forEach(v => {
             remove(v, id);
@@ -177,10 +181,10 @@ export default class ComponentManager {
      */
     static deleteComponentRootCootainer(id) {
         let cpt = ObjectManager.getObject<AbstractComponent>(id);
-        let rootId = cpt.getRootContainer().getId();
-        DisplayObjectManager.deleteDisplay(rootId);
-        // todo 9.11 号， 等待删除
-        // cpt.destroy();
+        if (Is.isPresent(cpt.getRootContainer())) {
+            let rootId = cpt.getRootContainer().getId();
+            DisplayObjectManager.deleteDisplay(rootId);
+        }
     }
 
     static getAllRegisters(): Array<AbstractComponentConstructor> {

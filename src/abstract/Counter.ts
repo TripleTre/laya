@@ -1,5 +1,5 @@
 let count = 0;
 
-export default function () {
+export default function counter() {
     return count++;
 }

@@ -12,7 +12,7 @@ export default {
                           container: LayaContainer | LayaWorld, game: LayaGame, id: number = -1, argument: string, value: (context) => any, triggers: Array<string>) {
         triggers.forEach((v) => {
             if (own.hasOwnActiveProperty(v)) {
-                ViewModelManager.addDependences(id, v, () => {
+                ViewModelManager.addDependences(id, v, (newValue) => {
                     ComponentManager.deleteComponentRootCootainer(id);
                     ComponentManager.buildRootContainer(id);
                 });
