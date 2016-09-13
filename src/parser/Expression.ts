@@ -1,7 +1,7 @@
 import Is from '../util/Is';
 
 declare var process;
-const ignoreWords = 'true,false,null,undefined,Infinity,NaN';
+const ignoreWords = 'true,false,null,undefined,Infinity,NaN,vm';
 const ignoreWordsRE = new RegExp('\\b' + ignoreWords.replace(/,/g, '\\b|\\b') + '\\b');
 const improperKeywords =
     'this,Math,Date' +

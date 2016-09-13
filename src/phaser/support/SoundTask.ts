@@ -27,6 +27,10 @@ export default class SoundTask extends AbstractSupportObject {
         // this.getChildren().clear();
     }
 
+    play() {
+        this.start = true;
+    }
+
     set start(value) {
         if (value === true) {
             if (this.list === undefined) {
