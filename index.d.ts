@@ -113,7 +113,7 @@ export default class Laya {
     static useDisplayObject(impls: any): void;
     static cancelComponent(name: string): void;
     static rebuildSence(): void;
-    static dispatch(action: {type: any, value: any}): void;
+    static dispatch(action: {type: any, value: any}, delay?: number): void;
     static getState(): any;
 }
 

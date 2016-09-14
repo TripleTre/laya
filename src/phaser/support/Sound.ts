@@ -1,6 +1,7 @@
 import Game from '../display/Game';
 import support from '../../decorators/Support';
 import {AbstractSupportObject} from '../../abstract/AbstractSupport';
+import Is from '../../util/Is';
 
 @support({
     require: ['key'],
@@ -8,13 +9,36 @@ import {AbstractSupportObject} from '../../abstract/AbstractSupport';
     name: 'Sound'
 })
 export default class Sound extends AbstractSupportObject {
+    private static cache = {};
     private realObject: Phaser.Sound;
     private loop: boolean;
     private _duration: number;
+    private layaStopFunc = undefined;
+    private layaPlayFunc = undefined;
 
     constructor(game: Game, target: any, require: any, optional: any, id: number) {
         super(id);
-        this.realObject = new Phaser.Sound(game.realGame, require.key, optional.volumn, optional.loop);
+        if (Is.isPresent(Sound.cache[require.key])) {
+            this.realObject = Sound.cache[require.key];
+        } else {
+            Sound.cache[require.key]
+                = this.realObject
+                = new Phaser.Sound(game.realGame, require.key, optional.volumn, optional.loop);
+            this.realObject.onPlay.add(this.layaPlay, this);
+            this.realObject.onStop.add(this.layaStop, this);
+        }
+    }
+
+    layaStop() {
+        if (typeof this.layaStopFunc === 'function') {
+            this.layaStopFunc(this);
+        }
+    }
+
+    layaPlay() {
+        if (typeof this.layaPlayFunc === 'function') {
+            this.layaPlayFunc(this);
+        }
     }
 
     getRealObject(): Phaser.Sound {
@@ -22,7 +46,6 @@ export default class Sound extends AbstractSupportObject {
     }
 
     destroy() {
-        this.realObject.destroy();
         this.realObject = null;
     }
 
@@ -30,21 +53,28 @@ export default class Sound extends AbstractSupportObject {
         this.realObject.play(undefined, undefined, undefined, this.loop);
         if (this.duration !== undefined) {
             setTimeout(() => {
-                this.realObject.stop();
+                if (this.realObject.isPlaying !== false) {
+                     this.realObject.stop();
+                }
             }, this.duration);
         }
     }
 
-    stop() {
-        this.realObject.stop();
+    stop(callBack: boolean = true) {
+        if (this.realObject.isPlaying !== false) {
+            if (callBack === true) {
+                this.realObject.onStop.dispose();
+            }
+            this.realObject.stop();
+        }
     }
 
     set onStart(value) {
-        this.realObject.onPlay.add(value);
+        this.layaPlayFunc = value;
     }
 
     set onStop(value) {
-        this.realObject.onStop.add(value);
+        this.layaStopFunc = value;
     }
 
     set duration(value) {

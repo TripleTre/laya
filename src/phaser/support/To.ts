@@ -34,8 +34,8 @@ export default class To extends AbstractSupportObject {
         }
     }
 
-    set skip(value: boolean) {
-        if (value === true && Is.isPresent(this.parent)) {
+    skip() {
+        if (Is.isPresent(this.parent)) {
             let tween = this.parent.getRealObject();
             if (Is.isPresent(tween)) {
                 tween.updateTweenData('duration', 100, this.index);

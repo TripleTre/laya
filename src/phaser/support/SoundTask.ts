@@ -14,6 +14,8 @@ export default class SoundTask extends AbstractSupportObject {
     current: number = -1;
     next: number;
     list: Array<Sound>;
+    _onStop: any;
+    isStoped = false;
 
     constructor(game: Game, target: any, require: any, optional: any, id: number) {
         super(id);
@@ -28,23 +30,27 @@ export default class SoundTask extends AbstractSupportObject {
     }
 
     play() {
-        this.start = true;
-    }
-
-    set start(value) {
-        if (value === true) {
-            if (this.list === undefined) {
-                this.initList();
-            }
-            this.next = -1;
-            this.playNext();
+        if (this.list === undefined) {
+            this.initList();
         }
+        this.next = -1;
+        this.isStoped = false;
+        this.playNext();
     }
 
-    set stop(value) {
-        if (value === true) {
+    /**
+     * @param lastSoundCallBack sound task 停止时会 stop 当前正在播放的 sound， 如果此
+     *          sound 有 stop 回调， 可以选择是否调用回调。 因为有时候只需要 soundTask 自身的
+     *          回调。
+     */
+    stop(lastSoundCallBack: boolean) {
+        if (this.isStoped === false) {
             this.next = undefined;
-            this.list[this.current].stop();
+            if (Is.isPresent(this.list) && this.current >= 0) {
+                this.list[this.current].stop(lastSoundCallBack);
+            }
+            this.isStoped = true;
+            this._onStop();
         }
     }
 
@@ -53,9 +59,7 @@ export default class SoundTask extends AbstractSupportObject {
     }
 
     set onStop(value) {
-        if (Is.isPresent(this.list) && this.list.length > 0) {
-            this.list[this.list.length - 1].onStop = value;
-        }
+        this._onStop = value;
     }
 
     initList() {
@@ -75,6 +79,9 @@ export default class SoundTask extends AbstractSupportObject {
             if (Is.isPresent(next)) {
                 next.start();
             }
+        } else {
+            this.isStoped = true;
+            this._onStop();
         }
     }
 }

@@ -66,11 +66,11 @@ export default class Tween extends AbstractSupportObject {
         this.tween.timeline.push(toDate);
     }
 
-    set start(value) {
+    start() {
         if (this.tween === null) {
             return;
         }
-        if (value === true && Is.isPresent(this.tween)) {
+        if (Is.isPresent(this.tween)) {
             this.tween.start();
         }
     }

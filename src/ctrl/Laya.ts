@@ -102,10 +102,14 @@ export default class Laya {
         SenceManager.buildSence(name, curSence, Laya.game, true);
     }
 
-    static dispatch(action: {type: any, value: any}): void {
-        // setTimeout(() => {
-        Laya.store.dispatch(action);
-        // }, 50);
+    static dispatch(action: {type: any, value: any}, delay: number = -1): void {
+        if (delay > 16) {
+            setTimeout(() => {
+                Laya.store.dispatch(action);
+            }, delay);
+        } else {
+            Laya.store.dispatch(action);
+        }
     }
 
     static getState(): any {
