@@ -29,7 +29,7 @@ export function expressionVars(expression: string): Array<string> {
     let list = [];
     expression = expression.replace(/\{.*:(.*)\}/g, (a, b, c, d) => {
         let s = list.concat(b.replace(/'[^']*'/g, '')
-                    .match(/\b[a-z]([a-zA-Z._$0-9]+)?\b/g));
+                    .match(/\b[a-zA-Z]([a-zA-Z._$0-9]+)?\b/g));
         if (Is.isPresent(s)) {
             list = list.concat(s);
         }

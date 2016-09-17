@@ -24,6 +24,11 @@ export default class Laya {
         Laya.store.subscribe(() => {
             StateManager.updateState(Laya.store.getState());
         });
+        // Laya.store.subscribe(() => {
+        //     setTimeout(() => {
+        //         StateManager.updateState(Laya.store.getState());
+        //     });
+        // });
         StateManager.setLast(Laya.store.getState());
     }
 

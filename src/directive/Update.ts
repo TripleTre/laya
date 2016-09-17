@@ -16,6 +16,8 @@ export default {
                     ComponentManager.deleteComponentRootCootainer(id);
                     ComponentManager.buildRootContainer(id);
                 });
+            } else {
+                // console.warn(own.constructor['$$name'] + '组件，没有属性名为: ' + v + '的响应式属性.');
             }
         });
     },

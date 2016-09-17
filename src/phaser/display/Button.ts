@@ -3,8 +3,8 @@ import display from '../../decorators/Display';
 import Is from '../../util/Is';
 
 @display({
-    require: ['x', 'y', 'key', 'outFrame'],
-    optional: ['callBack', 'callBackContext', 'overFrame', 'downFrame', 'upFrame', 'disableFrame'],
+    require: ['x', 'y', 'key'],
+    optional: ['callBack', 'callBackContext', 'overFrame', 'downFrame', 'upFrame', 'disableFrame', 'outFrame'],
     name: 'Button'
 })
 export default class Button extends AbstractDisplayObject {
@@ -15,7 +15,7 @@ export default class Button extends AbstractDisplayObject {
     buildRealObject(game, require, optional) {
         this.button = new Phaser.Button(game.realGame, require.x, require.y, require.key,
                             optional.callBack, optional.callBackContext, optional.overFrame,
-                            require.outFrame, optional.downFrame, optional.upFrame);
+                            optional.outFrame, optional.downFrame, optional.upFrame);
         this.disableFrame = optional.disableFrame;
         this.enableFrame  = optional.enableFrame;
     }
@@ -66,5 +66,10 @@ export default class Button extends AbstractDisplayObject {
 
     set DownSound(value) {
         this.button.onDownSound = value.getRealObject();
+    }
+
+    set frame(value) {
+        let key: any = this.button.key;
+        this.button.setFrame(this.button.game.cache.getFrameByName(key, value));
     }
 }

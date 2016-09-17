@@ -10,9 +10,8 @@ export default {
     bind(cpt: AbstractComponent | AbstractSence, target: any, argument: string, value: (context) => any, triggers: Array<string>) {
         let id     = cpt.getId();
         let targetId = target.getId();
-        triggers.filter(v => cpt.hasOwnActiveProperty(v))
-                .forEach((v) => {
-                    if (cpt[v] !== undefined) {
+        triggers.forEach((v) => {
+                    if (cpt.hasOwnActiveProperty(v)) {
                         if (target instanceof AbstractComponent) {
                             debugger;
                             // ViewModelManager.addDependences(id, v, (() => {
@@ -27,6 +26,8 @@ export default {
                                 }
                             }).bind(null, id, targetId, value));
                         }
+                    } else {
+                        // console.warn(cpt.constructor['$$name'] + '组件，没有属性名为: ' + v + '的响应式属性.');
                     }
                 });
     },

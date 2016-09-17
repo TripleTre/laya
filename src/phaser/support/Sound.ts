@@ -20,6 +20,10 @@ export default class Sound extends AbstractSupportObject {
         super(id);
         if (Is.isPresent(Sound.cache[require.key])) {
             this.realObject = Sound.cache[require.key];
+            this.realObject.onPlay.dispose();
+            this.realObject.onStop.dispose();
+            this.realObject.onPlay.add(this.layaPlay, this);
+            this.realObject.onStop.add(this.layaStop, this);
         } else {
             Sound.cache[require.key]
                 = this.realObject
@@ -53,7 +57,7 @@ export default class Sound extends AbstractSupportObject {
         this.realObject.play(undefined, undefined, undefined, this.loop);
         if (this.duration !== undefined) {
             setTimeout(() => {
-                if (this.realObject.isPlaying !== false) {
+                if (this.realObject && this.realObject.isPlaying !== false) {
                      this.realObject.stop();
                 }
             }, this.duration);

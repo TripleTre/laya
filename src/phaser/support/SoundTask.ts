@@ -50,7 +50,9 @@ export default class SoundTask extends AbstractSupportObject {
                 this.list[this.current].stop(lastSoundCallBack);
             }
             this.isStoped = true;
-            this._onStop();
+            if (typeof this._onStop === 'function') {
+                this._onStop();
+            }
         }
     }
 
@@ -78,10 +80,12 @@ export default class SoundTask extends AbstractSupportObject {
             let next = this.list[this.next];
             if (Is.isPresent(next)) {
                 next.start();
+            } else {
+                this.isStoped = true;
+                if (typeof this._onStop === 'function') {
+                    this._onStop();
+                }
             }
-        } else {
-            this.isStoped = true;
-            this._onStop();
         }
     }
 }

@@ -68,7 +68,7 @@ export default class Tween extends AbstractSupportObject {
 
     start() {
         if (this.tween === null) {
-            return;
+            console.log('tween is null');
         }
         if (Is.isPresent(this.tween)) {
             this.tween.start();
