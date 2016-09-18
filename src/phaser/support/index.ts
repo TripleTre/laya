@@ -5,6 +5,7 @@ import Tween from './Tween';
 import Sound from './Sound';
 import SoundTask from './SoundTask';
 import DownSound from './DownSound';
+import Animation from './Animation';
 
 export default [
     Mask,
@@ -13,5 +14,6 @@ export default [
     Tween,
     Sound,
     SoundTask,
-    DownSound
+    DownSound,
+    Animation
 ];

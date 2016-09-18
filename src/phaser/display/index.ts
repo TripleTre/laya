@@ -7,6 +7,7 @@ import Graphics from './Graphics';
 import Shadow from './Shadow';
 import BitmapText from './BitmapText';
 import IntegerBitmapText from './IntegerBitmapText';
+import Sprite from './Sprite';
 
 export default [
     Button,
@@ -17,5 +18,6 @@ export default [
     Graphics,
     Shadow,
     BitmapText,
-    IntegerBitmapText
+    IntegerBitmapText,
+    Sprite
 ];

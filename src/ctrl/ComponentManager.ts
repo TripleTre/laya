@@ -134,6 +134,7 @@ export default class ComponentManager {
             instance['$$update'].apply(instance);
         }
         let name = instance.constructor['$$name'];
+        console.log('buildRootContainer', name);
         let registe = ComponentManager.registers.get(name);
         let subNode = registe.node;
         let implement = DisplayObjectManager.buildDisplayObject(instance, subNode, instance.getOwn().getRootContainer());

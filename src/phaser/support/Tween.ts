@@ -66,13 +66,18 @@ export default class Tween extends AbstractSupportObject {
         this.tween.timeline.push(toDate);
     }
 
-    start() {
-        if (this.tween === null) {
-            console.log('tween is null');
-        }
-        if (Is.isPresent(this.tween)) {
-            this.tween.start();
-        }
+    start(): Promise<any> {
+        return new Promise((resolve, reject) => {
+            if (this.tween === null) {
+                console.log('tween is null');
+            }
+            if (Is.isPresent(this.tween)) {
+                this.tween.start();
+                this.tween.onComplete.addOnce(() => {
+                    resolve();
+                });
+            }
+        });
     }
 
     set onComplete(func: Function | Array<Function>) {
