@@ -26,7 +26,7 @@ export default class SoundTask extends AbstractSupportObject {
     }
 
     destroy() {
-        // this.getChildren().clear();
+        this._onStop = undefined;
     }
 
     play() {

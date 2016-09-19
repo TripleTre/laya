@@ -8,7 +8,6 @@ import DisplayObjectManager from './DisplayObjectManager';
 import {AbstractComponentConstructor} from '../abstract/AbstractComponent';
 import ComponentManager from './ComponentManager';
 import Is from '../util/Is';
-import ActivePropertyManager from './ActivePropertyManager';
 import SupportObjectManager from './SupportObjectManager';
 import World from '../phaser/display/World';
 
@@ -97,12 +96,12 @@ export default class Laya {
      */
     static cancelComponent(name: string): void {
         ComponentManager.cancelComponent(name);
-        ActivePropertyManager.cancelRegistData(name);
+        // ActivePropertyManager.cancelRegistData(name);
     }
 
     static rebuildSence(): void {
         let curSence = Laya.curSence;
-        curSence.destorySubComponent();
+        curSence.destroySubComponent();
         let name = curSence.constructor['$$name'];
         SenceManager.buildSence(name, curSence, Laya.game, true);
     }

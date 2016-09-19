@@ -81,7 +81,7 @@ export default class DisplayObjectManager {
     private static optionalAttrs: Map<string, Array<string>> = new Map<string, Array<string>>();
 
     static buildDisplayObject(own: AbstractComponent | AbstractSence,
-                              node: ComponentNode, container: LayaContainer, id: number = -1): AbstractDisplayObject {
+                              node: ComponentNode, container: LayaContainer, id: number = -1): AbstractDisplayObject<any> {
         if (node.check.some(v => !v(own))) {
             return;
         }
@@ -96,7 +96,7 @@ export default class DisplayObjectManager {
             return;
         }
         let {require, optional, setters} = collectAttributes(node, own, registe.$$require, registe.$$optional);
-        let build: AbstractDisplayObject = new registe(game, require, optional, id);
+        let build: AbstractDisplayObject<any> = new registe(game, require, optional, id);
         ObjectManager.setObject(build.getId(), build);
         node.directives.forEach(({name, argument, value, triggers}) => {
              DirectiveManager.getDirective(name).bind(own, build, argument, value, triggers);
@@ -123,7 +123,7 @@ export default class DisplayObjectManager {
                     }
                 });
             }
-            container.addChildren(build.getId());
+            (<any>container).addChildren(build.getId());
             container.add(build);
         }
         return build;
@@ -152,12 +152,12 @@ export default class DisplayObjectManager {
         return DisplayObjectManager.registers.has(name);
     }
 
-    static getInstance(id: number): AbstractDisplayObject {
-        return ObjectManager.getObject<AbstractDisplayObject>(id);
+    static getInstance(id: number): AbstractDisplayObject<any> {
+        return ObjectManager.getObject<AbstractDisplayObject<any>>(id);
     }
 
     static deleteDisplay(id: number): void {
-        let instance = ObjectManager.getObject<AbstractDisplayObject>(id);
+        let instance = ObjectManager.getObject<AbstractDisplayObject<any>>(id);
         if (Is.isAbsent(instance)) {
             return;
         }

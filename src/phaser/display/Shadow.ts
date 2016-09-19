@@ -9,7 +9,7 @@ import {AbstractDisplayObject} from '../../abstract/AbstractDisplay';
     require: [],
     name: 'Shadow'
 })
-export default class Shadow extends AbstractDisplayObject {
+export default class Shadow extends AbstractDisplayObject<any> {
 
     // constructor(game: Game, require: any, optional: any, id: number) {
     //     super(id);

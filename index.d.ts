@@ -86,6 +86,8 @@ export namespace layaAbstract{
 
         destorySubComponent(): void;
         
+        destroySelf(): void;
+
         getId(): number;
     }
 

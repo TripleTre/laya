@@ -16,6 +16,10 @@ export default class ObjectManager {
         // }
         ObjectManager.objects.delete(id);
     }
+
+    static hasObject(id) {
+        return ObjectManager.objects.has(id);
+    }
 }
 
 window['_ObjectManager'] = ObjectManager;

@@ -6,6 +6,7 @@ import ViewModelManager from './ViewModelManager';
 import DisplayObjectManager from './DisplayObjectManager';
 import {LayaGame} from '../abstract/LayaInterface';
 import ObjectManager from './ObjectManager';
+import StateManager from './StateManager';
 
 interface NamedSenceData {
     node:             ComponentNode;
@@ -36,6 +37,10 @@ export default class SenceManager {
         if (rebuild === false) {
             ViewModelManager.initSenceViewModel(build);
         }
+        let beforeHock = build['$$init'];
+        if (typeof beforeHock === 'function') {
+            beforeHock.apply(build);
+        }
         if (build.constructor['$$watch']) {
             build.constructor['$$watch'].forEach(({propertyName, propertyKey}) => {
                 if (rebuild === false) {
@@ -54,6 +59,10 @@ export default class SenceManager {
                 ct.add(DisplayObjectManager.buildDisplayObject(build, v, game.getWorld()));
             }
         });
+        let afterhock = build['$$create']; // create 钩子
+        if (typeof afterhock === 'function') {
+            afterhock.apply(build);
+        }
         return build;
     }
 
@@ -71,6 +80,12 @@ export default class SenceManager {
 
     static getInstance(id: number) {
         return ObjectManager.getObject(id);
+    }
+
+    static deleteSence(id: number) {
+        ObjectManager.deleteObject(id);
+        ViewModelManager.deleteViewModel(id);
+        StateManager.delete(id);
     }
 }
 

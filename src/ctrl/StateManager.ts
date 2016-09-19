@@ -3,6 +3,7 @@ import Is from '../util/Is';
 import ViewModelManager from './ViewModelManager';
 import {Getter} from './DirectiveManager';
 import diff from '../util/Diff';
+import ObjectManager from './ObjectManager';
 
 export default class StateManager {
     private static last: any;
@@ -35,7 +36,9 @@ export default class StateManager {
                 let changes = StateManager.getters.get(path);
                 if (Is.isPresent(changes)) {
                     changes.forEach(v => {
-                        ViewModelManager.activePropertyForComponent(v.id, v.propertyName, result.newVal);
+                        if (ObjectManager.hasObject(v.id)) {
+                            ViewModelManager.activePropertyForComponent(v.id, v.propertyName, result.newVal);
+                        }
                     });
                 }
             });

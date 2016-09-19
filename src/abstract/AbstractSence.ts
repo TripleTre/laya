@@ -6,6 +6,7 @@ import ViewModelManager from '../ctrl/ViewModelManager';
 import StateManager from '../ctrl/StateManager';
 import counter from './Counter';
 import {forEachKey} from '../util/Iter';
+import SenceManager from '../ctrl/SenceManager';
 
 export interface AbstractSenceConstructor {
     new (): AbstractSence;
@@ -50,7 +51,7 @@ export class AbstractSence {
         this.layaGame = game;
     }
 
-    destorySubComponent(): void {
+    destroySubComponent(): void {
         this.subComponents.forEach(v => {
             let id = v.getId();
             ComponentManager.deleteComponent(id);
@@ -58,6 +59,11 @@ export class AbstractSence {
             StateManager.delete(id);
         });
         this.subComponents = [];
+    }
+
+    destroySelf() {
+        this.destroySubComponent();
+        SenceManager.deleteSence(this.getId());
     }
 
     getId(): number {

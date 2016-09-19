@@ -4,10 +4,15 @@ import counter from './Counter';
 export interface AbstractDisplayObjectConstructor {
     $$require: Array<string>;
     $$optional: Array<string>;
-    new(game: LayaGame, require: any, optional: any, id: number): AbstractDisplayObject;
+    new(game: LayaGame, require: any, optional: any, id: number): AbstractDisplayObject<any>;
 }
 
-export abstract class AbstractDisplayObject {
+interface Destroied {
+    destroy(children?: boolean): void;
+}
+
+export abstract class AbstractDisplayObject<T extends Destroied> {
+    protected realObject: T;
     private id: number;
     private children: Array<number>;
 
@@ -19,6 +24,15 @@ export abstract class AbstractDisplayObject {
         }
         this.children = [];
         this.buildRealObject(game, require, optional);
+    }
+
+    destroy(): void {
+        this.realObject.destroy(true);
+        this.realObject = null;
+    }
+
+    getRealObject(): T {
+        return this.realObject;
     }
 
     getId(): number {
@@ -33,7 +47,5 @@ export abstract class AbstractDisplayObject {
         return this.children;
     }
 
-    abstract getRealObject<T>(): T;
-    abstract destroy(): void;
     abstract buildRealObject(game: LayaGame, require: any, optional: any): void;
 }

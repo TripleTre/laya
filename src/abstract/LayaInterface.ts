@@ -1,10 +1,10 @@
 import {AbstractSence} from './AbstractSence';
 import {AbstractDisplayObject} from './AbstractDisplay';
 
-export interface LayaContainer extends AbstractDisplayObject {
-    add(obj: AbstractDisplayObject): void;
+export interface LayaContainer extends AbstractDisplayObject<any> {
+    add(obj: AbstractDisplayObject<any>): void;
 
-    remove(obj: AbstractDisplayObject, destory: boolean): boolean;
+    remove(obj: AbstractDisplayObject<any>, destory: boolean): boolean;
 
     destroy(): void;
 }
@@ -23,10 +23,10 @@ export interface Sence {
     update?(): void;
 }
 
-export interface LayaWorld extends AbstractDisplayObject {
-    add(obj: AbstractDisplayObject): void;
+export interface LayaWorld extends AbstractDisplayObject<any> {
+    add(obj: AbstractDisplayObject<any>): void;
 
-    remove(obj: AbstractDisplayObject, destory: boolean): boolean;
+    remove(obj: AbstractDisplayObject<any>, destory: boolean): boolean;
 
     destroy(): void;
 }

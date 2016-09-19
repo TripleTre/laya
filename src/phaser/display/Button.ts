@@ -1,75 +1,52 @@
 import {AbstractDisplayObject} from '../../abstract/AbstractDisplay';
 import display from '../../decorators/Display';
 import Is from '../../util/Is';
+import setUp from '../chain/SetUp';
+import userInterface from '../chain/UserInterface';
+import input from '../chain/Input';
 
 @display({
-    require: ['x', 'y', 'key'],
-    optional: ['callBack', 'callBackContext', 'overFrame', 'downFrame', 'upFrame', 'disableFrame', 'outFrame'],
+    require: ['x', 'y'],
+    optional: ['callBack', 'callBackContext', 'overFrame', 'downFrame', 'upFrame', 'disableFrame', 'outFrame', 'key'],
     name: 'Button'
 })
-export default class Button extends AbstractDisplayObject {
-    button:       Phaser.Button;
+export default class Button extends AbstractDisplayObject<Phaser.Button> {
+    realObject:   Phaser.Button;
     disableFrame: string;
     enableFrame:  string;
 
     buildRealObject(game, require, optional) {
-        this.button = new Phaser.Button(game.realGame, require.x, require.y, require.key,
+        this.realObject = new Phaser.Button(game.realGame, require.x, require.y, optional.key,
                             optional.callBack, optional.callBackContext, optional.overFrame,
                             optional.outFrame, optional.downFrame, optional.upFrame);
         this.disableFrame = optional.disableFrame;
         this.enableFrame  = optional.enableFrame;
     }
 
-    getRealObject(): Phaser.Button {
-        return this.button;
-    }
-
-    destroy() {
-        this.button.destroy(true);
-        this.button = null;
-    }
-
-    set scaleX(value) {
-        this.button.scale.x = value;
-    }
-
-    set scaleY(value) {
-        this.button.scale.y = value;
-    }
-
-    set visible(value: boolean) {
-        this.button.visible = value;
-    }
-
     set enable(value: boolean) {
-        this.button.inputEnabled = value;
+        this.realObject.inputEnabled = value;
         // phaser button 自己的 setStateFrame 后执行， 因此延迟
         setTimeout(() => {
-            if (Is.isAbsent(this.button)) {
+            if (Is.isAbsent(this.realObject)) {
                 return;
             }
             if (value === false) {
-                this.button['frameName'] = this.disableFrame;
+                this.realObject['frameName'] = this.disableFrame;
             } else {
-                this.button['frameName'] = this.enableFrame;
+                this.realObject['frameName'] = this.enableFrame;
             }
         });
     }
 
-    set anchorX (value) {
-        this.button.anchor.x = value;
-    }
-
-    set anchorY (value) {
-        this.button.anchor.y = value;
-    }
-
     set DownSound(value) {
-        this.button.onDownSound = value.getRealObject();
+        this.realObject.onDownSound = value.getRealObject();
     }
 
     set frame(value) {
-        let key: any = this.button.key;
-        this.button.setFrame(this.button.game.cache.getFrameByName(key, value));
+        let key: any = this.realObject.key;
+        this.realObject.setFrame(this.realObject.game.cache.getFrameByName(key, value));
     }
 }
+
+setUp(Button.prototype, input);
+setUp(Button.prototype, userInterface);

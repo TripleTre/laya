@@ -1,4 +1,4 @@
-import {LayaContainer, LayaGame} from '../abstract/LayaInterface';
+import {LayaGame} from '../abstract/LayaInterface';
 import {AbstractComponent} from '../abstract/AbstractComponent';
 import {AbstractSence} from '../abstract/AbstractSence';
 import {ComponentNode} from '../ctrl/ComponentManager';
@@ -6,7 +6,7 @@ import ComponentManager from '../ctrl/ComponentManager';
 import DisplayObjectManager from '../ctrl/DisplayObjectManager';
 import SupportObjectManager from '../ctrl/SupportObjectManager';
 
-export default function container(build: any, own: AbstractComponent | AbstractSence, node: ComponentNode, game: LayaGame, container: LayaContainer) {
+export default function container(build: any, own: AbstractComponent | AbstractSence, node: ComponentNode, game: LayaGame, container: any) {
     container.add(build);
     container.addChildren(build.getId());
     let len = build['$$repeatCount'] || 1;

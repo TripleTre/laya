@@ -2,20 +2,22 @@ import {LayaContainer} from '../../abstract/LayaInterface';
 import {AbstractDisplayObject} from '../../abstract/AbstractDisplay';
 import display from '../../decorators/Display';
 import Graphics from './Graphics';
+import setUp from '../chain/SetUp';
+import userInterface from '../chain/UserInterface';
 
 @display({
     require: [],
     optional: ['name'],
     name: 'Container'
 })
-export default class Container extends AbstractDisplayObject implements LayaContainer {
+export default class Container extends AbstractDisplayObject<Phaser.Group> implements LayaContainer {
     realObject: Phaser.Group;
 
     buildRealObject(game, require, optional) {
         this.realObject = new Phaser.Group(game.realGame, null, optional.name);
     }
 
-    add(obj: AbstractDisplayObject): void {
+    add(obj: AbstractDisplayObject<any>): void {
         this.realObject.add(obj.getRealObject());
     }
 
@@ -23,41 +25,13 @@ export default class Container extends AbstractDisplayObject implements LayaCont
         return this.realObject.remove(child, destroy);
     }
 
-    getRealObject(): Phaser.Group {
-        return this.realObject;
-    }
-
-    destroy(): void {
-        this.realObject.destroy(true);
-        this.realObject = null;
-    }
-
     set Mask(value: Graphics) {
         this.realObject.mask = value.getRealObject();
-    }
-
-    set alpha(value: number) {
-        this.realObject.alpha = value;
     }
 
     set inputEnable(value: boolean) {
         this.realObject.ignoreChildInput = !value;
     }
-
-    set y(value: number) {
-        this.realObject.y = value;
-    }
-
-    set x(value: number) {
-        this.realObject.x = value;
-    }
-
-    set visible(value) {
-        this.realObject.visible = value;
-    }
-
-    // set SoundTask(value) {
-    //     // debugger
-    //     debugger;
-    // }
 }
+
+setUp(Container.prototype, userInterface);

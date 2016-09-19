@@ -24,7 +24,7 @@ export default class SupportObjectManger {
     private static optionalAttrs: Map<string, Array<string>> = new Map<string, Array<string>>();
 
     static buildSupportObject(own: AbstractComponent | AbstractSence,
-                              node: ComponentNode, game: LayaGame, target: AbstractDisplayObject | AbstractSupportObject, id: number = -1): AbstractSupportObject {
+                              node: ComponentNode, game: LayaGame, target: AbstractDisplayObject<any> | AbstractSupportObject, id: number = -1): AbstractSupportObject {
         if (node.check.some(v => !v(own))) {
             return;
         }
@@ -74,7 +74,7 @@ export default class SupportObjectManger {
     }
 
     static deleteSupportObject (id) {
-        let instance = ObjectManager.getObject<AbstractDisplayObject>(id);
+        let instance = ObjectManager.getObject<AbstractDisplayObject<any>>(id);
         if (Is.isAbsent(instance)) {
             return;
         }
