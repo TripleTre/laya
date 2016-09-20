@@ -96,12 +96,13 @@ export default class Laya {
      */
     static cancelComponent(name: string): void {
         ComponentManager.cancelComponent(name);
-        // ActivePropertyManager.cancelRegistData(name);
     }
 
     static rebuildSence(): void {
         let curSence = Laya.curSence;
         curSence.destroySubComponent();
+        curSence.destroySubDisplay();
+        curSence.destroySubSupport();
         let name = curSence.constructor['$$name'];
         SenceManager.buildSence(name, curSence, Laya.game, true);
     }

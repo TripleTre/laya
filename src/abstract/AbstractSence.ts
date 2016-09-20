@@ -7,6 +7,10 @@ import StateManager from '../ctrl/StateManager';
 import counter from './Counter';
 import {forEachKey} from '../util/Iter';
 import SenceManager from '../ctrl/SenceManager';
+import {AbstractSupportObject} from './AbstractSupport';
+import {AbstractDisplayObject} from './AbstractDisplay';
+import DisplayObjectManager from '../ctrl/DisplayObjectManager';
+import SupportObjectManager from '../ctrl/SupportObjectManager';
 
 export interface AbstractSenceConstructor {
     new (): AbstractSence;
@@ -21,6 +25,8 @@ export class AbstractSence {
     $$refs: any = Object.create(null);
     private id: number;
     private subComponents: Array<AbstractComponent> = [];
+    private subSupports: Array<AbstractSupportObject> = [];
+    private subDisplays: Array<AbstractDisplayObject<any>> = [];
     private layaGame: LayaGame;
     // private getterProperty: Map<Getter, string> = new Map<Getter, string>();
     private repeatScope: Map<string, Array<any>> = new Map<string, Array<any>>();
@@ -43,6 +49,14 @@ export class AbstractSence {
         this.subComponents.push(component);
     }
 
+    addSubSupport(support: AbstractSupportObject): void {
+        this.subSupports.push(support);
+    }
+
+    addSubDisplay(display): void {
+        this.subSupports.push(display);
+    }
+
     getLayaGame(): LayaGame {
         return this.layaGame;
     }
@@ -61,9 +75,26 @@ export class AbstractSence {
         this.subComponents = [];
     }
 
+    destroySubDisplay(): void {
+        this.subDisplays.forEach(v => {
+            DisplayObjectManager.deleteDisplay(v.getId());
+        });
+    }
+
+    destroySubSupport(): void {
+        this.subSupports.forEach(v => {
+            SupportObjectManager.deleteSupportObject(v.getId());
+        });
+    }
+
     destroySelf() {
         this.destroySubComponent();
-        SenceManager.deleteSence(this.getId());
+        this.destroySubDisplay();
+        this.destroySubSupport();
+        let id = this.getId();
+        ViewModelManager.deleteViewModel(id);
+        StateManager.delete(id);
+        SenceManager.deleteSence(id);
     }
 
     getId(): number {

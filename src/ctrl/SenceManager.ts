@@ -7,6 +7,7 @@ import DisplayObjectManager from './DisplayObjectManager';
 import {LayaGame} from '../abstract/LayaInterface';
 import ObjectManager from './ObjectManager';
 import StateManager from './StateManager';
+import SupportObjectManager from './SupportObjectManager';
 
 interface NamedSenceData {
     node:             ComponentNode;
@@ -54,9 +55,13 @@ export default class SenceManager {
             if (ComponentManager.hasComponent(name)) {
                 let c = ComponentManager.buildComponent(build, v, build.getLayaGame().getWorld(), build.getLayaGame());
                 build.addSubComponent(c);
-            } else {
+            } else if (DisplayObjectManager.hasDisplay(name)) {
                 let ct = build.getLayaGame().getWorld();
-                ct.add(DisplayObjectManager.buildDisplayObject(build, v, game.getWorld()));
+                let display = DisplayObjectManager.buildDisplayObject(build, v, game.getWorld());
+                ct.add(display);
+                build.addSubDisplay(display);
+            } else {
+                build.addSubSupport(SupportObjectManager.buildSupportObject(build, v, build.getLayaGame(), build.getLayaGame().getWorld()));
             }
         });
         let afterhock = build['$$create']; // create 钩子

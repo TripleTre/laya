@@ -12,7 +12,7 @@
   "scripts": {
     "dev": "node webpack/dev-server.js",
     "build": "node webpack/build.js",
-    "unit": "karma start test/unit/karma.conf.js --single-run",
+    "unit": "karma start test/karma.conf.js --single-run",
     "test": "npm run unit",
     "lint": "eslint --ext .js,.vue src test/unit/specs test/e2e/specs"
   },

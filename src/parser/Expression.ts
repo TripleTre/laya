@@ -43,9 +43,6 @@ export function expressionVars(expression: string): Array<string> {
     return list.filter(v => !ignoreWordsRE.test(v));
 }
 
-let test = "'abc'+ 88 * ppp === {y: 150 * (reel.length - xxx - 3)} ? true : false";
-console.log(expressionVars(test));
-
 /**
  *  将表达式转化成函数
  * @para exp 表达式字符串

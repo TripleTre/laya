@@ -90,7 +90,7 @@ export default class ComponentManager {
             if (calcValue === undefined) {
                 console.warn(name + ' 组件,' + argument + '属性计算结果为 undefined，检查标签中属性值是否拼写错误.');
             }
-            // build[argument] = calcValue;
+            build[argument] = calcValue;
             DirectiveManager.getDirective(name).bind(own, build, argument, value, triggers);
         });
         let beforeHock = build['$$init']; // init 钩子, 在vm初始化完成后

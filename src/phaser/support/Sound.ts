@@ -50,7 +50,7 @@ export default class Sound extends AbstractSupportObject {
     }
 
     destroy() {
-        this.realObject = null;
+        // this.realObject = null;
     }
 
     start() {

@@ -2,8 +2,8 @@ import BitmapText from './BitmapText';
 import display from '../../decorators/Display';
 
 @display({
-  require: ['x', 'y', 'font'],
-  optional: ['rtext', 'size', 'align'],
+  require: ['x', 'y'],
+  optional: ['text', 'size', 'align', 'font'],
   name: 'IntegerBitmapText'
 })
 export default class IntegerBitmapText extends BitmapText {

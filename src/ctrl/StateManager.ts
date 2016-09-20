@@ -4,6 +4,7 @@ import ViewModelManager from './ViewModelManager';
 import {Getter} from './DirectiveManager';
 import diff from '../util/Diff';
 import ObjectManager from './ObjectManager';
+import objectUtil from '../util/Object';
 
 export default class StateManager {
     private static last: any;
@@ -28,20 +29,24 @@ export default class StateManager {
     }
 
     static updateState(state: any): void {
-        let result = diff(state, [], state, StateManager.last, []);
+        let results = diff(state, [], state, StateManager.last, []);
         StateManager.last = state;
-        result.forEach(result => {
+        let set = new Set<string>();
+        results.forEach(result => {
             let fullObersvers = StateManager.getFullObersver(result.path);
-            fullObersvers.forEach(path => {
-                let changes = StateManager.getters.get(path);
-                if (Is.isPresent(changes)) {
-                    changes.forEach(v => {
-                        if (ObjectManager.hasObject(v.id)) {
-                            ViewModelManager.activePropertyForComponent(v.id, v.propertyName, result.newVal);
-                        }
-                    });
-                }
+            fullObersvers.forEach(item => {
+                set.add(item);
             });
+        });
+        set.forEach(item => {
+            let changes = StateManager.getters.get(item);
+            if (Is.isPresent(changes)) {
+                changes.forEach(v => {
+                    if (ObjectManager.hasObject(v.id)) {
+                        ViewModelManager.activePropertyForComponent(v.id, v.propertyName, objectUtil.deepGet(state, item));
+                    }
+                });
+            }
         });
     }
 

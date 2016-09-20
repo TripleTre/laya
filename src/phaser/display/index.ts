@@ -8,6 +8,7 @@ import Shadow from './Shadow';
 import BitmapText from './BitmapText';
 import IntegerBitmapText from './IntegerBitmapText';
 import Sprite from './Sprite';
+import LayaText from './LayaText';
 
 export default [
     Button,
@@ -19,5 +20,6 @@ export default [
     Shadow,
     BitmapText,
     IntegerBitmapText,
-    Sprite
+    Sprite,
+    LayaText
 ];

@@ -4,14 +4,13 @@ import setUp from '../chain/SetUp';
 import userInterface from '../chain/UserInterface';
 
 @display({
-  require: ['x', 'y'],
-  optional: ['rtext', 'size', 'align', 'font'],
-  name: 'BitmapText'
+  require: ['x', 'y', 'text'],
+  optional: ['style'],
+  name: 'LayaText'
 })
-export default class BitmapText extends AbstractDisplayObject<Phaser.BitmapText> {
+export default class LayaText extends AbstractDisplayObject<Phaser.Text> {
     buildRealObject(game, require, optional) {
-       this.realObject = new Phaser.BitmapText(game.realGame, require.x, require.y, optional.font,
-              optional.text && optional.text.toString(), optional.size, optional.align);
+       this.realObject = new Phaser.Text(game.realGame, require.x, require.y, require.text, optional.style);
     }
 
     set text(value) {
@@ -27,4 +26,4 @@ export default class BitmapText extends AbstractDisplayObject<Phaser.BitmapText>
     }
 }
 
-setUp(BitmapText.prototype, userInterface);
+setUp(LayaText.prototype, userInterface);
