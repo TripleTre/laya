@@ -5,9 +5,9 @@ import {AbstractSupportObject} from '../../abstract/AbstractSupport';
 @support({
     require: ['name'],
     optional: [],
-    name: 'Slot'
+    name: 'Flot'
 })
-export default class Slot extends AbstractSupportObject {
+export default class Flot extends AbstractSupportObject {
     constructor(game: Game, target: any, require: any, optional: any, id: number) {
         super(id);
     }

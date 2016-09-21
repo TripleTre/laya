@@ -6,6 +6,8 @@ import Sound from './Sound';
 import SoundTask from './SoundTask';
 import DownSound from './DownSound';
 import Animation from './Animation';
+import Slot from './Slot';
+import Flot from './Flot';
 
 export default [
     Mask,
@@ -15,5 +17,7 @@ export default [
     Sound,
     SoundTask,
     DownSound,
-    Animation
+    Animation,
+    Slot,
+    Flot
 ];
