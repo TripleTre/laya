@@ -23,6 +23,7 @@ export interface ComponentNode {
     children:   Array<ComponentNode>;
     check:      Array<(context) => any>;
     condition:  Array<ParsedDirective>;
+    vmId?:      number;
 }
 
 export interface NamedComponetData {
@@ -74,7 +75,7 @@ export default class ComponentManager {
         build.setLayaGame(game);
         build.setOwn(own);
         ViewModelManager.initComponentViewModel(build);
-        subNode = replaceSlot(node, subNode);
+        subNode = replaceSlot(own.getId(), node, subNode);
         // 设置 component prop 属性的默认值
         node.normals.forEach(({name: attrName, value: attrVal}) => {
             let parsedName = attrName.replace(/\-([a-z])/g, (a: string, b: string) => {
@@ -198,26 +199,28 @@ export default class ComponentManager {
     }
 }
 
-function replaceSlot(source: ComponentNode, registe: ComponentNode): ComponentNode {
-    source.children
-          .filter(v => v.name === 'Flot')
+function replaceSlot(id: number, source: ComponentNode, registe: ComponentNode): ComponentNode {
+    registe.children
+          .filter(v => v.name === 'Slot')
           .forEach(v => {
-              walk(v, registe);
+              walk(id, v, source);
           });
     return registe;
 }
 
-function walk(flot: ComponentNode, registe: ComponentNode): any {
+function walk(id: number, registe: ComponentNode, flot: ComponentNode): any {
     registe.children.forEach((child, index, children) => {
         if (child.name === 'Slot') {
             let flotName = flot.normals.filter(v => v.name === 'name')[0].value(undefined);
             let childName = child.normals.filter(v => v.name === 'name')[0].value(undefined);
             if (flotName === childName) {
                 registe.children = children.slice(0, index).concat(flot.children).concat(children.slice(index + 1));
+            } else {
+                registe.children = children.slice(0, index).concat(children.slice(index + 1));
             }
         } else {
             if (child.children.length > 0) {
-                walk(flot, child);
+                walk(id, flot, child);
             }
         }
     });

@@ -9,6 +9,7 @@ import {AbstractSupportObject} from '../abstract/AbstractSupport';
 import Is from '../util/Is';
 
 export default function shadow (instance: AbstractSupportObject, own: AbstractComponent | AbstractSence, node: ComponentNode, game: LayaGame, container: any) {
+    container.addChildren(instance.getId());
     let len = instance['$$repeatCount'] || 1;
     for (let i = 0; i < len; i++) {
         if (instance['$$repeatCount'] && instance['$$repeatName']) {

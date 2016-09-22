@@ -11,10 +11,6 @@ import {AbstractDisplayObject} from '../../abstract/AbstractDisplay';
 })
 export default class Shadow extends AbstractDisplayObject<any> {
 
-    // constructor(game: Game, require: any, optional: any, id: number) {
-    //     super(id);
-    // }
-
     buildRealObject(game, require, optional) {
         //
     }
