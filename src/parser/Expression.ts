@@ -27,14 +27,25 @@ export function expressionVars(expression: string): Array<string> {
         return [];
     }
     let list = [];
-    expression = expression.replace(/\{.*:(.*)\}/g, (a, b, c, d) => {
-        let s = list.concat(b.replace(/'[^']*'/g, '')
-                    .match(/\b[a-zA-Z]([a-zA-Z._$0-9]+)?\b/g));
-        if (Is.isPresent(s)) {
-            list = list.concat(s);
-        }
+    expression = expression.replace(/\{.+\}/g, (a, b, c) => {
+        a.replace(/[^,]*:([^,]*)/g, (a, b, c, d) => {
+            let s = list.concat(b.replace(/'[^']*'/g, '')
+                        .match(/\b[a-zA-Z]([a-zA-Z._$0-9]+)?\b/g));
+            if (Is.isPresent(s)) {
+                list = list.concat(s);
+            }
+            return '';
+        });
         return '';
     });
+    // expression = expression.replace(/\{.*:(.*)\}/g, (a, b, c, d) => {
+    //     let s = list.concat(b.replace(/'[^']*'/g, '')
+    //                 .match(/\b[a-zA-Z]([a-zA-Z._$0-9]+)?\b/g));
+    //     if (Is.isPresent(s)) {
+    //         list = list.concat(s);
+    //     }
+    //     return '';
+    // });
     let ms: Array<string> = expression.replace(/'[^']*'/g, '')
                                       .match(/\b[a-zA-Z]([a-zA-Z._$0-9]+)?\b/g);
     if (Is.isPresent(ms)) {
