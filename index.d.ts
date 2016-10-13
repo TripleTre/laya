@@ -16,6 +16,7 @@ export namespace layaInterface{
         getWorld(): LayaWorld;
         startSence(name: string, clearWorld: boolean, clearCache?: boolean): void;
         registerSence(key: string, sence: layaAbstract.AbstractSence);
+        getRealObject(): Phaser.Game;
     }
 
     interface Sence {
@@ -50,6 +51,11 @@ export namespace layaAbstract{
         addToRepeatScope(name: string, value: any): void;
 
         setRepeatIndex(name: string, index: number): void;
+
+        getLayaGame(): layaInterface.LayaGame;
+
+        setLayaGame(value: layaInterface.LayaGame): void;
+
     }
 
     interface AbstractDisplayObjectConstructor {

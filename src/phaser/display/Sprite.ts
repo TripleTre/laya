@@ -8,7 +8,7 @@ import userInterface from '../chain/UserInterface';
     optional: ['frame'],
     name: 'Sprite'
 })
-class Tmage extends AbstractDisplayObject<Phaser.Sprite> {
+class Sprite extends AbstractDisplayObject<Phaser.Sprite> {
 
     buildRealObject(game, require, optional) {
         this.realObject = new Phaser.Sprite(game.realGame, require.x, require.y, require.key, optional.frame);
@@ -31,5 +31,5 @@ class Tmage extends AbstractDisplayObject<Phaser.Sprite> {
     }
 }
 
-setUp(Tmage, userInterface);
-export default Tmage;
+setUp(Sprite, userInterface);
+export default Sprite;
