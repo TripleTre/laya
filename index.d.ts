@@ -1,5 +1,6 @@
 import * as Redux from 'redux/index.d.ts';
 import '../node_modules/phaser/typescript/phaser.d.ts';
+import {Directive} from './src/ctrl/DirectiveManager';
 
 export namespace layaInterface{
     
@@ -123,6 +124,7 @@ export default class Laya {
     static rebuildSence(): void;
     static dispatch(action: {type: any, value: any}, delay?: number): void;
     static getState(): any;
+    static addDirective(directive: Directive): void
 }
 
 interface SupportLike {

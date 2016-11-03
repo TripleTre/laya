@@ -106,5 +106,36 @@ tweenDone(index) {
 }
 ```
 * l-wref &emsp;与 l-ref 类型， 不过是将标签类的实例暴露到 window 全局变量下。用 window.$$refs.xxx 来访问。
+* l-if &emsp;&emsp;根据指令表达式的值， 创建或者删除绑定的标签。
+* l-update 当指令的表达式值改变时， 重新刷新整个组件。这个可以替代 Phaser 的 bringToTop 方法， 其他作用待挖掘。
+* l-repeat 根据表达式的值，重复创建绑定标签的子元素实例。赋值时使用指令的参数部分取值， 参数 + 'Index' 取索引，  
+值只支持数组和数字，例如：
+``` javascript
+@component({
+    template: `
+        <container l-repeat-row="3" l-update="update">
+            <shadow l-repeat-column="[1,2,3,4,5]">
+                <tmage key="'symbols'" x="row" y="column + rowIndex * 5" frame="'kuang'" visible="false">
+                </tmage>
+            </shadow>
+        </container>
+    `,
+    name: 'WinPanel'
+})
+```
+还可以自行添加指令， 指令对象的类型定义如下：  
+``` javascript
+export interface Directive {
+    name:   string;
+    bind:   (cpt: AbstractComponent | AbstractSence, target: any, argument: string, value: (context) => any, triggers: Array<string>) => void;
+    unbind: () =>  void;
+}
+```
+bind方法的参数：  
+&emsp;&emsp;cpt 作为指令表达式求值的上下文对象，也就是组件类实例对象， 表达式" foo === 'x' ? : n : m ", 最后会被解析成 function(vm){return vm.foo === 'x' ? vm.n : vm.m}。  
+&emsp;&emsp;target 指令作用的标签对象，可能为 DisplayObject SupportObject 或者是 Component 对象
+&emsp;&emsp;argument 指令的参数  
+&emsp;&emsp;value: 指令表达式转换后的求值方法，需传入 cpt。  
+&emsp;&emsp;triggers 指令表达式中的所有变量  
 
-
+## 标签

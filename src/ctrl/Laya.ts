@@ -10,6 +10,8 @@ import ComponentManager from './ComponentManager';
 import Is from '../util/Is';
 import SupportObjectManager from './SupportObjectManager';
 import World from '../phaser/display/World';
+import DirectiveManager from './DirectiveManager';
+import {Directive} from './DirectiveManager';
 
 export default class Laya {
     private static store:  Redux.Store<any>;
@@ -119,5 +121,9 @@ export default class Laya {
 
     static getState(): any {
         return Laya.store.getState();
+    }
+
+    static addDirective(directive: Directive): void{
+        DirectiveManager.addDirective(directive);
     }
 }

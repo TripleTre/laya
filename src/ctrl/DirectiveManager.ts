@@ -42,5 +42,3 @@ DirectiveManager.addDirective(Bind);
 DirectiveManager.addDirective(Ref);
 DirectiveManager.addDirective(Repeat);
 DirectiveManager.addDirective(Wref);
-
-window['_DirectiveManager'] = DirectiveManager;
