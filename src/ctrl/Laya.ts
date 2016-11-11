@@ -123,7 +123,7 @@ export default class Laya {
         return Laya.store.getState();
     }
 
-    static addDirective(directive: Directive): void{
+    static addDirective(directive: Directive): void {
         DirectiveManager.addDirective(directive);
     }
 }
