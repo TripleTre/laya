@@ -70,4 +70,8 @@ export default {
             this.realObject.onInputUp.addOnce(value);
         }
     },
+
+    'inPutEnabled' (value) {
+        this.realObject.inPutEnabled = value;
+    }
 };
