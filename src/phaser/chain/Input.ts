@@ -1,77 +1,24 @@
+function generator (event, once = false) {
+    return function (callBack) {
+        let events = this.realObject.events || this.realObject;
+        if (once === true) {
+            events['onInput' + event].addOnce(callBack);
+        } else {
+            events['onInput' + event].add(callBack);
+        }
+    };
+}
+
 export default {
-    'onOverAdd' (value) {
-        if (this.realObject.events) {
-            this.realObject.events.onInputOver.add(value);
-            return;
-        } else {
-            this.realObject.onInputOver.add(value);
-        }
-    },
-
-    'onOverOnce' (value) {
-        if (this.realObject.events) {
-            this.realObject.events.onInputOver.addOnce(value);
-            return;
-        } else {
-            this.realObject.onInputOver.addOnce(value);
-        }
-    },
-
-    'onOutAdd' (value) {
-        if (this.realObject.events) {
-            this.realObject.events.onInputOut.add(value);
-            return;
-        } else {
-            this.realObject.onInputOut.add(value);
-        }
-    },
-
-    'onOutOnce' (value) {
-        if (this.realObject.events) {
-            this.realObject.events.onInputOut.addOnce(value);
-            return;
-        } else {
-            this.realObject.onInputOut.addOnce(value);
-        }
-    },
-
-    'onDownAdd' (value) {
-        if (this.realObject.events) {
-            this.realObject.events.onInputDown.add(value);
-            return;
-        } else {
-            this.realObject.onInputDown.add(value);
-        }
-    },
-
-    'onDownOnce' (value) {
-        if (this.realObject.events) {
-            this.realObject.events.onInputDown.addOnce(value);
-            return;
-        } else {
-            this.realObject.onInputDown.addOnce(value);
-        }
-    },
-
-    'onUpAdd' (value) {
-        if (this.realObject.events) {
-            this.realObject.events.onInputUp.add(value);
-            return;
-        } else {
-            this.realObject.onInputUp.add(value);
-        }
-    },
-
-    'onUpOnce' (value) {
-        if (this.realObject.events) {
-            this.realObject.events.onInputUp.addOnce(value);
-            return;
-        } else {
-            this.realObject.onInputUp.addOnce(value);
-        }
-    },
-
-    'inPutEnabled' (value) {
-        this.realObject.inPutEnabled = value;
+    'onOverAdd':  generator('Over'),
+    'onOverOnce': generator('Over', true),
+    'onOutAdd':   generator('Out'),
+    'onOutOnce':  generator('Out', true),
+    'onDownAdd':  generator('Down'),
+    'onDownOnce': generator('Down', true),
+    'onUpAdd':    generator('Up'),
+    'onUpOnce':   generator('Up', true),
+    'inputEnabled' (value) {
+        this.realObject.inputEnabled = value;
     }
 };
