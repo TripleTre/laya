@@ -1,6 +1,6 @@
 {
   "name": "laya",
-  "version": "1.0.2",
+  "version": "1.1.1",
   "description": "build phaser project with template, data bind, and webpack hmr",
   "keywords": [
     "phaser",
