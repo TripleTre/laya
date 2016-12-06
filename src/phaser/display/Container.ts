@@ -11,7 +11,6 @@ import userInterface from '../chain/UserInterface';
     name: 'Container'
 })
 export default class Container extends AbstractDisplayObject<Phaser.Group> implements LayaContainer {
-    realObject: Phaser.Group;
 
     buildRealObject(game, require, optional) {
         this.realObject = new Phaser.Group(game.realGame, null, optional.name);

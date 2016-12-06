@@ -2,6 +2,7 @@ import {AbstractSupportObject} from '../../abstract/AbstractSupport';
 import Game from '../display/Game';
 import support from '../../decorators/Support';
 import To from './To';
+import From from './From';
 import Is from '../../util/Is';
 import ObjectManager from '../../ctrl/ObjectManager';
 
@@ -48,6 +49,25 @@ export default class Tween extends AbstractSupportObject {
         }
     }
 
+    updateFrom(index: number) {
+        if (this.tween === null) {
+            return;
+        }
+        let from = <From>ObjectManager.getObject(this.getChildren()[index]);
+        if (Is.isPresent(from)) {
+            let ease = from.easing;
+            if (typeof from.easing === 'string' && this.tween.manager['easeMap'][from.easing]) {
+                ease =  this.tween.manager['easeMap'][from.easing];
+            }
+            let fromDate = new Phaser.TweenData(this.tween).from(from.properties, from.duration, ease, from.delay, from.repeat, from.yoyo);
+            if (this.tween.isRunning) {
+                console.warn('Phaser.Tween.to cannot be called after Tween.start');
+                return;
+            }
+            this.tween.timeline[from.index] = fromDate;
+        }
+    }
+
     set To(to: To) {
         if (this.tween === null) {
             return;
@@ -64,6 +84,24 @@ export default class Tween extends AbstractSupportObject {
             return;
         }
         this.tween.timeline.push(toDate);
+    }
+
+    set From(from: From) {
+        if (this.tween === null) {
+            return;
+        }
+        from.setParent(this);
+        from.index = this.count++;
+        let ease = from.easing;
+        if (typeof from.easing === 'string' && this.tween.manager['easeMap'][from.easing]) {
+            ease =  this.tween.manager['easeMap'][from.easing];
+        }
+        let fromDate = new Phaser.TweenData(this.tween).from(from.properties, from.duration, ease, from.delay, from.repeat, from.yoyo);
+        if (this.tween.isRunning) {
+            console.warn('Phaser.Tween.from cannot be called after Tween.start');
+            return;
+        }
+        this.tween.timeline.push(fromDate);
     }
 
     start(): Promise<any> {

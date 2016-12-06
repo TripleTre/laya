@@ -138,4 +138,89 @@ bind方法的参数：
 &emsp;&emsp;value: 指令表达式转换后的求值方法，需传入 cpt。  
 &emsp;&emsp;triggers 指令表达式中的所有变量  
 
+## 抽象游戏引擎
+
+出于替换游戏引擎和 [sdl native](https://github.com/huaguhzheng/sdl-typescript) 方案。 laya 在 游戏引擎上层做了一层抽象，
+也就是标签对应着 laya 类， laya 类使用底层游戏引擎实现功能。每个标签类实现了一个 laya 接口， 这个接口定义了标签类必须要提供的一些方法，
+这样， 如果出了更好的游戏引擎， 只需再提供一套实现了接口中相应功能的标签类即可，而无需改动游戏逻辑代码。
+
+举例来说：
+container 标签类的类定义如下：
+``` javascript
+ class Container extends AbstractDisplayObject<Phaser.Group> implements LayaContainer { //... }
+```
+AbstractDisplayObject 泛型类提供了一些通用方法，如果销毁 DisplayObject 实例， 获取底层真实的游戏引擎对象等。
+LayaContainer 接口，定义了标签要实现的功能。 可以用 Phaser.Group 实现， 或者其他的游戏引擎对象来实现，或者自己写一个也可以。
+
+LayaContainer 当前只定义了3个抽象方法
+``` javascript
+interface LayaContainer extends AbstractDisplayObject<any> {
+    // 添加子元素
+    add(obj: AbstractDisplayObject<any>): void;
+    // 移除子元素
+    remove(obj: AbstractDisplayObject<any>, destory: boolean): boolean;
+    // 销毁自己
+    destroy(): void;
+}
+```
+然后来看 Container 是如何实现的
+``` javascript 
+import {LayaContainer} from '../../abstract/LayaInterface';
+import {AbstractDisplayObject} from '../../abstract/AbstractDisplay';
+import display from '../../decorators/Display';
+import Graphics from './Graphics';
+import setUp from '../chain/SetUp';
+import userInterface from '../chain/UserInterface';
+
+@display({
+    require: [],
+    optional: ['name'],
+    name: 'Container'
+})
+export default class Container extends AbstractDisplayObject<Phaser.Group> implements LayaContainer {
+    /** 定义于 AbstractDisplayObject 中的抽象方法，必须提供此方法的实现，laya 在解析完 xml 模板后， 就是
+        调用这个方法来构建真实的游戏引擎对象。
+        this.realObject 也是在 AbstractDisplayObject 中定义， 引用了真实的游戏引擎对象
+        需要注意的是，参数中的 game 是 LayaGame(Phaser.Game的抽象)。
+        require 是调用 Phaser.Container 构造函数必须提供的属性值， 也就是 <container> 标签必须存在的属性值。
+                如果没有，就会报警告。 有哪些属性在 上面的 @display 注解中指明。
+        optional 是调用 Phaser.Container 构造函数时，可选的参数，同样也是在 @display 中指明。
+                这里有一点需要注意， 如果在 @display 注解中指明了某个属性， 比如 name, 那么在调用构造函数时才会
+                传入这个参数和对应的值。 而如果没有在 @display 注解中指明，也就是 optional 为空数组。 那么
+                <container name="container1"></container> 这里的name不是在构造时传入的， 而是构造函数调用后，
+                再给对象的 name 存取器属性赋值。 大多数时候无论哪种方式都能正常工作， 但还是建议根据引擎对象的构造函数
+                明确指明。
+    */
+    buildRealObject(game, require, optional) {
+        this.realObject = new Phaser.Group(game.realGame, null, optional.name);
+    }
+
+    add(obj: AbstractDisplayObject<any>): void {
+        this.realObject.add(obj.getRealObject());
+    }
+
+    remove(child, destroy): boolean {
+        return this.realObject.remove(child, destroy);
+    }
+
+    set Mask(value: Graphics) {
+        this.realObject.mask = value.getRealObject();
+    }
+
+    set inputEnable(value: boolean) {
+        this.realObject.ignoreChildInput = !value;
+    }
+}
+
+setUp(Container.prototype, userInterface);
+```
 ## 标签
+
+### &lt;container>
+
+container 对应 Phaser.Group 类， 每个组件必须以 &lt;container> 作为唯一根元素，可以嵌套 &lt;container> 标签。
+
+属性表：
+|属性名|说明|
+|--|--|
+|name|标识 container，可以在 Phaser.World 中|
